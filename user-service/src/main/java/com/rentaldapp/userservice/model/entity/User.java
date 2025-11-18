@@ -34,7 +34,7 @@ public class User {
     @Column(name = "password_hash", nullable = false, length = 255)
     private String passwordHash;
 
-    @Column(name = "wallet_adresse", unique = true, length = 255)
+    @Column(name = "wallet_adresse", nullable = false, unique = true, length = 255)
     private String walletAdresse;
 
     @Column(name = "photo_url", length = 255)
@@ -63,7 +63,7 @@ public class User {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // ✅ NOUVEAU : Relation OneToMany vers UserLanguage
+    //  Relation OneToMany vers UserLanguage
     @OneToMany(mappedBy = "userId", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<UserLanguage> userLanguages = new ArrayList<>();
 }

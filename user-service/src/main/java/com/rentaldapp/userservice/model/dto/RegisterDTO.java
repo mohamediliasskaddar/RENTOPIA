@@ -23,9 +23,11 @@ public class RegisterDTO {
     @NotBlank(message = "Le mot de passe est obligatoire")
     @Size(min = 8, max = 100, message = "Le mot de passe doit contenir au moins 8 caractères")
     private String password;
+    @NotBlank(message = "L'adresse wallet est obligatoire") // NOUVEAU : wallet obligatoire
+    private String walletAdresse;
 
     @Size(max = 20, message = "Le numéro de téléphone ne doit pas dépasser 20 caractères")
     private String tel;
 
-    private String walletAdresse;
+
 }

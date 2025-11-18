@@ -23,65 +23,74 @@ public class AuthService {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private JwtTokenProvider jwtTokenProvider; // ✅ Changé de JwtService à JwtTokenProvider
+    private JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
+    private VerificationService verificationService; // AJOUT
 
     @Transactional
     public JwtResponseDTO register(RegisterDTO registerDTO) {
-        // Vérifier si l'email existe déjà
+        // 1. Vérifier si l'email existe déjà
         if (userRepository.existsByEmail(registerDTO.getEmail())) {
             throw new RuntimeException("L'email existe déjà");
         }
 
-        // Vérifier si le wallet existe déjà (si fourni)
-        if (registerDTO.getWalletAdresse() != null &&
-                !registerDTO.getWalletAdresse().isEmpty() &&
-                userRepository.existsByWalletAdresse(registerDTO.getWalletAdresse())) {
+        // 2. Vérifier si le wallet existe déjà
+        if (userRepository.existsByWalletAdresse(registerDTO.getWalletAdresse())) {
             throw new RuntimeException("Cette adresse wallet est déjà utilisée");
         }
 
-        // Créer un nouvel utilisateur
+        // 3. Créer user avec email/password ET wallet
         User user = new User();
         user.setNom(registerDTO.getNom());
         user.setPrenom(registerDTO.getPrenom());
         user.setEmail(registerDTO.getEmail());
         user.setPasswordHash(passwordEncoder.encode(registerDTO.getPassword()));
-        user.setTel(registerDTO.getTel());
         user.setWalletAdresse(registerDTO.getWalletAdresse());
+        user.setTel(registerDTO.getTel());
         user.setEmailVerified(false);
         user.setTelephoneVerified(false);
         user.setIsGuest(true);
         user.setIsHost(false);
 
-        // Sauvegarder l'utilisateur
         User savedUser = userRepository.save(user);
 
-        // Générer le token JWT
-        String token = jwtTokenProvider.generateToken(savedUser.getEmail(), savedUser.getId());
+        // 4. ENVOI AUTOMATIQUE EMAIL DE VÉRIFICATION
+        try {
+            verificationService.sendEmailVerification(savedUser.getEmail());
+        } catch (Exception e) {
+            System.err.println("Erreur envoi email verification: " + e.getMessage());
+        }
 
-        // Créer la réponse
+        // 5. Générer JWT avec wallet comme subject
+        String token = jwtTokenProvider.generateToken(savedUser.getWalletAdresse(), savedUser.getId());
         UserResponseDTO userResponse = convertToDTO(savedUser);
 
         return new JwtResponseDTO(token, userResponse);
     }
 
+    // CORRIGER le nom de la méthode (login → walletLogin)
     @Transactional(readOnly = true)
-    public JwtResponseDTO login(LoginDTO loginDTO) {
-        // Trouver l'utilisateur par email
-        User user = userRepository.findByEmail(loginDTO.getEmail())
-                .orElseThrow(() -> new InvalidCredentialsException("Email ou mot de passe incorrect"));
-
-        // Vérifier le mot de passe
-        if (!passwordEncoder.matches(loginDTO.getPassword(), user.getPasswordHash())) {
-            throw new InvalidCredentialsException("Email ou mot de passe incorrect");
+    public JwtResponseDTO login(LoginDTO loginDTO) { // CHANGER walletLogin → login
+        // 1. Vérifier la signature
+        if (!verifySignature(loginDTO.getWalletAdresse(), loginDTO.getSignature())) {
+            throw new InvalidCredentialsException("Signature invalide");
         }
 
-        // Générer le token JWT
-        String token = jwtTokenProvider.generateToken(user.getEmail(), user.getId());
+        // 2. Trouver user par wallet
+        User user = userRepository.findByWalletAdresse(loginDTO.getWalletAdresse())
+                .orElseThrow(() -> new InvalidCredentialsException("Wallet non enregistré"));
 
-        // Créer la réponse
+        // 3. Générer JWT avec wallet comme subject
+        String token = jwtTokenProvider.generateToken(user.getWalletAdresse(), user.getId());
         UserResponseDTO userResponse = convertToDTO(user);
 
         return new JwtResponseDTO(token, userResponse);
+    }
+
+    private boolean verifySignature(String walletAddress, String signature) {
+        // À IMPLÉMENTER
+        return true; // Temporaire
     }
 
     private UserResponseDTO convertToDTO(User user) {

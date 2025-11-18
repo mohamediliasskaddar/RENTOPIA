@@ -4,13 +4,14 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
+
 @Data
 public class LoginDTO {
+    @NotBlank(message = "L'adresse wallet est obligatoire")
+    private String walletAdresse;
 
-    @NotBlank(message = "L'email est obligatoire")
-    @Email(message = "L'email doit être valide")
-    private String email;
+    @NotBlank(message = "La signature est obligatoire")
+    private String signature;
 
-    @NotBlank(message = "Le mot de passe est obligatoire")
-    private String password;
+
 }

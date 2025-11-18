@@ -6,10 +6,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
-
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import javax.sql.DataSource;
 import java.util.Properties;
-
+@EnableDiscoveryClient
 @SpringBootApplication
 public class UserServiceApplication {
 
