@@ -69,9 +69,9 @@ public class AuthService {
         return new JwtResponseDTO(token, userResponse);
     }
 
-    // CORRIGER le nom de la méthode (login → walletLogin)
+    // CORRIGER le nom de la méthode
     @Transactional(readOnly = true)
-    public JwtResponseDTO login(LoginDTO loginDTO) { // CHANGER walletLogin → login
+    public JwtResponseDTO login(LoginDTO loginDTO) {
         // 1. Vérifier la signature
         if (!verifySignature(loginDTO.getWalletAdresse(), loginDTO.getSignature())) {
             throw new InvalidCredentialsException("Signature invalide");
