@@ -1,0 +1,22 @@
+# Configuration production
+eureka:
+  server:
+    # Activer la self-preservation en production
+    enable-self-preservation: true
+    # Augmenter les intervalles pour production
+    eviction-interval-timer-in-ms: 30000
+    response-cache-update-interval-ms: 30000
+    renewal-percent-threshold: 0.85
+
+logging:
+  level:
+    root: WARN
+    com.netflix.eureka: INFO
+    com.netflix.discovery: INFO
+
+# Sécurité renforcée en production
+spring:
+  security:
+    user:
+      name: ${EUREKA_USERNAME:admin}
+      password: ${EUREKA_PASSWORD:changeme}

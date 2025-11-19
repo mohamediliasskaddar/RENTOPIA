@@ -1,0 +1,14 @@
+# Configuration développement
+eureka:
+  server:
+    # Désactiver la self-preservation en dev
+    enable-self-preservation: false
+    # Réduire les délais pour développement
+    eviction-interval-timer-in-ms: 5000
+    response-cache-update-interval-ms: 3000
+
+logging:
+  level:
+    root: DEBUG
+    com.netflix.eureka: DEBUG
+    com.netflix.discovery: DEBUG
