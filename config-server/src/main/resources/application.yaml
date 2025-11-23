@@ -1,0 +1,63 @@
+# Configuration du serveur
+server:
+  port: 8888
+
+# Configuration Spring
+spring:
+  application:
+    name: config-server
+  
+  # Configuration Cloud Config
+  cloud:
+    config:
+      server:
+        git:
+          # Chemin vers le dépôt Git local
+          uri: file://${user.dir}/config-repo
+          # Cloner au démarrage
+          clone-on-start: true
+          # Branche par défaut
+          default-label: master
+          # Timeout
+          timeout: 5
+          # Forcer le pull à chaque requête (dev uniquement)
+          force-pull: true
+        # Configuration du profil par défaut
+        default-application-name: application
+        # Accepter les profils vides
+        accept-empty: true
+
+  # Configuration de sécurité
+  security:
+    user:
+      name: configuser
+      password: configpass123
+
+# Configuration Eureka Client
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://admin:admin123@localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${random.value}
+    lease-renewal-interval-in-seconds: 30
+
+# Configuration Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,refresh,env,configprops
+  endpoint:
+    health:
+      show-details: always
+
+# Configuration des logs
+logging:
+  level:
+    root: INFO
+    com.rental.configserver: DEBUG
+    org.springframework.cloud.config: DEBUG
