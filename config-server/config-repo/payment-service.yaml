@@ -1,0 +1,36 @@
+# Configuration spécifique au Payment Service
+server:
+  port: 8084
+
+spring:
+  application:
+    name: payment-service
+
+# Configuration Blockchain
+blockchain:
+  network: sepolia
+  chain-id: 11155111
+  infura:
+    project-id: your-infura-project-id
+    project-secret: your-infura-secret
+    url: https://sepolia.infura.io/v3/${blockchain.infura.project-id}
+  contract:
+    rental-platform:
+      address: 0xYourContractAddress
+  platform:
+    wallet-address: 0xPlatformWalletAddress
+    private-key: ${PLATFORM_PRIVATE_KEY:}
+  transaction:
+    gas-price-multiplier: 1.2
+    max-retry: 3
+    confirmation-blocks: 2
+
+# Configuration Web3
+web3:
+  gas-price: 20000000000
+  gas-limit: 6721975
+
+logging:
+  level:
+    com.rental.paymentservice: DEBUG
+    org.web3j: DEBUG

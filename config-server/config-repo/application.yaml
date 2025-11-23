@@ -1,0 +1,54 @@
+# Configuration partagée par TOUS les microservices
+
+# Configuration de la base de données MySQL
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/rental_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: votre_mot_de_passe
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+# Configuration JWT partagée
+jwt:
+  secret: votreSecretKeyTresTresLongueAuMoins256BitsPourEtreSécurisée123456789
+  expiration: 86400000
+  header: Authorization
+  prefix: "Bearer "
+
+# Configuration Eureka partagée
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://admin:admin123@localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 30
+    lease-expiration-duration-in-seconds: 90
+
+# Configuration Actuator partagée
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# Configuration des logs partagée
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+  level:
+    root: INFO

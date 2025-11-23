@@ -1,0 +1,26 @@
+# Configuration spécifique au Booking Service
+server:
+  port: 8083
+
+spring:
+  application:
+    name: booking-service
+
+# Configuration des réservations
+booking:
+  request:
+    expiration-hours: 24
+  cancellation:
+    flexible:
+      refund-percentage: 100
+      deadline-hours: 24
+    moderate:
+      refund-percentage: 50
+      deadline-hours: 120
+    strict:
+      refund-percentage: 0
+      deadline-hours: 168
+
+logging:
+  level:
+    com.rental.bookingservice: DEBUG

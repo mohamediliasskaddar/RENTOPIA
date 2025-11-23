@@ -1,0 +1,41 @@
+# Configuration spécifique au User Service
+server:
+  port: 8081
+
+spring:
+  application:
+    name: user-service
+
+# Configuration de l'email
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: your-email@gmail.com
+    password: your-app-password
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          ssl:
+            trust: smtp.gmail.com
+
+# Configuration de la vérification email
+email:
+  verification:
+    expiration-hours: 24
+    base-url: http://localhost:3000
+
+# Configuration SMS (Twilio)
+twilio:
+  account-sid: your-account-sid
+  auth-token: your-auth-token
+  phone-number: your-twilio-phone-number
+
+logging:
+  level:
+    com.rental.userservice: DEBUG
+    org.springframework.security: DEBUG
