@@ -1,0 +1,40 @@
+# Configuration spécifique au Notification Service
+server:
+  port: 8086
+
+spring:
+  application:
+    name: notification-service
+
+# Configuration RabbitMQ
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    listener:
+      simple:
+        acknowledge-mode: auto
+        retry:
+          enabled: true
+          initial-interval: 1000
+          max-attempts: 3
+
+# Configuration des notifications
+notification:
+  email:
+    from: noreply@rental-platform.com
+    from-name: Rental Platform
+    templates:
+      booking-confirmation: templates/booking-confirmation.html
+      payment-confirmation: templates/payment-confirmation.html
+      booking-reminder: templates/booking-reminder.html
+      review-request: templates/review-request.html
+  sms:
+    enabled: true
+    provider: twilio
+
+logging:
+  level:
+    com.rental.notificationservice: DEBUG

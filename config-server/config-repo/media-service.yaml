@@ -1,0 +1,41 @@
+# Configuration spécifique au Media Service
+server:
+  port: 8088
+
+spring:
+  application:
+    name: media-service
+
+# Configuration AWS S3
+aws:
+  s3:
+    bucket-name: rental-platform-media
+    region: eu-west-3
+    access-key: ${AWS_ACCESS_KEY:}
+    secret-key: ${AWS_SECRET_KEY:}
+    endpoint: s3.${aws.s3.region}.amazonaws.com
+
+# Configuration upload
+media:
+  max-file-size: 10MB
+  max-files-per-property: 20
+  allowed-extensions:
+    - jpg
+    - jpeg
+    - png
+    - gif
+    - webp
+  compression:
+    enabled: true
+    quality: 0.85
+    max-width: 1920
+    max-height: 1080
+  thumbnail:
+    enabled: true
+    width: 400
+    height: 300
+
+logging:
+  level:
+    com.rental.mediaservice: DEBUG
+    com.amazonaws: INFO
