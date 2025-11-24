@@ -33,10 +33,11 @@
 	<!-- ✅ AJOUTER CETTE SECTION -->
 	<dependencyManagement>
 		<dependencies>
+			<!-- https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-dependencies -->
 			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-dependencies</artifactId>
-				<version>${spring-cloud.version}</version>
+				<version>2025.0.0</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
