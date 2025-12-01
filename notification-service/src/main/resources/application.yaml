@@ -1,0 +1,89 @@
+server:
+  port: 8086
+
+spring:
+  application:
+    name: notification-service
+
+  # Configuration MySQL
+  datasource:
+    url: jdbc:mysql://localhost:3306/rental_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: ""
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  # Configuration JPA
+  jpa:
+    hibernate:
+      ddl-auto: none  # La base existe déjà
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+  # Configuration Email (Gmail)
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: fatimaezzahraallai4@gmail.com
+    password: gtee htfd lpwl lswd
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+  # Configuration RabbitMQ
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+  # Config Server
+  config:
+    import: optional:configserver:http://localhost:8888
+  cloud:
+    config:
+      enabled: false  # Désactivé pour ce guide, vous pouvez activer plus tard
+
+# Eureka Client
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${random.value}
+
+# Twilio Configuration (pour SMS)
+twilio:
+  account-sid: ACb40aaed57bd1f5f08d89b1b912559b78
+  auth-token: 09d28f38519895c26ad9e1d5610f9230
+  phone-number: +1 267 314 8246
+
+
+# Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# Logging
+logging:
+  level:
+    com.rental.notification: DEBUG
+    org.springframework.mail: DEBUG
+    org.springframework.amqp: DEBUG
