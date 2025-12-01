@@ -50,8 +50,27 @@ spring:
           lower-case-service-id: true
 
       # Configuration des routes manuelles
+      # Dans la section routes de api-gateway.yaml
       routes:
-        # Route pour User Service
+        # Route pour l'authentification
+        - id: auth-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - StripPrefix=2
+            - name: CircuitBreaker
+
+              args:
+                name: authServiceCircuitBreaker
+                fallbackUri: forward:/fallback/auth-service
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 5  # Limite plus basse pour l'auth
+                redis-rate-limiter.burstCapacity: 10
+                redis-rate-limiter.requestedTokens: 1
+
+        # Route pour User Service (gestion des utilisateurs)
         - id: user-service
           uri: lb://user-service
           predicates:
@@ -61,11 +80,13 @@ spring:
               args:
                 name: userServiceCircuitBreaker
                 fallbackUri: forward:/fallback/user-service
+            - StripPrefix=2
             - name: RequestRateLimiter
               args:
                 redis-rate-limiter.replenishRate: 10
                 redis-rate-limiter.burstCapacity: 20
                 redis-rate-limiter.requestedTokens: 1
+
 
         # Route pour Listing Service
         - id: listing-service
@@ -213,3 +234,8 @@ jwt:
   expiration: 86400000
   header: Authorization
   prefix: "Bearer "
+  logging:
+    level:
+      org.springframework.cloud.gateway: TRACE
+      org.springframework.web: DEBUG
+      reactor.netty: DEBUG
