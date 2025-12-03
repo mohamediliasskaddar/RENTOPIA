@@ -5,95 +5,82 @@ server:
 spring:
   application:
     name: api-gateway
-  # Désactiver Spring Cloud Config
 
-    config:
-      enabled: false
-  # Configuration Cloud Gateway
+  # DÉSACTIVEZ Spring Cloud Config
+  config:
+    import: "optional:configserver:"  # ⬅️ IMPORTANT
   cloud:
-    # Désactiver Spring Cloud Config
-
     config:
-      enabled: false
+      enabled: false  # Désactive la vérification
+
+  # Configuration Cloud Gateway
+
     gateway:
-      redis:
-        host: localhost
-        port: 6379
-        timeout: 2000ms
-        lettuce:
-          pool:
-            max-active: 8
-            max-idle: 8
-            min-idle: 0
       # Configuration CORS globale
       globalcors:
-        corsConfigurations:
+        cors-configurations:
           '[/**]':
-            allowedOrigins:
-              - "http://localhost:3000"
-              - "http://localhost:5173"
-            allowedMethods:
+            allowed-origins: "http://localhost:4200"
+            allowed-methods:
               - GET
               - POST
               - PUT
               - DELETE
               - PATCH
               - OPTIONS
-            allowedHeaders: "*"
-            allowCredentials: true
-            maxAge: 3600
+            allowed-headers: "*"
+            allow-credentials: true
+            max-age: 3600
 
-      # D�couverte automatique des routes via Eureka
+      # Découverte automatique des routes via Eureka
       discovery:
         locator:
           enabled: true
           lower-case-service-id: true
 
-      # Configuration des routes manuelles
-      # Dans la section routes de api-gateway.yaml
+      # Configuration des routes
       routes:
-        # Route pour l'authentification
-        - id: auth-service
-          uri: lb://user-service
-          predicates:
-            - Path=/api/auth/**
-          filters:
-            - StripPrefix=2
-            - name: CircuitBreaker
-
-              args:
-                name: authServiceCircuitBreaker
-                fallbackUri: forward:/fallback/auth-service
-            - name: RequestRateLimiter
-              args:
-                redis-rate-limiter.replenishRate: 5  # Limite plus basse pour l'auth
-                redis-rate-limiter.burstCapacity: 10
-                redis-rate-limiter.requestedTokens: 1
-
-        # Route pour User Service (gestion des utilisateurs)
+        # SEULEMENT cette route - supprimez auth-service
         - id: user-service
           uri: lb://user-service
           predicates:
             - Path=/api/users/**
           filters:
+            - StripPrefix=2  # /api/users/auth/register -> /auth/register
             - name: CircuitBreaker
               args:
                 name: userServiceCircuitBreaker
                 fallbackUri: forward:/fallback/user-service
-            - StripPrefix=2
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 5
+                redis-rate-limiter.burstCapacity: 10
+                redis-rate-limiter.requestedTokens: 1
+
+        # Route pour User Service
+        - id: user-service
+          uri: lb://user-service  # En majuscules comme dans Eureka
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - StripPrefix=2  # Supprime /api/users -> reste /...
+            - name: CircuitBreaker
+              args:
+                name: userServiceCircuitBreaker
+                fallbackUri: forward:/fallback/user-service
             - name: RequestRateLimiter
               args:
                 redis-rate-limiter.replenishRate: 10
                 redis-rate-limiter.burstCapacity: 20
                 redis-rate-limiter.requestedTokens: 1
 
-
         # Route pour Listing Service
         - id: listing-service
-          uri: lb://listing-service
+          uri: lb://LISTING-SERVICE
           predicates:
             - Path=/api/listings/**
           filters:
+            - StripPrefix=2
             - name: CircuitBreaker
               args:
                 name: listingServiceCircuitBreaker
@@ -105,10 +92,11 @@ spring:
 
         # Route pour Booking Service
         - id: booking-service
-          uri: lb://booking-service
+          uri: lb://BOOKING-SERVICE
           predicates:
             - Path=/api/bookings/**
           filters:
+            - StripPrefix=2
             - name: CircuitBreaker
               args:
                 name: bookingServiceCircuitBreaker
@@ -116,10 +104,11 @@ spring:
 
         # Route pour Payment Service
         - id: payment-service
-          uri: lb://payment-service
+          uri: lb://PAYMENT-SERVICE
           predicates:
             - Path=/api/payments/**
           filters:
+            - StripPrefix=2
             - name: CircuitBreaker
               args:
                 name: paymentServiceCircuitBreaker
@@ -127,10 +116,11 @@ spring:
 
         # Route pour Messaging Service
         - id: messaging-service
-          uri: lb://messaging-service
+          uri: lb://MESSAGING-SERVICE
           predicates:
             - Path=/api/messages/**
           filters:
+            - StripPrefix=2
             - name: CircuitBreaker
               args:
                 name: messagingServiceCircuitBreaker
@@ -138,10 +128,11 @@ spring:
 
         # Route pour Notification Service
         - id: notification-service
-          uri: lb://notification-service
+          uri: lb://NOTIFICATION-SERVICE
           predicates:
             - Path=/api/notifications/**
           filters:
+            - StripPrefix=2
             - name: CircuitBreaker
               args:
                 name: notificationServiceCircuitBreaker
@@ -149,10 +140,11 @@ spring:
 
         # Route pour Review Service
         - id: review-service
-          uri: lb://review-service
+          uri: lb://REVIEW-SERVICE
           predicates:
             - Path=/api/reviews/**
           filters:
+            - StripPrefix=2
             - name: CircuitBreaker
               args:
                 name: reviewServiceCircuitBreaker
@@ -160,10 +152,11 @@ spring:
 
         # Route pour Media Service
         - id: media-service
-          uri: lb://media-service
+          uri: lb://MEDIA-SERVICE
           predicates:
             - Path=/api/media/**
           filters:
+            - StripPrefix=2
             - name: CircuitBreaker
               args:
                 name: mediaServiceCircuitBreaker
@@ -171,10 +164,11 @@ spring:
 
         # Route pour Blockchain Service
         - id: blockchain-service
-          uri: lb://blockchain-service
+          uri: lb://BLOCKCHAIN-SERVICE
           predicates:
             - Path=/api/blockchain/**
           filters:
+            - StripPrefix=2
             - name: CircuitBreaker
               args:
                 name: blockchainServiceCircuitBreaker
@@ -184,25 +178,37 @@ spring:
 eureka:
   client:
     enabled: true
-    serviceUrl:
+    service-url:
       defaultZone: http://localhost:8761/eureka/
     register-with-eureka: true
     fetch-registry: true
+    # Configuration pour un refresh rapide
+    registry-fetch-interval-seconds: 5
+    instance-info-replication-interval-seconds: 10
+
   instance:
     prefer-ip-address: true
-    instance-id: ${spring.application.name}:${random.value}
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 10
 
 # Configuration Actuator
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,gateway,routes,metrics
+        include: health,info,gateway,routes,metrics,env
+      cors:
+        allowed-origins: "http://localhost:4200"
+        allowed-methods: GET,POST
+
   endpoint:
     gateway:
       enabled: true
     health:
       show-details: always
+    routes:
+      enabled: true
 
 # Configuration Resilience4J (Circuit Breaker)
 resilience4j:
@@ -222,20 +228,22 @@ resilience4j:
       default:
         timeoutDuration: 5s
 
-# Configuration des logs
+# Configuration des logs (TRACE pour débogage)
 logging:
   level:
     root: INFO
     com.rental.apigateway: DEBUG
-    org.springframework.cloud.gateway: DEBUG
-# Configuration JWT
+    org.springframework.cloud.gateway: TRACE  # TRACE pour voir les routes
+    org.springframework.cloud.netflix.eureka: DEBUG
+    org.springframework.cloud.loadbalancer: DEBUG
+    com.netflix.discovery: DEBUG
+    reactor.netty.http.client: DEBUG
+    org.springframework.web: DEBUG
+
+# Configuration JWT (si utilisé)
 jwt:
   secret: password321
   expiration: 86400000
   header: Authorization
   prefix: "Bearer "
-  logging:
-    level:
-      org.springframework.cloud.gateway: TRACE
-      org.springframework.web: DEBUG
-      reactor.netty: DEBUG
+

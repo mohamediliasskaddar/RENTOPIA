@@ -7,6 +7,9 @@ spring:
   application:
     name: user-service
 
+  # Configuration CORS - SUPPRIMEZ-LA COMPLÈTEMENT !
+  # NE mettez PAS de configuration cors ici
+  # L'API Gateway gère CORS
 
   # Configuration MySQL
   datasource:
@@ -29,6 +32,7 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true
     open-in-view: false
+
 eureka:
   client:
     service-url:
@@ -50,3 +54,10 @@ logging:
     org.hibernate.SQL: DEBUG
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+  logging:
+    level:
+      org.springframework.security: TRACE  # ⬅️ TRACE au lieu de DEBUG
+      org.springframework.web: DEBUG
+      com.rentaldapp.userservice: DEBUG
+      org.hibernate.SQL: DEBUG
+      org.hibernate.type.descriptor.sql.BasicBinder: TRACE

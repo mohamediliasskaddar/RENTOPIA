@@ -12,12 +12,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.Arrays;
-import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -34,40 +28,38 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                // Désactiver CSRF pour les API
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+                // Désactiver CORS - l'API Gateway s'en occupe
+                .cors(AbstractHttpConfigurer::disable)
+
+                // Session sans état
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                // Configuration des autorisations
                 .authorizeHttpRequests(auth -> auth
-                        // Routes publiques - SANS le context-path /api/v1
-                        .requestMatchers("/auth/health").permitAll()
-                        .requestMatchers("/auth/login").permitAll()
-                        .requestMatchers("/auth/register").permitAll()
+                        // IMPORTANT: Les routes doivent être dans le bon ordre
+
+                        // D'abord les routes les plus spécifiques
+                        .requestMatchers("/auth/register", "/auth/login").permitAll()
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/health").permitAll()
-                        .requestMatchers("/languages/**").permitAll() // ✅ AJOUTÉ ICI
-                        .requestMatchers("/actuator/**").permitAll()
+                        .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers("/error").permitAll()
 
+                        // Ensuite les routes plus génériques
+                        .requestMatchers("/api/users/auth/**").permitAll()  // IMPORTANT: ajoutez cette ligne
+
                         // Toutes les autres routes nécessitent une authentification
-                        .anyRequest().authenticated()
+                        // Permettre toutes les requêtes pour le débogage
+                        .anyRequest().permitAll()  // ⬅️ TEMPORAIRE
                 )
+
+                // Ajouter le filtre JWT
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
-    }
-
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setExposedHeaders(List.of("Authorization"));
-        configuration.setAllowCredentials(false);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
     }
 }
