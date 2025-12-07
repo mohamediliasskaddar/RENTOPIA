@@ -13,7 +13,7 @@ spring:
     config:
       enabled: false  # Désactive la vérification
 
-  # Configuration Cloud Gateway
+    # Configuration Cloud Gateway
 
     gateway:
       # Configuration CORS globale
@@ -246,4 +246,3 @@ jwt:
   expiration: 86400000
   header: Authorization
   prefix: "Bearer "
-
