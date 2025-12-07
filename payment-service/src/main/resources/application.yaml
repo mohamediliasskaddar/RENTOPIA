@@ -1,0 +1,77 @@
+spring:
+  application:
+    name: payment-service
+
+  # DÉSACTIVER CONFIG SERVER
+  cloud:
+    config:
+      enabled: false
+      import-check:
+        enabled: false
+  # Configuration MySQL
+  datasource:
+    url: jdbc:mysql://localhost:3306/rental_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+    username: root
+    password:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+  # RabbitMQ
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+# Port du service
+server:
+  port: 8084
+
+# Eureka Client
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${random.value}
+
+# Configuration Blockchain
+blockchain:
+  network: sepolia  # testnet Ethereum
+  infura:
+    project-id: 50e3d616c7ae4bb4bb5d48d97ab6d5a8  # ✅ Mon Infura Project ID
+    endpoint: https://sepolia.infura.io/v3/${blockchain.infura.project-id}
+  contract:
+    address: 0x4c5556c7bb47c8cadb5417af494AaE7792AF14d # ✅ Mon contrat déployé
+  wallet:
+    private-key: 95f943fbd16b6288242988cc02a48e9519fe37a71f989bde1687e7c471ea214f  # ⚠️ Ma clé privée admin
+  gas:
+    price: 20000000000  # 20 Gwei
+    limit: 500000
+
+# Actuator endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# Logs
+logging:
+  level:
+    com.rental.payment: DEBUG
+    org.web3j: INFO
