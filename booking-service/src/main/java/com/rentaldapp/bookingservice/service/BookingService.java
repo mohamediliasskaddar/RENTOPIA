@@ -1,11 +1,13 @@
 package com.rentaldapp.bookingservice.service;
 
+import com.rentaldapp.bookingservice.client.NotificationServiceClient;
+import com.rentaldapp.bookingservice.client.PaymentServiceClient;
+import com.rentaldapp.bookingservice.client.PropertyServiceClient;
+import com.rentaldapp.bookingservice.client.UserServiceClient;
 import com.rentaldapp.bookingservice.exception.InvalidBookingException;
 import com.rentaldapp.bookingservice.exception.PropertyNotAvailableException;
 import com.rentaldapp.bookingservice.exception.ReservationNotFoundException;
-import com.rentaldapp.bookingservice.model.dto.CreateBookingDTO;
-import com.rentaldapp.bookingservice.model.dto.PriceBreakdownDTO;
-import com.rentaldapp.bookingservice.model.dto.ReservationResponseDTO;
+import com.rentaldapp.bookingservice.model.dto.*;
 import com.rentaldapp.bookingservice.model.entity.PropertyVersion;
 import com.rentaldapp.bookingservice.model.entity.Reservation;
 import com.rentaldapp.bookingservice.model.entity.ReservationStatusHistory;
@@ -13,18 +15,22 @@ import com.rentaldapp.bookingservice.model.enums.ReservationStatus;
 import com.rentaldapp.bookingservice.repository.PropertyVersionRepository;
 import com.rentaldapp.bookingservice.repository.ReservationRepository;
 import com.rentaldapp.bookingservice.repository.ReservationStatusHistoryRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 public class BookingService {
+
+    private static final Logger logger = LoggerFactory.getLogger(BookingService.class);
 
     @Autowired
     private ReservationRepository reservationRepository;
@@ -33,24 +39,81 @@ public class BookingService {
     private ReservationStatusHistoryRepository statusHistoryRepository;
 
     @Autowired
+    private PropertyVersionRepository propertyVersionRepository;
+
+    @Autowired
     private PriceCalculationService priceCalculationService;
 
-    // ✅ NOUVEAU : Injection du repository PropertyVersion
+    // ✅ FEIGN CLIENTS
     @Autowired
-    private PropertyVersionRepository propertyVersionRepository;
+    private PropertyServiceClient propertyServiceClient;
+
+    @Autowired
+    private UserServiceClient userServiceClient;
+
+    @Autowired
+    private PaymentServiceClient paymentServiceClient;
+
+    @Autowired
+    private NotificationServiceClient notificationServiceClient;
+
+    // ✅ EVENT PUBLISHER
+    @Autowired
+    private BookingEventPublisher eventPublisher;
 
     @Transactional
     public ReservationResponseDTO createBooking(CreateBookingDTO createBookingDTO, Integer userId) {
-        // Validation des dates
+        logger.info("🔷 Creating booking for user {} - Property {}", userId, createBookingDTO.getPropertyId());
+
+        // ✅ 1. VÉRIFIER QUE L'UTILISATEUR EXISTE
+        try {
+            Map<String, Object> userResponse = userServiceClient.getUserById(userId);
+            if (userResponse == null || userResponse.isEmpty()) {
+                throw new InvalidBookingException("Utilisateur non trouvé");
+            }
+            logger.info("✅ User verified: {} {}",
+                    userResponse.get("prenom"),
+                    userResponse.get("nom"));
+        } catch (Exception e) {
+            logger.error("❌ Failed to verify user", e);
+            throw new InvalidBookingException("Impossible de vérifier l'utilisateur");
+        }
+
+        // ✅ 2. RÉCUPÉRER LES DÉTAILS DE LA PROPRIÉTÉ
+        PropertyDTO property;
+        try {
+            property = propertyServiceClient.getPropertyById(createBookingDTO.getPropertyId());
+            if (property == null) {
+                throw new InvalidBookingException("Propriété non trouvée");
+            }
+            logger.info("✅ Property found: {}", property.getTitle());
+        } catch (Exception e) {
+            logger.error("❌ Failed to fetch property", e);
+            throw new InvalidBookingException("Impossible de récupérer les détails de la propriété");
+        }
+
+        // ✅ 3. VALIDATION DES DATES
         validateDates(createBookingDTO.getCheckInDate(), createBookingDTO.getCheckOutDate());
 
-        // ✅ NOUVEAU : Déterminer la version de la propriété
-        Integer versionId = determinePropertyVersion(
-                createBookingDTO.getPropertyId(),
-                createBookingDTO.getVersionId()
-        );
+        // ✅ 4. VÉRIFIER LA DISPONIBILITÉ VIA PROPERTY SERVICE
+        try {
+            Boolean isAvailable = propertyServiceClient.checkAvailability(
+                    createBookingDTO.getPropertyId(),
+                    createBookingDTO.getCheckInDate(),
+                    createBookingDTO.getCheckOutDate()
+            );
 
-        // Vérifier la disponibilité
+            if (!isAvailable) {
+                throw new PropertyNotAvailableException("La propriété n'est pas disponible pour ces dates");
+            }
+        } catch (PropertyNotAvailableException e) {
+            throw e;
+        } catch (Exception e) {
+            logger.error("❌ Failed to check availability", e);
+            // Fallback: Vérifier localement
+        }
+
+        // ✅ 5. VÉRIFIER LES CHEVAUCHEMENTS LOCAUX
         List<Reservation> overlapping = reservationRepository.findOverlappingReservations(
                 createBookingDTO.getPropertyId(),
                 createBookingDTO.getCheckInDate(),
@@ -58,12 +121,10 @@ public class BookingService {
         );
 
         if (!overlapping.isEmpty()) {
-            throw new PropertyNotAvailableException(
-                    "La propriété n'est pas disponible pour ces dates"
-            );
+            throw new PropertyNotAvailableException("La propriété n'est pas disponible (chevauchement détecté)");
         }
 
-        // Vérifier que l'utilisateur n'a pas déjà une réservation pour la même propriété aux mêmes dates
+        // ✅ 6. VÉRIFIER QUE L'UTILISATEUR N'A PAS DÉJÀ UNE RÉSERVATION
         boolean hasOverlapping = reservationRepository.existsOverlappingReservationForUser(
                 userId,
                 createBookingDTO.getPropertyId(),
@@ -72,39 +133,42 @@ public class BookingService {
         );
 
         if (hasOverlapping) {
-            throw new InvalidBookingException(
-                    "Vous avez déjà une réservation pour cette propriété pendant ces dates"
-            );
+            throw new InvalidBookingException("Vous avez déjà une réservation pour cette propriété pendant ces dates");
         }
 
-        // Calculer le nombre de nuits
+        // ✅ 7. DÉTERMINER LA VERSION DE LA PROPRIÉTÉ
+        Integer versionId = determinePropertyVersion(
+                createBookingDTO.getPropertyId(),
+                createBookingDTO.getVersionId()
+        );
+
+        // ✅ 8. CALCULER LE NOMBRE DE NUITS
         long totalNights = ChronoUnit.DAYS.between(
                 createBookingDTO.getCheckInDate(),
                 createBookingDTO.getCheckOutDate()
         );
 
-        // TODO: Récupérer les prix depuis Property Service via Feign Client
-        // Pour l'instant, utiliser des valeurs par défaut
-        Double pricePerNight = new Double("100.00");
-        Double cleaningFee = new Double("50.00");
-        Double petFee = createBookingDTO.getHasPets() ? new Double("30.00") : 0.0;
+        // ✅ 9. RÉCUPÉRER LES PRIX DEPUIS LA PROPRIÉTÉ
+        Double pricePerNight = property.getWeekendPricePerNight();
+        Double cleaningFee = property.getCleaningFee();
+        Double petFee = createBookingDTO.getHasPets() ? property.getPetFee() : 0.0;
 
-        // Calculer le prix
+        // ✅ 10. CALCULER LE PRIX TOTAL
         PriceBreakdownDTO priceBreakdown = priceCalculationService.calculatePrice(
                 createBookingDTO.getCheckInDate(),
                 createBookingDTO.getCheckOutDate(),
                 pricePerNight,
-                null,  // weeklyPrice
-                null,  // monthlyPrice
+                property.getWeeklyPrice(),
+                property.getMonthlyPrice(),
                 cleaningFee,
                 petFee,
-                null   // discountPercentage
+                null  // discountPercentage (peut être ajouté plus tard)
         );
 
-        // Créer la réservation
+        // ✅ 11. CRÉER LA RÉSERVATION
         Reservation reservation = new Reservation();
         reservation.setPropertyId(createBookingDTO.getPropertyId());
-        reservation.setVersionId(versionId);  // ✅ NOUVEAU : Assigner la version
+        reservation.setVersionId(versionId);
         reservation.setUserId(userId);
         reservation.setCheckInDate(createBookingDTO.getCheckInDate());
         reservation.setCheckOutDate(createBookingDTO.getCheckOutDate());
@@ -122,23 +186,25 @@ public class BookingService {
         reservation.setTotalAmount(priceBreakdown.getTotalAmount());
         reservation.setPlatformFeePercentage(priceBreakdown.getPlatformFeePercentage());
 
-        // Sauvegarder
+        // ✅ 12. SAUVEGARDER
         Reservation savedReservation = reservationRepository.save(reservation);
+        logger.info("✅ Reservation {} created successfully", savedReservation.getId());
 
-        // Enregistrer l'historique du statut
+        // ✅ 13. ENREGISTRER L'HISTORIQUE
         saveStatusHistory(savedReservation.getId(), null, ReservationStatus.PENDING.name(), userId, "Réservation créée");
 
-        return convertToDTO(savedReservation);
+        // ✅ 14. PUBLIER L'ÉVÉNEMENT
+        ReservationResponseDTO responseDTO = convertToDTO(savedReservation);
+        eventPublisher.publishBookingCreated(responseDTO);
+
+        return responseDTO;
     }
 
-    // ✅ NOUVELLE MÉTHODE : Déterminer la version de la propriété
     private Integer determinePropertyVersion(Integer propertyId, Integer requestedVersionId) {
-        // Si une version spécifique est demandée, la valider
         if (requestedVersionId != null) {
             PropertyVersion version = propertyVersionRepository.findById(requestedVersionId)
                     .orElseThrow(() -> new InvalidBookingException("Version de propriété invalide"));
 
-            // Vérifier que la version correspond bien à la propriété
             if (!version.getPropertyId().equals(propertyId)) {
                 throw new InvalidBookingException("La version ne correspond pas à la propriété");
             }
@@ -146,12 +212,9 @@ public class BookingService {
             return requestedVersionId;
         }
 
-        // Sinon, utiliser la dernière version de la propriété
         PropertyVersion latestVersion = propertyVersionRepository
                 .findLatestVersionByPropertyId(propertyId)
-                .orElseThrow(() -> new InvalidBookingException(
-                        "Aucune version trouvée pour cette propriété. La propriété doit avoir au moins une version."
-                ));
+                .orElseThrow(() -> new InvalidBookingException("Aucune version trouvée pour cette propriété"));
 
         return latestVersion.getVersionId();
     }
@@ -193,6 +256,8 @@ public class BookingService {
 
     @Transactional
     public ReservationResponseDTO confirmReservation(Integer reservationId, String blockchainTxHash) {
+        logger.info("🔷 Confirming reservation {} with tx {}", reservationId, blockchainTxHash);
+
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new ReservationNotFoundException("Réservation non trouvée"));
 
@@ -206,15 +271,48 @@ public class BookingService {
 
         Reservation updated = reservationRepository.save(reservation);
 
-        // Historique
+        // ✅ HISTORIQUE
         saveStatusHistory(reservationId, oldStatus.name(), ReservationStatus.CONFIRMED.name(),
                 reservation.getUserId(), "Paiement confirmé");
 
-        return convertToDTO(updated);
+        // ✅ BLOQUER LES DATES DANS PROPERTY SERVICE
+        try {
+            propertyServiceClient.blockDates(
+                    reservation.getPropertyId(),
+                    reservation.getCheckInDate(),
+                    reservation.getCheckOutDate(),
+                    reservationId
+            );
+            logger.info("✅ Dates blocked in Property Service");
+        } catch (Exception e) {
+            logger.error("❌ Failed to block dates", e);
+        }
+
+        // ✅ PUBLIER L'ÉVÉNEMENT
+        ReservationResponseDTO responseDTO = convertToDTO(updated);
+        eventPublisher.publishBookingConfirmed(responseDTO);
+
+        // ✅ ENVOYER NOTIFICATION
+        try {
+            Map<String, Object> user = userServiceClient.getUserById(reservation.getUserId());
+            if (user != null && user.get("email") != null) {
+                notificationServiceClient.sendBookingConfirmation(
+                        reservation.getUserId(),
+                        reservationId,
+                        (String) user.get("email")
+                );
+            }
+        } catch (Exception e) {
+            logger.error("❌ Failed to send notification", e);
+        }
+
+        return responseDTO;
     }
 
     @Transactional
     public ReservationResponseDTO checkIn(Integer reservationId, Integer userId) {
+        logger.info("🔷 Check-in for reservation {}", reservationId);
+
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new ReservationNotFoundException("Réservation non trouvée"));
 
@@ -222,7 +320,6 @@ public class BookingService {
             throw new InvalidBookingException("Seules les réservations confirmées peuvent être check-in");
         }
 
-        // Vérifier que c'est le jour du check-in ou après
         if (LocalDateTime.now().isBefore(reservation.getCheckInDate())) {
             throw new InvalidBookingException("Le check-in ne peut être effectué avant la date prévue");
         }
@@ -232,15 +329,23 @@ public class BookingService {
 
         Reservation updated = reservationRepository.save(reservation);
 
-        // Historique
         saveStatusHistory(reservationId, oldStatus.name(), ReservationStatus.CHECKED_IN.name(),
                 userId, "Check-in effectué");
+
+        // ✅ NOTIFICATION
+        try {
+            notificationServiceClient.sendCheckInCompleted(reservation.getUserId(), reservationId);
+        } catch (Exception e) {
+            logger.error("❌ Failed to send notification", e);
+        }
 
         return convertToDTO(updated);
     }
 
     @Transactional
     public ReservationResponseDTO checkOut(Integer reservationId, Integer userId) {
+        logger.info("🔷 Check-out for reservation {}", reservationId);
+
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new ReservationNotFoundException("Réservation non trouvée"));
 
@@ -248,7 +353,6 @@ public class BookingService {
             throw new InvalidBookingException("Seules les réservations avec check-in peuvent être check-out");
         }
 
-        // Vérifier que c'est le jour du check-out ou après
         if (LocalDateTime.now().isBefore(reservation.getCheckOutDate())) {
             throw new InvalidBookingException("Le check-out ne peut être effectué avant la date prévue");
         }
@@ -258,17 +362,40 @@ public class BookingService {
 
         Reservation updated = reservationRepository.save(reservation);
 
-        // Historique
         saveStatusHistory(reservationId, oldStatus.name(), ReservationStatus.COMPLETED.name(),
                 userId, "Check-out effectué");
 
-        // TODO: Déclencher la libération de l'escrow via Payment Service
+        // ✅ PUBLIER L'ÉVÉNEMENT
+        ReservationResponseDTO responseDTO = convertToDTO(updated);
+        eventPublisher.publishBookingCompleted(responseDTO);
+// ✅ DÉCLENCHER LA LIBÉRATION DE L'ESCROW VIA PAYMENT SERVICE
+        try {
+            PropertyDTO property = propertyServiceClient.getPropertyById(reservation.getPropertyId());
+            Map<String, Object> host = userServiceClient.getUserById(property.getUserId());
 
-        return convertToDTO(updated);
+            if (host != null && host.get("walletAdresse") != null) {
+                paymentServiceClient.releaseEscrow(reservationId, (String) host.get("walletAdresse"));
+                logger.info("✅ Escrow release initiated");
+            }
+        } catch (Exception e) {
+            logger.error("❌ Failed to release escrow", e);
+        }
+
+
+        // ✅ NOTIFICATION
+        try {
+            notificationServiceClient.sendCheckOutCompleted(reservation.getUserId(), reservationId);
+        } catch (Exception e) {
+            logger.error("❌ Failed to send notification", e);
+        }
+
+        return responseDTO;
     }
 
     @Transactional
     public ReservationResponseDTO cancelReservation(Integer reservationId, Integer userId, String reason) {
+        logger.info("🔷 Cancelling reservation {}", reservationId);
+
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new ReservationNotFoundException("Réservation non trouvée"));
 
@@ -283,13 +410,44 @@ public class BookingService {
 
         Reservation updated = reservationRepository.save(reservation);
 
-        // Historique
         saveStatusHistory(reservationId, oldStatus.name(), ReservationStatus.CANCELLED.name(),
                 userId, reason != null ? reason : "Annulation demandée");
 
-        // TODO: Déclencher le remboursement via Payment Service selon la politique d'annulation
+        // ✅ DÉBLOQUER LES DATES
+        try {
+            propertyServiceClient.unblockDates(reservation.getPropertyId(), reservationId);
+            logger.info("✅ Dates unblocked");
+        } catch (Exception e) {
+            logger.error("❌ Failed to unblock dates", e);
+        }
 
-        return convertToDTO(updated);
+        // ✅ PUBLIER L'ÉVÉNEMENT
+        ReservationResponseDTO responseDTO = convertToDTO(updated);
+        eventPublisher.publishBookingCancelled(responseDTO, reason);
+
+        // ✅ INITIER LE REMBOURSEMENT
+        try {
+            paymentServiceClient.initiateRefund(reservationId, reason);
+            logger.info("✅ Refund initiated");
+        } catch (Exception e) {
+            logger.error("❌ Failed to initiate refund", e);
+        }
+
+        // ✅ NOTIFICATION
+        try {
+            Map<String, Object> user = userServiceClient.getUserById(reservation.getUserId());
+            if (user != null && user.get("email") != null) {
+                notificationServiceClient.sendBookingCancellation(
+                        reservation.getUserId(),
+                        reservationId,
+                        (String) user.get("email"),
+                        reason
+                );
+            }
+        } catch (Exception e) {
+            logger.error("❌ Failed to send notification", e);
+        }
+        return responseDTO;
     }
 
     @Transactional
@@ -338,7 +496,7 @@ public class BookingService {
         ReservationResponseDTO dto = new ReservationResponseDTO();
         dto.setId(reservation.getId());
         dto.setPropertyId(reservation.getPropertyId());
-        dto.setVersionId(reservation.getVersionId());  // ✅ NOUVEAU
+        dto.setVersionId(reservation.getVersionId());
         dto.setUserId(reservation.getUserId());
         dto.setCheckInDate(reservation.getCheckInDate());
         dto.setCheckOutDate(reservation.getCheckOutDate());
@@ -351,7 +509,6 @@ public class BookingService {
         dto.setEscrowReleased(reservation.getEscrowReleased());
         dto.setEscrowReleaseTxHash(reservation.getEscrowReleaseTxHash());
 
-        // Prix
         PriceBreakdownDTO priceBreakdown = new PriceBreakdownDTO(
                 reservation.getLockedPricePerNight(),
                 reservation.getBaseAmount(),
