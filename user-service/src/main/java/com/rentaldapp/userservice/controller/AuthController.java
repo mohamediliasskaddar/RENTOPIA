@@ -77,6 +77,11 @@ public class AuthController {
         }
     }
 
+    @GetMapping("/verify-email/confirm")  // AJOUTER CET ENDPOINT
+    public ResponseEntity<?> confirmEmailVerificationGet(@RequestParam String token) {
+        return confirmEmailVerification(token);
+    }
+
     @GetMapping("/health")
     public ResponseEntity<Map<String, String>> health() {
         Map<String, String> response = new HashMap<>();

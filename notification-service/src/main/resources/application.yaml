@@ -41,10 +41,20 @@ spring:
 
   # Configuration RabbitMQ
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
+    listener:
+      type: simple
+      simple:
+        acknowledge-mode: auto
+        concurrency: 1
+        max-concurrency: 1
+        prefetch: 1
+        default-requeue-rejected: false
+
+# OU pour désactiver un consumer spécifique
+  management:
+  health:
+    rabbits:
+      enabled: false
 
   # Config Server
   config:

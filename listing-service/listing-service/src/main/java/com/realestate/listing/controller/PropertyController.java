@@ -21,9 +21,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping("/properties")
@@ -43,6 +44,63 @@ public class PropertyController {
 
     @Autowired
     private PropertyCardMapper propertyCardMapper;
+
+
+    /**
+     * ✅ Vérifier la disponibilité d'une propriété
+     * Endpoint: GET /api/properties/{id}/availability/check
+     */
+    @GetMapping("/{id}/availability/check")
+    public ResponseEntity<Boolean> checkAvailability(
+            @PathVariable Integer id,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime checkIn,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime checkOut
+    ) {
+        boolean isAvailable = availabilityService.checkAvailability(id, checkIn, checkOut);
+        return ResponseEntity.ok(isAvailable);
+    }
+
+    /**
+     * ✅ IMPORTANT : Doit être POST et non GET
+     * Endpoint: POST /api/properties/{id}/availability/block
+     */
+    @PostMapping("/{id}/availability/block")
+    public ResponseEntity<Void> blockDates(
+            @PathVariable Integer id,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate checkIn,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate checkOut,
+            @RequestParam Integer reservationId
+    ) {
+        availabilityService.blockPeriod(id, checkIn, checkOut, String.valueOf(reservationId));
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * ✅ IMPORTANT : Doit être POST et non GET
+     * Endpoint: POST /api/properties/{id}/availability/unblock
+     */
+    @PostMapping("/{id}/availability/unblock")
+    public ResponseEntity<Void> unblockDates(
+            @PathVariable Integer id,
+            @RequestParam Integer reservationId
+    ) {
+        availabilityService.unblockDates(id, reservationId);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * ✅ NOUVEAU : Vérifier si un utilisateur est propriétaire
+     * Endpoint: GET /api/properties/{id}/owner/{userId}
+     */
+    @GetMapping("/{id}/owner/{userId}")
+    public ResponseEntity<Boolean> isOwner(
+            @PathVariable Integer id,
+            @PathVariable Integer userId
+    ) {
+        boolean isOwner = propertyService.isOwner(id, userId);
+        return ResponseEntity.ok(isOwner);
+    }
+
 
     // === CRUD ===
     @GetMapping("/all")

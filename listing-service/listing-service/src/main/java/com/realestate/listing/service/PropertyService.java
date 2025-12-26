@@ -45,7 +45,15 @@ public class PropertyService {
     // === CRUD DE BASE ===
     // ======================
 
+        /**
+         * ✅ NOUVEAU : Vérifier si un utilisateur est propriétaire d'une propriété
+         */
+        public boolean isOwner(Integer propertyId, Integer userId) {
+            Property property = propertyRepository.findById(propertyId)
+                    .orElseThrow(() -> new RuntimeException("Propriété non trouvée"));
 
+            return property.getUserId().equals(userId);
+        }
     public Page<Property> getAllProperties(Pageable pageable) {
         return propertyRepository.findByStatus(Property.PropertyStatus.ACTIVE, pageable);
     }

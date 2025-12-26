@@ -7,7 +7,6 @@ spring:
   main:
     allow-bean-definition-overriding: true
 
-
   # ==================== DATASOURCE ====================
   datasource:
     url: jdbc:mysql://localhost:3306/rental_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
@@ -22,7 +21,7 @@ spring:
   # ==================== JPA ====================
   jpa:
     hibernate:
-      ddl-auto: update  # ✅ CHANGÉ de "create" à "update" pour ne pas recréer la DB à chaque démarrage
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
@@ -44,7 +43,6 @@ spring:
     port: 5672
     username: guest
     password: guest
-    # Configuration des exchanges et queues (déjà définie dans RabbitMQConfig)
 
 # ==================== EUREKA ====================
 eureka:
@@ -77,6 +75,7 @@ jwt:
   expiration: 86400000
 
 # ==================== URLs DES SERVICES ====================
+# ✅ CORRECTION : Chaque service a maintenant sa propre URL
 services:
   user-service:
     url: http://localhost:8081/api/v1
@@ -84,8 +83,7 @@ services:
     url: http://localhost:8082/api/v1
   payment-service:
     url: http://localhost:8084/api/v1
-  notification-service:
-    url: http://localhost:8086/api/v1
+  # ✅ NOTIFICATION-SERVICE N'EST PLUS NÉCESSAIRE EN FEIGN (utilise RabbitMQ)
 
 # ==================== ACTUATOR ====================
 management:

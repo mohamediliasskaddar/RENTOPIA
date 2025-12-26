@@ -23,7 +23,8 @@ public interface PropertyAvailabilityRepository extends JpaRepository<PropertyAv
     // Supprimer une période
     void deleteByProperty_PropertyIdAndDateDebutAndDateFin(
             Integer propertyId, LocalDate dateDebut, LocalDate dateFin);
-
+    // ✅ NOUVELLE MÉTHODE : Trouver par propertyId et because (raison)
+    List<PropertyAvailability> findByProperty_PropertyIdAndBecause(Integer propertyId, String because);
 
 
     @Query("SELECT a FROM PropertyAvailability a " +

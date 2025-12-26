@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import com.rentaldapp.userservice.model.dto.BookingUserInfoDTO;
 
 import java.util.HashMap;
 import java.util.List;
@@ -114,5 +115,58 @@ public class UserController {
         UserLanguageDTO updated = userLanguageService.updateUserLanguageProficiency(
                 id, languageId, proficiencyLevel);
         return ResponseEntity.ok(updated);
+    }
+
+    // ✅ NOUVEAU : Endpoint pour Booking Service
+    @GetMapping("/{id}/booking-info")
+    public ResponseEntity<BookingUserInfoDTO> getUserInfoForBooking(@PathVariable Integer id) {
+        UserResponseDTO user = userService.getUserById(id);
+
+        BookingUserInfoDTO bookingInfo = new BookingUserInfoDTO();
+        bookingInfo.setUserId(user.getId());
+        bookingInfo.setFullName(user.getNom() + " " + user.getPrenom());
+        bookingInfo.setEmail(user.getEmail());
+        bookingInfo.setPhone(user.getTel());
+        bookingInfo.setWalletAddress(user.getWalletAdresse());
+        bookingInfo.setIsHost(user.getIsHost());
+        bookingInfo.setIsGuest(user.getIsGuest());
+
+        return ResponseEntity.ok(bookingInfo);
+    }
+
+    // ✅ NOUVEAU : Endpoint batch pour Booking Service
+    @PostMapping("/batch/booking-info")
+    public ResponseEntity<List<BookingUserInfoDTO>> getUsersInfoForBooking(@RequestBody List<Integer> userIds) {
+        List<BookingUserInfoDTO> result = userService.getUsersBookingInfo(userIds);
+        return ResponseEntity.ok(result);
+    }
+    /**
+     * ✅ NOUVEAU : Récupérer uniquement l'email d'un utilisateur
+     * Endpoint: GET /api/v1/users/{id}/email
+     */
+    @GetMapping("/{id}/email")
+    public ResponseEntity<String> getUserEmail(@PathVariable Integer id) {
+        String email = userService.getUserEmail(id);
+        return ResponseEntity.ok(email);
+    }
+
+    /**
+     * ✅ NOUVEAU : Récupérer l'adresse wallet d'un utilisateur
+     * Endpoint: GET /api/v1/users/{id}/wallet
+     */
+    @GetMapping("/{id}/wallet")
+    public ResponseEntity<String> getUserWallet(@PathVariable Integer id) {
+        String wallet = userService.getUserWallet(id);
+        return ResponseEntity.ok(wallet);
+    }
+
+    /**
+     * ✅ NOUVEAU : Vérifier si un utilisateur existe
+     * Endpoint: GET /api/v1/users/{id}/exists
+     */
+    @GetMapping("/{id}/exists")
+    public ResponseEntity<Boolean> userExists(@PathVariable Integer id) {
+        boolean exists = userService.userExists(id);
+        return ResponseEntity.ok(exists);
     }
 }

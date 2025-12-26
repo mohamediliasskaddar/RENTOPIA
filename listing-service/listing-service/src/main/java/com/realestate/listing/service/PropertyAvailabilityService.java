@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-
+import java.time.LocalDateTime;
 @Service
 @Transactional
 public class PropertyAvailabilityService {
@@ -101,4 +101,57 @@ public class PropertyAvailabilityService {
     public List<PropertyAvailability> getBlockedPeriods(Integer propertyId, LocalDate start, LocalDate end) {
         return repo.findByProperty_PropertyIdAndDateDebutBetween(propertyId, start, end);
     }
+    // ========================================================================
+    // ✅ NOUVELLES MÉTHODES POUR BOOKING-SERVICE (avec LocalDateTime)
+    // ========================================================================
+
+    /**
+     * ✅ NOUVELLE : Vérifier disponibilité avec LocalDateTime
+     * Appelée depuis PropertyController pour Booking Service
+     */
+    public boolean checkAvailability(Integer propertyId, LocalDateTime checkIn, LocalDateTime checkOut) {
+        // Convertir LocalDateTime en LocalDate
+        LocalDate startDate = checkIn.toLocalDate();
+        LocalDate endDate = checkOut.toLocalDate();
+
+        // Vérifier que la propriété existe
+        if (!propertyRepo.existsById(propertyId)) {
+            throw new IllegalArgumentException("Propriété non trouvée");
+        }
+
+        // Utiliser la méthode existante hasConflict
+        return !hasConflict(propertyId, startDate, endDate);
+    }
+
+    /**
+     * ✅ NOUVELLE : Bloquer des dates pour une réservation avec LocalDateTime
+     * Appelée depuis PropertyController pour Booking Service
+     */
+    public void blockDates(Integer propertyId, LocalDateTime checkIn, LocalDateTime checkOut, Integer reservationId) {
+        LocalDate startDate = checkIn.toLocalDate();
+        LocalDate endDate = checkOut.toLocalDate();
+
+        // Utiliser la méthode existante blockPeriod avec un reason spécifique
+        String reason = "Réservation #" + reservationId;
+        blockPeriod(propertyId, startDate, endDate, reason);
+    }
+
+    /**
+     * ✅ NOUVELLE : Débloquer des dates pour une réservation
+     * Appelée depuis PropertyController pour Booking Service
+     */
+    public void unblockDates(Integer propertyId, Integer reservationId) {
+        // Trouver toutes les périodes bloquées pour cette réservation
+        String reason = "Réservation #" + reservationId;
+
+        List<PropertyAvailability> blocks = repo.findByProperty_PropertyIdAndBecause(propertyId, reason);
+
+        if (blocks.isEmpty()) {
+            throw new IllegalArgumentException("Aucune période bloquée trouvée pour cette réservation");
+        }
+
+        // Supprimer tous les blocs liés à cette réservation
+        repo.deleteAll(blocks);
+    }
+
 }

@@ -1,6 +1,5 @@
 package com.rentaldapp.bookingservice.service;
 
-import com.rentaldapp.bookingservice.client.NotificationServiceClient;
 import com.rentaldapp.bookingservice.client.PaymentServiceClient;
 import com.rentaldapp.bookingservice.client.PropertyServiceClient;
 import com.rentaldapp.bookingservice.client.UserServiceClient;
@@ -44,7 +43,7 @@ public class BookingService {
     @Autowired
     private PriceCalculationService priceCalculationService;
 
-    // ✅ FEIGN CLIENTS
+    // Feign Clients
     @Autowired
     private PropertyServiceClient propertyServiceClient;
 
@@ -54,32 +53,31 @@ public class BookingService {
     @Autowired
     private PaymentServiceClient paymentServiceClient;
 
+    // ✅ CHANGEMENT : Utilise RabbitMQ au lieu de Feign pour les notifications
     @Autowired
-    private NotificationServiceClient notificationServiceClient;
+    private NotificationEventPublisher notificationEventPublisher;
 
-    // ✅ EVENT PUBLISHER
+    // Event Publisher pour les événements de booking
     @Autowired
     private BookingEventPublisher eventPublisher;
 
     @Transactional
     public ReservationResponseDTO createBooking(CreateBookingDTO createBookingDTO, Integer userId) {
-        logger.info("🔷 Creating booking for user {} - Property {}", userId, createBookingDTO.getPropertyId());
+        logger.info("📝 Creating booking for user {} - Property {}", userId, createBookingDTO.getPropertyId());
 
-        // ✅ 1. VÉRIFIER QUE L'UTILISATEUR EXISTE
+        // 1. Vérifier que l'utilisateur existe
         try {
             Map<String, Object> userResponse = userServiceClient.getUserById(userId);
             if (userResponse == null || userResponse.isEmpty()) {
                 throw new InvalidBookingException("Utilisateur non trouvé");
             }
-            logger.info("✅ User verified: {} {}",
-                    userResponse.get("prenom"),
-                    userResponse.get("nom"));
+            logger.info("✅ User verified: {} {}", userResponse.get("prenom"), userResponse.get("nom"));
         } catch (Exception e) {
             logger.error("❌ Failed to verify user", e);
             throw new InvalidBookingException("Impossible de vérifier l'utilisateur");
         }
 
-        // ✅ 2. RÉCUPÉRER LES DÉTAILS DE LA PROPRIÉTÉ
+        // 2. Récupérer les détails de la propriété
         PropertyDTO property;
         try {
             property = propertyServiceClient.getPropertyById(createBookingDTO.getPropertyId());
@@ -92,10 +90,10 @@ public class BookingService {
             throw new InvalidBookingException("Impossible de récupérer les détails de la propriété");
         }
 
-        // ✅ 3. VALIDATION DES DATES
+        // 3. Validation des dates
         validateDates(createBookingDTO.getCheckInDate(), createBookingDTO.getCheckOutDate());
 
-        // ✅ 4. VÉRIFIER LA DISPONIBILITÉ VIA PROPERTY SERVICE
+        // 4. Vérifier la disponibilité via Property Service
         try {
             Boolean isAvailable = propertyServiceClient.checkAvailability(
                     createBookingDTO.getPropertyId(),
@@ -110,10 +108,9 @@ public class BookingService {
             throw e;
         } catch (Exception e) {
             logger.error("❌ Failed to check availability", e);
-            // Fallback: Vérifier localement
         }
 
-        // ✅ 5. VÉRIFIER LES CHEVAUCHEMENTS LOCAUX
+        // 5. Vérifier les chevauchements locaux
         List<Reservation> overlapping = reservationRepository.findOverlappingReservations(
                 createBookingDTO.getPropertyId(),
                 createBookingDTO.getCheckInDate(),
@@ -124,7 +121,7 @@ public class BookingService {
             throw new PropertyNotAvailableException("La propriété n'est pas disponible (chevauchement détecté)");
         }
 
-        // ✅ 6. VÉRIFIER QUE L'UTILISATEUR N'A PAS DÉJÀ UNE RÉSERVATION
+        // 6. Vérifier que l'utilisateur n'a pas déjà une réservation
         boolean hasOverlapping = reservationRepository.existsOverlappingReservationForUser(
                 userId,
                 createBookingDTO.getPropertyId(),
@@ -136,24 +133,24 @@ public class BookingService {
             throw new InvalidBookingException("Vous avez déjà une réservation pour cette propriété pendant ces dates");
         }
 
-        // ✅ 7. DÉTERMINER LA VERSION DE LA PROPRIÉTÉ
+        // 7. Déterminer la version de la propriété
         Integer versionId = determinePropertyVersion(
                 createBookingDTO.getPropertyId(),
                 createBookingDTO.getVersionId()
         );
 
-        // ✅ 8. CALCULER LE NOMBRE DE NUITS
+        // 8. Calculer le nombre de nuits
         long totalNights = ChronoUnit.DAYS.between(
                 createBookingDTO.getCheckInDate(),
                 createBookingDTO.getCheckOutDate()
         );
 
-        // ✅ 9. RÉCUPÉRER LES PRIX DEPUIS LA PROPRIÉTÉ
+        // 9. Récupérer les prix depuis la propriété
         Double pricePerNight = property.getWeekendPricePerNight();
         Double cleaningFee = property.getCleaningFee();
         Double petFee = createBookingDTO.getHasPets() ? property.getPetFee() : 0.0;
 
-        // ✅ 10. CALCULER LE PRIX TOTAL
+        // 10. Calculer le prix total
         PriceBreakdownDTO priceBreakdown = priceCalculationService.calculatePrice(
                 createBookingDTO.getCheckInDate(),
                 createBookingDTO.getCheckOutDate(),
@@ -162,10 +159,10 @@ public class BookingService {
                 property.getMonthlyPrice(),
                 cleaningFee,
                 petFee,
-                null  // discountPercentage (peut être ajouté plus tard)
+                null
         );
 
-        // ✅ 11. CRÉER LA RÉSERVATION
+        // 11. Créer la réservation
         Reservation reservation = new Reservation();
         reservation.setPropertyId(createBookingDTO.getPropertyId());
         reservation.setVersionId(versionId);
@@ -186,14 +183,14 @@ public class BookingService {
         reservation.setTotalAmount(priceBreakdown.getTotalAmount());
         reservation.setPlatformFeePercentage(priceBreakdown.getPlatformFeePercentage());
 
-        // ✅ 12. SAUVEGARDER
+        // 12. Sauvegarder
         Reservation savedReservation = reservationRepository.save(reservation);
         logger.info("✅ Reservation {} created successfully", savedReservation.getId());
 
-        // ✅ 13. ENREGISTRER L'HISTORIQUE
+        // 13. Enregistrer l'historique
         saveStatusHistory(savedReservation.getId(), null, ReservationStatus.PENDING.name(), userId, "Réservation créée");
 
-        // ✅ 14. PUBLIER L'ÉVÉNEMENT
+        // 14. Publier l'événement
         ReservationResponseDTO responseDTO = convertToDTO(savedReservation);
         eventPublisher.publishBookingCreated(responseDTO);
 
@@ -256,7 +253,7 @@ public class BookingService {
 
     @Transactional
     public ReservationResponseDTO confirmReservation(Integer reservationId, String blockchainTxHash) {
-        logger.info("🔷 Confirming reservation {} with tx {}", reservationId, blockchainTxHash);
+        logger.info("📝 Confirming reservation {} with tx {}", reservationId, blockchainTxHash);
 
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new ReservationNotFoundException("Réservation non trouvée"));
@@ -271,11 +268,10 @@ public class BookingService {
 
         Reservation updated = reservationRepository.save(reservation);
 
-        // ✅ HISTORIQUE
         saveStatusHistory(reservationId, oldStatus.name(), ReservationStatus.CONFIRMED.name(),
                 reservation.getUserId(), "Paiement confirmé");
 
-        // ✅ BLOQUER LES DATES DANS PROPERTY SERVICE
+        // Bloquer les dates dans Property Service
         try {
             propertyServiceClient.blockDates(
                     reservation.getPropertyId(),
@@ -288,15 +284,14 @@ public class BookingService {
             logger.error("❌ Failed to block dates", e);
         }
 
-        // ✅ PUBLIER L'ÉVÉNEMENT
         ReservationResponseDTO responseDTO = convertToDTO(updated);
         eventPublisher.publishBookingConfirmed(responseDTO);
 
-        // ✅ ENVOYER NOTIFICATION
+        // ✅ CHANGEMENT : Notification ASYNCHRONE via RabbitMQ
         try {
             Map<String, Object> user = userServiceClient.getUserById(reservation.getUserId());
             if (user != null && user.get("email") != null) {
-                notificationServiceClient.sendBookingConfirmation(
+                notificationEventPublisher.sendBookingConfirmation(
                         reservation.getUserId(),
                         reservationId,
                         (String) user.get("email")
@@ -311,7 +306,7 @@ public class BookingService {
 
     @Transactional
     public ReservationResponseDTO checkIn(Integer reservationId, Integer userId) {
-        logger.info("🔷 Check-in for reservation {}", reservationId);
+        logger.info("📝 Check-in for reservation {}", reservationId);
 
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new ReservationNotFoundException("Réservation non trouvée"));
@@ -332,9 +327,9 @@ public class BookingService {
         saveStatusHistory(reservationId, oldStatus.name(), ReservationStatus.CHECKED_IN.name(),
                 userId, "Check-in effectué");
 
-        // ✅ NOTIFICATION
+        // ✅ CHANGEMENT : Notification ASYNCHRONE via RabbitMQ
         try {
-            notificationServiceClient.sendCheckInCompleted(reservation.getUserId(), reservationId);
+            notificationEventPublisher.sendCheckInCompleted(reservation.getUserId(), reservationId);
         } catch (Exception e) {
             logger.error("❌ Failed to send notification", e);
         }
@@ -344,7 +339,7 @@ public class BookingService {
 
     @Transactional
     public ReservationResponseDTO checkOut(Integer reservationId, Integer userId) {
-        logger.info("🔷 Check-out for reservation {}", reservationId);
+        logger.info("📝 Check-out for reservation {}", reservationId);
 
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new ReservationNotFoundException("Réservation non trouvée"));
@@ -365,10 +360,10 @@ public class BookingService {
         saveStatusHistory(reservationId, oldStatus.name(), ReservationStatus.COMPLETED.name(),
                 userId, "Check-out effectué");
 
-        // ✅ PUBLIER L'ÉVÉNEMENT
         ReservationResponseDTO responseDTO = convertToDTO(updated);
         eventPublisher.publishBookingCompleted(responseDTO);
-// ✅ DÉCLENCHER LA LIBÉRATION DE L'ESCROW VIA PAYMENT SERVICE
+
+        // Déclencher la libération de l'escrow via Payment Service
         try {
             PropertyDTO property = propertyServiceClient.getPropertyById(reservation.getPropertyId());
             Map<String, Object> host = userServiceClient.getUserById(property.getUserId());
@@ -381,10 +376,9 @@ public class BookingService {
             logger.error("❌ Failed to release escrow", e);
         }
 
-
-        // ✅ NOTIFICATION
+        // ✅ CHANGEMENT : Notification ASYNCHRONE via RabbitMQ
         try {
-            notificationServiceClient.sendCheckOutCompleted(reservation.getUserId(), reservationId);
+            notificationEventPublisher.sendCheckOutCompleted(reservation.getUserId(), reservationId);
         } catch (Exception e) {
             logger.error("❌ Failed to send notification", e);
         }
@@ -394,7 +388,7 @@ public class BookingService {
 
     @Transactional
     public ReservationResponseDTO cancelReservation(Integer reservationId, Integer userId, String reason) {
-        logger.info("🔷 Cancelling reservation {}", reservationId);
+        logger.info("📝 Cancelling reservation {}", reservationId);
 
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new ReservationNotFoundException("Réservation non trouvée"));
@@ -413,7 +407,7 @@ public class BookingService {
         saveStatusHistory(reservationId, oldStatus.name(), ReservationStatus.CANCELLED.name(),
                 userId, reason != null ? reason : "Annulation demandée");
 
-        // ✅ DÉBLOQUER LES DATES
+        // Débloquer les dates
         try {
             propertyServiceClient.unblockDates(reservation.getPropertyId(), reservationId);
             logger.info("✅ Dates unblocked");
@@ -421,11 +415,10 @@ public class BookingService {
             logger.error("❌ Failed to unblock dates", e);
         }
 
-        // ✅ PUBLIER L'ÉVÉNEMENT
         ReservationResponseDTO responseDTO = convertToDTO(updated);
         eventPublisher.publishBookingCancelled(responseDTO, reason);
 
-        // ✅ INITIER LE REMBOURSEMENT
+        // Initier le remboursement
         try {
             paymentServiceClient.initiateRefund(reservationId, reason);
             logger.info("✅ Refund initiated");
@@ -433,11 +426,11 @@ public class BookingService {
             logger.error("❌ Failed to initiate refund", e);
         }
 
-        // ✅ NOTIFICATION
+        // ✅ CHANGEMENT : Notification ASYNCHRONE via RabbitMQ
         try {
             Map<String, Object> user = userServiceClient.getUserById(reservation.getUserId());
             if (user != null && user.get("email") != null) {
-                notificationServiceClient.sendBookingCancellation(
+                notificationEventPublisher.sendBookingCancellation(
                         reservation.getUserId(),
                         reservationId,
                         (String) user.get("email"),
@@ -447,6 +440,7 @@ public class BookingService {
         } catch (Exception e) {
             logger.error("❌ Failed to send notification", e);
         }
+
         return responseDTO;
     }
 

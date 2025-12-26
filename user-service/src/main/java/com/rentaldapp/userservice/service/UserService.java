@@ -9,6 +9,7 @@ import com.rentaldapp.userservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.rentaldapp.userservice.model.dto.BookingUserInfoDTO;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,6 +54,35 @@ public class UserService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+    /**
+     * ✅ NOUVEAU : Récupérer uniquement l'email
+     */
+    public String getUserEmail(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec l'ID: " + userId));
+        return user.getEmail();
+    }
+
+    /**
+     * ✅ NOUVEAU : Récupérer l'adresse wallet
+     */
+    public String getUserWallet(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec l'ID: " + userId));
+
+        if (user.getWalletAdresse() == null || user.getWalletAdresse().isEmpty()) {
+            throw new RuntimeException("Cet utilisateur n'a pas de wallet configuré");
+        }
+
+        return user.getWalletAdresse();
+    }
+
+    /**
+     * ✅ NOUVEAU : Vérifier si un utilisateur existe
+     */
+    public boolean userExists(Integer userId) {
+        return userRepository.existsById(userId);
+    }
 
     @Transactional
     public UserResponseDTO updateUser(Integer id, UserResponseDTO updateDTO) {
@@ -95,6 +125,32 @@ public class UserService {
         user.setIsHost(!user.getIsHost());
         User updatedUser = userRepository.save(user);
         return convertToDTO(updatedUser);
+    }
+    @Transactional(readOnly = true)
+    public BookingUserInfoDTO getUserBookingInfo(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("Utilisateur non trouvé avec l'ID: " + userId));
+
+        return convertToBookingInfoDTO(user);
+    }
+
+    @Transactional(readOnly = true)
+    public List<BookingUserInfoDTO> getUsersBookingInfo(List<Integer> userIds) {
+        return userRepository.findAllById(userIds).stream()
+                .map(this::convertToBookingInfoDTO)
+                .collect(Collectors.toList());
+    }
+
+    private BookingUserInfoDTO convertToBookingInfoDTO(User user) {
+        BookingUserInfoDTO dto = new BookingUserInfoDTO();
+        dto.setUserId(user.getId());
+        dto.setFullName(user.getNom() + " " + user.getPrenom());
+        dto.setEmail(user.getEmail());
+        dto.setPhone(user.getTel());
+        dto.setWalletAddress(user.getWalletAdresse());
+        dto.setIsHost(user.getIsHost());
+        dto.setIsGuest(user.getIsGuest());
+        return dto;
     }
 
     private UserResponseDTO convertToDTO(User user) {

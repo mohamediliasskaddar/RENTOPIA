@@ -7,6 +7,13 @@ spring:
   application:
     name: user-service
 
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    connection-timeout: 5000
+
   # Configuration CORS - SUPPRIMEZ-LA COMPLÈTEMENT !
   # NE mettez PAS de configuration cors ici
   # L'API Gateway gère CORS
