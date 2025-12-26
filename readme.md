@@ -1,241 +1,270 @@
-## RoadMap
+🧭 Roadmap – Communication entre Microservices
 
-🔗 COMMUNICATION ENTRE MICROSERVICES - VUE D'ENSEMBLE
-## ---------> Done listing service com remainig 
-BOOKING SERVICE (Port 8083) - LE CHEF D'ORCHESTRE
-📤 ENVOIE DES MESSAGES À : 
+Objectif : documenter l’état d’avancement des communications entre microservices
+✅ = fait
+⚠️ = optionnel / plus tard
+❌ = non implémenté
+🟡 = restant à faire
 
-USER SERVICE (8081) ✅
+🔗 Vue d’ensemble
 
-Vérifier si l'utilisateur existe
-Récupérer email pour notifications
-Récupérer wallet pour paiements
+Architecture microservices
 
+Booking Service = chef d’orchestre
 
-PROPERTY SERVICE (8082) ✅
+Communication REST + Events
+
+Messaging Service → sera ajouté plus tard
+
+Review Service → optionnel
+
+🧠 BOOKING SERVICE (Port 8083) – CHEF D’ORCHESTRE
+📝 Commentaire global
+
+Done listing service com – remaining messaging service com
+👉 Les communications critiques sont terminées
+👉 Messaging sera ajouté après
+
+📤 Envoie des messages à :
+👤 USER SERVICE (8081) ✅ DONE
+
+Vérifier si l’utilisateur existe
+
+Récupérer l’email (notifications)
+
+Récupérer le wallet (paiements)
+
+✔️ Communication complète et fonctionnelle
+
+🏠 PROPERTY / LISTING SERVICE (8082) ✅ DONE
 
 Vérifier si la propriété existe
-Récupérer les prix (pricePerNight, cleaningFee, petFee)
+
+Récupérer les prix :
+
+pricePerNight
+
+cleaningFee
+
+petFee
+
 Vérifier la disponibilité
+
 Bloquer les dates (après confirmation)
+
 Débloquer les dates (après annulation)
 
+✔️ Listing service totalement intégré
 
-PAYMENT SERVICE (8084) ✅
+💳 PAYMENT SERVICE (8084) ✅ DONE
 
-Initier le paiement (après création de réservation)
-Libérer l'escrow (après check-out)
-Initier un remboursement (après annulation)
+Initier le paiement
 
+Libérer l’escrow après check-out
 
-NOTIFICATION SERVICE (8086) ✅
+Initier un remboursement après annulation
 
-Envoyer email de confirmation
-Envoyer email d'annulation
-Envoyer rappels de check-in/check-out
+✔️ Paiements + escrow opérationnels
 
+📧 NOTIFICATION SERVICE (8086) ✅ DONE
 
+Email de confirmation
 
-📥 REÇOIT DES MESSAGES DE :
+Email d’annulation
 
-USER SERVICE (8081) ✅
+Rappels check-in / check-out
 
-Réponse : Infos utilisateur (email, wallet, etc.)
+✔️ Notifications prêtes
 
+📥 Reçoit des messages de :
+👤 USER SERVICE (8081) ✅ DONE
 
-PROPERTY SERVICE (8082) ✅
+Infos utilisateur (email, wallet)
 
-Réponse : Infos propriété (prix, disponibilité)
-Réponse : Confirmation de blocage/déblocage de dates
+🏠 PROPERTY SERVICE (8082) ✅ DONE
 
+Infos propriété
 
-PAYMENT SERVICE (8084) ✅
+Disponibilité
 
-Événement : Paiement confirmé (txHash)
-Événement : Escrow libéré
-Événement : Remboursement effectué
+Confirmation blocage / déblocage
 
+💳 PAYMENT SERVICE (8084) ✅ DONE
 
+Paiement confirmé (txHash)
 
-## ----> Done i will add the messaging service com after
-USER SERVICE (Port 8081)
-📤 ENVOIE DES MESSAGES À :
+Escrow libéré
 
-❌ AUCUN (service autonome)
+Remboursement effectué
 
-📥 REÇOIT DES MESSAGES DE :
+👤 USER SERVICE (Port 8081)
+📝 Commentaire
 
-BOOKING SERVICE (8083) ✅
+Service autonome – aucune dépendance sortante
+
+📤 Envoie des messages à :
+
+❌ Aucun
+
+📥 Reçoit des messages de :
+🧠 BOOKING SERVICE (8083) ✅ DONE
 
 Requête : Infos utilisateur
+
 Réponse → Booking Service
 
+💬 MESSAGING SERVICE (8085) ⚠️ OPTIONNEL
 
-MESSAGING SERVICE (8085) ⚠️ (optionnel)
+Requête : Infos utilisateur pour le chat
 
-Requête : Infos pour chat
+🟡 À faire plus tard
 
+🏠 PROPERTY SERVICE (Port 8082) – LISTING SERVICE
+📝 Commentaire
 
+Done ✅
 
+📤 Envoie des messages à :
+⛓ BLOCKCHAIN SERVICE (8089) ⚠️ OPTIONNEL
 
-PROPERTY SERVICE (Port 8082) - LISTING SERVICE
-📤 ENVOIE DES MESSAGES À :
+Enregistrer propriété on-chain
 
-BLOCKCHAIN SERVICE (8089) ⚠️ (optionnel)
+🟡 Peut être ajouté plus tard
 
-Enregistrer la propriété on-chain
+📥 Reçoit des messages de :
+🧠 BOOKING SERVICE (8083) ✅ DONE
 
+Infos propriété
 
+Vérifier disponibilité
 
-📥 REÇOIT DES MESSAGES DE :
+Bloquer dates
 
-BOOKING SERVICE (8083) ✅
+Débloquer dates
 
-Requête : Infos propriété
-Requête : Vérifier disponibilité
-Commande : Bloquer dates
-Commande : Débloquer dates
-Réponse → Booking Service
+💳 PAYMENT SERVICE (Port 8084)
+📝 Commentaire
 
+Done ✅
 
-## ---> Done ✅ 
-
-PAYMENT SERVICE (Port 8084)
-📤 ENVOIE DES MESSAGES À :
-
-BLOCKCHAIN SERVICE (8089) ✅
+📤 Envoie des messages à :
+⛓ BLOCKCHAIN SERVICE (8089) ✅ DONE
 
 Exécuter transaction blockchain
+
 Libérer escrow via smart contract
 
-
-BOOKING SERVICE (8083) ✅
+🧠 BOOKING SERVICE (8083) ✅ DONE
 
 Événement : Paiement confirmé
 
+📧 NOTIFICATION SERVICE (8086) ✅ DONE
 
-NOTIFICATION SERVICE (8086) ✅
+Commande : Envoyer notification paiement
 
-Commande : Envoyer notification de paiement
+📥 Reçoit des messages de :
+🧠 BOOKING SERVICE (8083) ✅ DONE
 
+Initier paiement
 
+Libérer escrow
 
-📥 REÇOIT DES MESSAGES DE :
+Rembourser
 
-BOOKING SERVICE (8083) ✅
+⛓ BLOCKCHAIN SERVICE (8089) ✅ DONE
 
-Commande : Initier paiement
-Commande : Libérer escrow
-Commande : Rembourser
+Transaction confirmée on-chain
 
+💬 MESSAGING SERVICE (Port 8085)
+📝 Commentaire
 
-BLOCKCHAIN SERVICE (8089) ✅
+⚠️ Pas encore implémenté
+👉 Sera ajouté après les communications critiques
 
-Événement : Transaction confirmée on-chain
+📤 Envoie des messages à :
 
+👤 User Service (8081) ⚠️
 
+📥 Reçoit des messages de :
 
+🧠 Booking Service (8083) ⚠️
 
-MESSAGING SERVICE (Port 8085)
-📤 ENVOIE DES MESSAGES À :
+Nouvelle réservation → créer conversation
 
-USER SERVICE (8081) ⚠️
+📧 NOTIFICATION SERVICE (Port 8086)
+📝 Commentaire
 
-Récupérer infos utilisateur pour le chat
+Done ✅ – service terminal
 
+📤 Envoie des messages à :
 
+❌ Aucun
 
-📥 REÇOIT DES MESSAGES DE :
+📥 Reçoit des messages de :
 
-BOOKING SERVICE (8083) ⚠️ (optionnel)
+🧠 Booking Service (8083) ✅
 
-Événement : Nouvelle réservation → Créer conversation
+💳 Payment Service (8084) ✅
 
+⭐ Review Service (8087) ⚠️
 
-## --> Done ✅  Maybe i will add the review com later since it's optionnal 
+⭐ REVIEW SERVICE (Port 8087)
+📝 Commentaire
 
-NOTIFICATION SERVICE (Port 8086)
-📤 ENVOIE DES MESSAGES À :
+⚠️ Optionnel – maybe later
 
-❌ AUCUN (service terminal - envoie juste des emails/SMS)
+📤 Envoie des messages à :
 
-📥 REÇOIT DES MESSAGES DE :
+📧 Notification Service (8086) ⚠️
 
-BOOKING SERVICE (8083) ✅
+📥 Reçoit des messages de :
 
-Commande : Envoyer notification de réservation
-Commande : Envoyer notification d'annulation
+🧠 Booking Service (8083) ⚠️
 
+🖼 MEDIA SERVICE (Port 8088)
+📝 Commentaire
 
-PAYMENT SERVICE (8084) ✅
+⚠️ Optionnel
 
-Commande : Envoyer notification de paiement
+📤 Envoie des messages à :
 
+❌ Aucun
 
-REVIEW SERVICE (8087) ⚠️
+📥 Reçoit des messages de :
 
-Commande : Envoyer demande d'avis
+🏠 Property Service (8082) ⚠️
 
+⛓ BLOCKCHAIN SERVICE (Port 8089)
+📝 Commentaire
 
+Done for payments – property on-chain optional
 
+📤 Envoie des messages à :
 
-REVIEW SERVICE (Port 8087)
-📤 ENVOIE DES MESSAGES À :
+💳 Payment Service (8084) ✅
 
-NOTIFICATION SERVICE (8086) ⚠️
+📥 Reçoit des messages de :
 
-Demander d'envoyer email pour laisser un avis
+💳 Payment Service (8084) ✅
 
+🏠 Property Service (8082) ⚠️
 
+✅ RÉSUMÉ RAPIDE
+Service	Statut
+Booking	✅ Done
+User	✅ Done
+Property	✅ Done
+Payment	✅ Done
+Notification	✅ Done
+Blockchain	✅ Done
+Messaging	⚠️ Later
+Review	⚠️ Optional
+Media	⚠️ Optional
+---
 
-📥 REÇOIT DES MESSAGES DE :
+## 📊 Schéma Global des Communications
 
-BOOKING SERVICE (8083) ⚠️
-
-Événement : Réservation terminée → Permettre l'avis
-
-
-
-
-MEDIA SERVICE (Port 8088)
-📤 ENVOIE DES MESSAGES À :
-
-❌ AUCUN (service autonome - upload/compression de photos)
-
-📥 REÇOIT DES MESSAGES DE :
-
-PROPERTY SERVICE (8082) ⚠️ (optionnel)
-
-Requête : Stocker photos de propriété
-
-
-
-
-BLOCKCHAIN SERVICE (Port 8089)
-📤 ENVOIE DES MESSAGES À :
-
-PAYMENT SERVICE (8084) ✅
-
-Événement : Transaction confirmée on-chain
-
-
-
-📥 REÇOIT DES MESSAGES DE :
-
-PAYMENT SERVICE (8084) ✅
-
-Commande : Exécuter transaction blockchain
-Commande : Libérer escrow
-
-
-PROPERTY SERVICE (8082) ⚠️ (optionnel)
-
-Commande : Enregistrer propriété on-chain
-
-
-
-
-📊 RÉSUMÉ VISUEL DES COMMUNICATIONS
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                    BOOKING SERVICE (8083)                    │
 │                   ★ CHEF D'ORCHESTRE ★                      │
@@ -245,53 +274,52 @@ Commande : Enregistrer propriété on-chain
         │ │ │                    ▼
         │ │ │         ┌──────────────────────┐
         │ │ │         │ NOTIFICATION (8086)  │
-        │ │ │         │ - Emails             │
-        │ │ │         │ - SMS                │
+        │ │ │         │ - Emails / SMS       │
         │ │ │         └──────────────────────┘
         │ │ │
         │ │ └─────────────────┐
         │ │                   ▼
         │ │         ┌──────────────────────┐
         │ │         │   PAYMENT (8084)     │◄────┐
-        │ │         │ - Paiements          │     │
-        │ │         │ - Escrow             │     │
         │ │         └──────────────────────┘     │
         │ │                   │                  │
-        │ │                   └──────────────────┘
-        │ │                   ▼                  
-        │ │         ┌──────────────────────┐     
-        │ │         │  BLOCKCHAIN (8089)   │     
-        │ │         │ - Smart Contracts    │     
-        │ │         └──────────────────────┘     
+        │ │                   ▼                  │
+        │ │         ┌──────────────────────┐     │
+        │ │         │  BLOCKCHAIN (8089)   │─────┘
+        │ │         └──────────────────────┘
         │ │
         │ └──────────────┐
         │                ▼
         │      ┌──────────────────────┐
         │      │   PROPERTY (8082)    │
-        │      │ - Propriétés         │
-        │      │ - Disponibilités     │
         │      └──────────────────────┘
         │
         └─────────────┐
                       ▼
             ┌──────────────────────┐
             │    USER (8081)       │
-            │ - Utilisateurs       │
-            │ - Wallets            │
             └──────────────────────┘
+```
 
-✅ COMMUNICATIONS CRITIQUES (OBLIGATOIRES)
+---
 
-Booking ↔ User : Récupérer infos utilisateur
-Booking ↔ Property : Vérifier dispo + bloquer dates
-Booking → Payment : Initier paiements
-Payment ↔ Blockchain : Exécuter transactions on-chain
-Booking → Notification : Envoyer emails
+## ✅ Communications Critiques (Obligatoires)
+
+* Booking ↔ User
+* Booking ↔ Property
+* Booking → Payment
+* Payment ↔ Blockchain
+* Booking → Notification
+
+---
+
+## ⚠️ Communications Optionnelles
+
+* Booking → Messaging
+* Booking → Review
+* Property → Media
+* Property → Blockchain
+
+---
 
 
-⚠️ COMMUNICATIONS OPTIONNELLES
-
-Booking → Messaging : Créer conversation après réservation
-Booking → Review : Activer les avis après check-out
-Property → Media : Stocker les photos
-Property → Blockchain : Enregistrer propriété on-chain (si souhaité)
