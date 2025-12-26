@@ -1,6 +1,9 @@
+## RoadMap
+
 🔗 COMMUNICATION ENTRE MICROSERVICES - VUE D'ENSEMBLE
+## ---------> Done listing service com remainig 
 BOOKING SERVICE (Port 8083) - LE CHEF D'ORCHESTRE
-📤 ENVOIE DES MESSAGES À :
+📤 ENVOIE DES MESSAGES À : 
 
 USER SERVICE (8081) ✅
 
@@ -54,7 +57,7 @@ PAYMENT SERVICE (8084) ✅
 
 
 
-
+## ----> Done i will add the messaging service com after
 USER SERVICE (Port 8081)
 📤 ENVOIE DES MESSAGES À :
 
@@ -95,7 +98,7 @@ Commande : Débloquer dates
 Réponse → Booking Service
 
 
-
+## ---> Done ✅ 
 
 PAYMENT SERVICE (Port 8084)
 📤 ENVOIE DES MESSAGES À :
@@ -149,7 +152,7 @@ BOOKING SERVICE (8083) ⚠️ (optionnel)
 Événement : Nouvelle réservation → Créer conversation
 
 
-
+## --> Done ✅  Maybe i will add the review com later since it's optionnal 
 
 NOTIFICATION SERVICE (Port 8086)
 📤 ENVOIE DES MESSAGES À :
