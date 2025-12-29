@@ -135,3 +135,113 @@ GET http://localhost:8084/api/payments/reservation/1
 
 ---
 
+
+
+
+
+1. Communication avec le Service Blockchain
+   Problème initial : Les appels Feign au service blockchain utilisaient des ResponseEntity dans les interfaces, ce qui causait des incompatibilités.
+
+Solution : Simplification des interfaces Feign pour retourner directement les DTO (Map<String, Object>) au lieu de ResponseEntity.
+
+Impact : Communication plus fiable et code plus propre.
+
+2. Gestion des Paiements Signés (Web3/MetaMask)
+   Nouvelle fonctionnalité : Implémentation d'un endpoint /confirm-payment pour recevoir et traiter les transactions signées par MetaMask.
+
+Processus :
+
+Réception du hash de transaction signé
+
+Enregistrement en base de données
+
+Récupération de l'adresse du propriétaire via booking-service
+
+Mise à jour du statut de la réservation
+
+Envoi de notification
+
+Publication d'événement RabbitMQ
+
+3. Libération d'Escrow Corrigée
+   Problème initial : Appel à une méthode release-funds qui n'existait pas dans le contrat.
+
+Solution : Utilisation de la méthode checkout() du contrat intelligent pour libérer les fonds.
+
+Sécurité : Utilisation de la clé privée admin configurée dans application.yml au lieu d'une valeur hardcodée.
+
+4. Health Check Amélioré
+   Fonctionnalité : Endpoint /health complet vérifiant toutes les dépendances :
+
+Base de données
+
+Service blockchain
+
+RabbitMQ
+
+Booking service
+
+Retour détaillé : Statut individuel de chaque service avec informations diagnostiques.
+
+5. Gestion des Erreurs et Résilience
+   Fallback Patterns : Implémentation de clients Feign avec fallback pour tous les services externes.
+
+Retry Automatique : Configuration de retry avec backoff exponentiel.
+
+Circuit Breaker : Configuration Resilience4j pour éviter les cascades d'échecs.
+
+🔗 Points d'Intégration Clés
+Avec le Service Blockchain
+Création de réservation : POST /api/blockchain/bookings/create
+
+Check-in/Check-out : Endpoints pour mettre à jour l'état des réservations
+
+Libération de fonds : Via checkout() du contrat
+
+Création de wallets : Pour les nouveaux utilisateurs
+
+Avec le Service Booking
+Récupération des détails : Pour obtenir les adresses wallet des parties
+
+Confirmation de paiement : Mise à jour du statut des réservations
+
+Libération d'escrow : Synchronisation avec le système de réservation
+
+Avec le Service Notification
+Notifications de paiement : PAYMENT_RECEIVED, PAYMENT_FAILED
+
+Notifications de réservation : BOOKING_CONFIRMATION, etc.
+
+Récupération d'historique : Pour afficher les notifications liées aux paiements
+
+🚀 Flux de Paiement Typique
+Initiation : L'utilisateur sélectionne une propriété et initie un paiement
+
+Signature : L'utilisateur signe la transaction avec MetaMask
+
+Confirmation : Le frontend envoie le hash signé au endpoint /confirm-payment
+
+Traitement :
+
+Enregistrement en base
+
+Vérification du solde
+
+Mise à jour de la réservation
+
+Notification aux parties
+
+Publication d'événement
+
+Libération : Après le check-out, l'escrow est libéré via checkout()
+
+
+Test #2 : Health Check Inter-Services
+bash
+# Vérification complète des dépendances
+curl "http://localhost:8084/api/payments/health"
+
+
+fichier ajoutee au blockchain :
+dossier dto: SetPropertyOwnerRequest
+et modification au niveau du controller : ce qui concerne recuperation du temps + Enregistrer un propriétaire pour un propertyId

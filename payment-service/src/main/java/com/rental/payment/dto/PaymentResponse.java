@@ -30,4 +30,32 @@ public class PaymentResponse {
                 .explorerUrl("https://sepolia.etherscan.io/tx/" + transaction.getTransactionHash())
                 .build();
     }
+    // Méthodes factory pour les réponses courantes
+    public static PaymentResponse success(BlockchainTransaction transaction) {
+        PaymentResponse response = fromEntity(transaction);
+        response.setMessage("Paiement traité avec succès");
+        return response;
+    }
+
+    public static PaymentResponse pending(BlockchainTransaction transaction) {
+        PaymentResponse response = fromEntity(transaction);
+        response.setMessage("Paiement en attente de confirmation");
+        return response;
+    }
+
+    public static PaymentResponse failed(String message) {
+        return PaymentResponse.builder()
+                .status("FAILED")
+                .message(message)
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
+
+    public static PaymentResponse serviceUnavailable() {
+        return PaymentResponse.builder()
+                .status("SERVICE_UNAVAILABLE")
+                .message("Service temporairement indisponible")
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
 }

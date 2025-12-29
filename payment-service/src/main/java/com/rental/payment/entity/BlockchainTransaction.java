@@ -73,7 +73,6 @@ public class BlockchainTransaction {
         PENDING,
         PROCESSING,
         CONFIRMED,
-        FAILED,
-        REFUNDED
+        FAILED
     }
 }

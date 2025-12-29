@@ -18,7 +18,4 @@ public interface BlockchainTransactionRepository extends JpaRepository<Blockchai
     List<BlockchainTransaction> findByPayerWalletAddress(String walletAddress);
 
     List<BlockchainTransaction> findByPayeeWalletAddress(String walletAddress);
-    Optional<BlockchainTransaction> findByReservationIdAndPaymentType(Integer reservationId, BlockchainTransaction.PaymentType paymentType);
-
-
 }
