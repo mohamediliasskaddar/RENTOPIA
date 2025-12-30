@@ -33,8 +33,13 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<UserResponseDTO> getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-        UserResponseDTO user = userService.getUserByEmail(email);
+
+// ✅ CORRECTION : Le JWT contient la wallet address, pas l'email
+        String walletAddress = authentication.getName();
+
+        System.out.println("🔍 Loading user with wallet: " + walletAddress);
+
+        UserResponseDTO user = userService.getUserByWallet(walletAddress);
         return ResponseEntity.ok(user);
     }
 
@@ -169,4 +174,7 @@ public class UserController {
         boolean exists = userService.userExists(id);
         return ResponseEntity.ok(exists);
     }
+
+
+
 }

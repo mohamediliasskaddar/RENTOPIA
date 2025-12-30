@@ -140,6 +140,12 @@ public class UserService {
                 .map(this::convertToBookingInfoDTO)
                 .collect(Collectors.toList());
     }
+    @Transactional(readOnly = true)
+    public UserResponseDTO getUserByWallet(String walletAddress) {
+        User user = userRepository.findByWalletAdresse(walletAddress)
+                .orElseThrow(() -> new UserNotFoundException("Utilisateur non trouvé avec wallet: " + walletAddress));
+        return convertToDTO(user);
+    }
 
     private BookingUserInfoDTO convertToBookingInfoDTO(User user) {
         BookingUserInfoDTO dto = new BookingUserInfoDTO();
