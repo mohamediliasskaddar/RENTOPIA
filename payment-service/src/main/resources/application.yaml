@@ -56,8 +56,8 @@ spring:
   rabbitmq:
     host: localhost
     port: 5672
-    username: admin
-    password: admin123
+    username: guest
+    password: guest
     connection-timeout: 5000
     listener:
       simple:
@@ -106,16 +106,28 @@ services:
 
 # Configuration Blockchain
 blockchain:
-  network: sepolia  # testnet Ethereum
+  enabled: true  # Peut être désactivé via variable d'environnement
+  network: sepolia
   infura:
-    project-id: 50e3d616c7ae4bb4bb5d48d97ab6d5a8  # ✅ Mon Infura Project ID
+    project-id: 50e3d616c7ae4bb4bb5d48d97ab6d5a8
     endpoint: https://sepolia.infura.io/v3/${blockchain.infura.project-id}
+
+    # CONFIGURATION DES TIMEOUTS (30-60 secondes)
+    connection-timeout: 30000    # 30 secondes pour établir la connexion
+    read-timeout: 60000          # 60 secondes pour lire la réponse
+    request-timeout: 60000       # 60 secondes timeout total
+
+    # Option DNS
+    use-google-dns: true         # Utiliser Google DNS en fallback
+
   contract:
-    address: "0x4c5556c7bb47c8cadb5417af494AaE7792AF14d" # ✅ Mon contrat déployé
+    address: "0x4c5556c7bb47c8cadb5417af494AaE7792AF14d"
+
   wallet:
-    private-key: "95f943fbd16b6288242988cc02a48e9519fe37a71f989bde1687e7c471ea214f"  # ⚠️ Ma clé privée admin
+    private-key: "95f943fbd16b6288242988cc02a48e9519fe37a71f989bde1687e7c471ea214f"
+
   gas:
-    price: "20000000000"  # 20 Gwei
+    price: "20000000000"
     limit: "500000"
 
 # ============ CONFIGURATION RESILIENCE4J (CIRCUIT BREAKER) ============
