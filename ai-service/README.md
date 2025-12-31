@@ -3,21 +3,6 @@
 > Microservice FastAPI avec 4 modèles ML optimisés pour la plateforme de location immobilière
 
 ---
-
-## 📋 Table des Matières
-
-1. [Vue d'ensemble](#-vue-densemble)
-2. [Architecture](#-architecture)
-3. [Modèles ML](#-modèles-ml)
-4. [API Endpoints](#-api-endpoints)
-5. [Installation & Démarrage](#-installation--démarrage)
-6. [Intégration Frontend](#-intégration-frontend-angular)
-7. [Datasets](#-datasets)
-8. [Performance](#-performance)
-9. [Documentation](#-documentation)
-
----
-
 ## 🎯 Vue d'ensemble
 
 Le **AI Service** est un microservice Python/FastAPI qui fournit 4 fonctionnalités d'intelligence artificielle pour optimiser la plateforme de location :
