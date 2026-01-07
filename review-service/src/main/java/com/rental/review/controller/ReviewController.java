@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/reviews")
+@RequestMapping("/reviews")
 @RequiredArgsConstructor
 @Slf4j
 public class ReviewController {
@@ -73,7 +73,7 @@ public class ReviewController {
      * Récupérer tous les avis d'une propriété
      * GET http://localhost:8087/api/reviews/property/{propertyId}
      */
-    @GetMapping("/property/{propertyId}")
+    @GetMapping("/api/property/{propertyId}")
     public ResponseEntity<List<ReviewResponse>> getPropertyReviews(@PathVariable Integer propertyId) {
         log.info("Récupération des avis pour la propriété: {}", propertyId);
         List<ReviewResponse> reviews = reviewService.getPropertyReviews(propertyId);

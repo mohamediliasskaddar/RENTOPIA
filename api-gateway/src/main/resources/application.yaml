@@ -132,12 +132,18 @@ spring:
                 fallbackUri: forward:/fallback/notification-service
 
         # Route pour Review Service
+        - id: review-service-property
+          uri: lb://review-service
+          predicates:
+            - Path=/api/reviews/property/**
+          filters:
+            - StripPrefix=2  # /api/reviews/property/1 -> /property/1 (ne marchera pas)
         - id: review-service
-          uri: lb://REVIEW-SERVICE
+          uri: lb://review-service
           predicates:
             - Path=/api/reviews/**
           filters:
-            - StripPrefix=2
+            - StripPrefix=1
             - name: CircuitBreaker
               args:
                 name: reviewServiceCircuitBreaker

@@ -104,7 +104,7 @@ Vérifiez Eureka : http://localhost:8761
       "name": "6. Get Property Reviews",
       "request": {
         "method": "GET",
-        "url": "http://localhost:8087/api/reviews/property/1"
+        "url": "http://localhost:8080/api/reviews/api/property/1"
       }
     },
     {
