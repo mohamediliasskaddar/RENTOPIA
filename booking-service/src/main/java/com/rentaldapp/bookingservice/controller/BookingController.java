@@ -16,7 +16,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/bookings")
-
 public class BookingController {
 
     @Autowired
@@ -26,7 +25,7 @@ public class BookingController {
     public ResponseEntity<ReservationResponseDTO> createBooking(
             @Valid @RequestBody CreateBookingDTO createBookingDTO,
             Authentication authentication) {
-        Integer userId = (Integer) authentication.getPrincipal();
+        Integer userId = extractUserIdFromAuthentication(authentication);
         ReservationResponseDTO reservation = bookingService.createBooking(createBookingDTO, userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(reservation);
     }
@@ -39,21 +38,21 @@ public class BookingController {
 
     @GetMapping("/user/me")
     public ResponseEntity<List<ReservationResponseDTO>> getMyReservations(Authentication authentication) {
-        Integer userId = (Integer) authentication.getPrincipal();
+        Integer userId = extractUserIdFromAuthentication(authentication);
         List<ReservationResponseDTO> reservations = bookingService.getUserReservations(userId);
         return ResponseEntity.ok(reservations);
     }
 
     @GetMapping("/user/upcoming")
     public ResponseEntity<List<ReservationResponseDTO>> getUpcomingReservations(Authentication authentication) {
-        Integer userId = (Integer) authentication.getPrincipal();
+        Integer userId = extractUserIdFromAuthentication(authentication);
         List<ReservationResponseDTO> reservations = bookingService.getUpcomingReservations(userId);
         return ResponseEntity.ok(reservations);
     }
 
     @GetMapping("/user/past")
     public ResponseEntity<List<ReservationResponseDTO>> getPastReservations(Authentication authentication) {
-        Integer userId = (Integer) authentication.getPrincipal();
+        Integer userId = extractUserIdFromAuthentication(authentication);
         List<ReservationResponseDTO> reservations = bookingService.getPastReservations(userId);
         return ResponseEntity.ok(reservations);
     }
@@ -76,7 +75,7 @@ public class BookingController {
     public ResponseEntity<ReservationResponseDTO> checkIn(
             @PathVariable Integer id,
             Authentication authentication) {
-        Integer userId = (Integer) authentication.getPrincipal();
+        Integer userId = extractUserIdFromAuthentication(authentication);
         ReservationResponseDTO reservation = bookingService.checkIn(id, userId);
         return ResponseEntity.ok(reservation);
     }
@@ -85,7 +84,7 @@ public class BookingController {
     public ResponseEntity<ReservationResponseDTO> checkOut(
             @PathVariable Integer id,
             Authentication authentication) {
-        Integer userId = (Integer) authentication.getPrincipal();
+        Integer userId = extractUserIdFromAuthentication(authentication);
         ReservationResponseDTO reservation = bookingService.checkOut(id, userId);
         return ResponseEntity.ok(reservation);
     }
@@ -95,7 +94,7 @@ public class BookingController {
             @PathVariable Integer id,
             @RequestParam(required = false) String reason,
             Authentication authentication) {
-        Integer userId = (Integer) authentication.getPrincipal();
+        Integer userId = extractUserIdFromAuthentication(authentication);
         ReservationResponseDTO reservation = bookingService.cancelReservation(id, userId, reason);
         return ResponseEntity.ok(reservation);
     }
@@ -114,5 +113,20 @@ public class BookingController {
         response.put("status", "UP");
         response.put("service", "booking-service");
         return ResponseEntity.ok(response);
+    }
+
+    // Méthode utilitaire pour extraire le userId de l'authentification
+    private Integer extractUserIdFromAuthentication(Authentication authentication) {
+        if (authentication == null || authentication.getPrincipal() == null) {
+            throw new SecurityException("User not authenticated");
+        }
+
+        // Le principal est le userId en String (voir JwtAuthenticationFilter)
+        String userIdStr = authentication.getName();
+        try {
+            return Integer.parseInt(userIdStr);
+        } catch (NumberFormatException e) {
+            throw new SecurityException("Invalid user ID in authentication");
+        }
     }
 }

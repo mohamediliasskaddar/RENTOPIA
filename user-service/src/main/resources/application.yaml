@@ -49,9 +49,8 @@ eureka:
 
 # Configuration JWT
 jwt:
-  secret: votre-secret-jwt-super-securise-changez-ca-en-production-minimum-256-bits
+  secret: "votreSuperSecretTresLongPourJWT256bitsMinimum1234567890!"  # Au moins 32 caractères
   expiration: 86400000  # 24 heures en millisecondes
-
 # Logging
 logging:
   level:

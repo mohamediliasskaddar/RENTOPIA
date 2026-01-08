@@ -69,11 +69,16 @@ feign:
   circuitbreaker:
     enabled: true
 
-# ==================== JWT ====================
-jwt:
-  secret: password321
-  expiration: 86400000
+# ==================== SECURITY ====================
+  security:
+  # Désactiver la sécurité par défaut pour les tests (optionnel)
+  # filter:
+  #   order: -100  # Place le filtre JWT en premier
 
+  # Configuration JWT
+jwt:
+  secret: "votreSuperSecretTresLongPourJWT256bitsMinimum1234567890!"  # Au moins 32 caractères
+  expiration: 86400000  # 24 heures en millisecondes
 # ==================== URLs DES SERVICES ====================
 # ✅ CORRECTION : Chaque service a maintenant sa propre URL
 services:

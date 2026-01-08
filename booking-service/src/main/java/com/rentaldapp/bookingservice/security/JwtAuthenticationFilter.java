@@ -14,6 +14,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -45,17 +46,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     logger.info("Email from token: " + email);
                     logger.info("User ID from token: " + userId);
 
+                    // Utiliser userId comme principal (converti en String pour compatibilité)
                     UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(userId, null, new ArrayList<>());
+                            new UsernamePasswordAuthenticationToken(userId.toString(), null, new ArrayList<>());
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                     SecurityContextHolder.getContext().setAuthentication(authentication);
-                    logger.info("Authentication set in SecurityContext");
+                    logger.info("Authentication set in SecurityContext for user ID: " + userId);
                 } else {
                     logger.warn("JWT token is invalid");
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT token");
+                    return;
                 }
             } else {
                 logger.warn("No JWT token found in request");
+                // Ne pas bloquer la requête ici, laisse Spring Security gérer l'authentification requise
             }
         } catch (Exception ex) {
             logger.error("Could not set user authentication in security context", ex);
@@ -73,7 +78,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private String getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-        logger.info("Authorization header: " + bearerToken);
+        logger.info("Authorization header: " + (bearerToken != null ? bearerToken.substring(0, Math.min(20, bearerToken.length())) + "..." : "null"));
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }

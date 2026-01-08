@@ -1,6 +1,5 @@
-package com.rentaldapp.bookingservice.config;
+package com.rentaldapp.bookingservice.security;
 
-import com.rentaldapp.bookingservice.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,8 +7,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -21,40 +18,33 @@ public class SecurityConfig {
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
         http
-                // Désactiver CSRF (API REST)
+                // Désactiver CSRF pour les API
                 .csrf(AbstractHttpConfigurer::disable)
 
-                // Désactiver CORS (géré par l’API Gateway)
+                // Désactiver CORS - l'API Gateway s'en occupe
                 .cors(AbstractHttpConfigurer::disable)
 
-                // API stateless (JWT)
+                // Session sans état
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                // Autorisations
+                // Configuration des autorisations
                 .authorizeHttpRequests(auth -> auth
-
                         // Routes publiques
                         .requestMatchers("/bookings/health").permitAll()
-                        .requestMatchers("/actuator/health").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/error").permitAll()
 
-                        // Toutes les autres routes /bookings nécessitent un JWT
+                        // Toutes les routes /bookings/** nécessitent une authentification
                         .requestMatchers("/bookings/**").authenticated()
 
-                        // Sécurité par défaut
-                        .anyRequest().authenticated()
+                        // Toutes les autres routes
+                        .anyRequest().permitAll()
                 )
 
-                // Filtre JWT
+                // Ajouter le filtre JWT
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
