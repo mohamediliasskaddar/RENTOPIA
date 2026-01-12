@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/price-history")
-@CrossOrigin(origins = "*")
+
 public class PriceHistoryController {
 
     @Autowired

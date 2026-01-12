@@ -4,12 +4,15 @@ package com.realestate.listing.controller;
 import com.realestate.listing.dto.PropertyCardDTO;
 import com.realestate.listing.dto.PropertyDetailDTO;
 import com.realestate.listing.dto.PropertySearchResultDTO;
+import com.realestate.listing.entity.Amenity;
 import com.realestate.listing.entity.Discount;
 import com.realestate.listing.entity.PriceHistory;
 import com.realestate.listing.entity.Property;
 import com.realestate.listing.entity.Property.PropertyStatus;
 import com.realestate.listing.mapper.PropertyCardMapper;
 import com.realestate.listing.mapper.PropertyDetailMapper;
+import com.realestate.listing.repository.DiscountRepository;
+import com.realestate.listing.service.AmenityService;
 import com.realestate.listing.service.PriceHistoryService;
 import com.realestate.listing.service.PropertyAvailabilityService;
 import com.realestate.listing.service.PropertyService;
@@ -24,6 +27,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -45,6 +49,13 @@ public class PropertyController {
     @Autowired
     private PropertyCardMapper propertyCardMapper;
 
+    @Autowired
+    private AmenityService amenityService;
+
+
+    @Autowired
+    private DiscountRepository discountRepository;
+
 
     /**
      * ✅ Vérifier la disponibilité d'une propriété
@@ -60,33 +71,6 @@ public class PropertyController {
         return ResponseEntity.ok(isAvailable);
     }
 
-    /**
-     * ✅ IMPORTANT : Doit être POST et non GET
-     * Endpoint: POST /api/properties/{id}/availability/block
-     */
-    @PostMapping("/{id}/availability/block")
-    public ResponseEntity<Void> blockDates(
-            @PathVariable Integer id,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate checkIn,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDate checkOut,
-            @RequestParam Integer reservationId
-    ) {
-        availabilityService.blockPeriod(id, checkIn, checkOut, String.valueOf(reservationId));
-        return ResponseEntity.ok().build();
-    }
-
-    /**
-     * ✅ IMPORTANT : Doit être POST et non GET
-     * Endpoint: POST /api/properties/{id}/availability/unblock
-     */
-    @PostMapping("/{id}/availability/unblock")
-    public ResponseEntity<Void> unblockDates(
-            @PathVariable Integer id,
-            @RequestParam Integer reservationId
-    ) {
-        availabilityService.unblockDates(id, reservationId);
-        return ResponseEntity.ok().build();
-    }
 
     /**
      * ✅ NOUVEAU : Vérifier si un utilisateur est propriétaire
@@ -116,7 +100,7 @@ public class PropertyController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
+    @PostMapping("/new")
     public ResponseEntity<Property> create(@RequestBody Property property) {
         try {
             return ResponseEntity.ok(propertyService.createProperty(property));
@@ -137,8 +121,10 @@ public class PropertyController {
     }
 
     @GetMapping("/my")
-    public List<Property> getMyProperties(@RequestParam Integer userId) {
-        return propertyService.getAllByUserId(userId);
+    public List<PropertyCardDTO> getMyProperties(@RequestParam Integer userId) {
+        return propertyService.getAllByUserId(userId).stream()
+                .map(propertyCardMapper::toCardDTO)
+                .toList();
     }
 
     @GetMapping("/my/status")
@@ -152,7 +138,7 @@ public class PropertyController {
      * ========================================
      * NOUVEAU ENDPOINT : FILTRAGE SIMPLE (SANS DATES)
      * GET /properties/filter
-     *
+     * <p>
      * Utilisé quand on filtre directement depuis /listings
      * SANS recherche préalable (pas de dates)
      * ========================================
@@ -196,7 +182,7 @@ public class PropertyController {
      * ========================================
      * ENDPOINT EXISTANT : RECHERCHE AVEC DATES
      * GET /properties/search/tenant
-     *
+     * <p>
      * Utilisé quand on recherche depuis la search bar
      * AVEC dates (checkIn/checkOut REQUIRED)
      * ========================================
@@ -305,5 +291,103 @@ public class PropertyController {
                     return ResponseEntity.ok(dto);
                 })
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
+     * PATCH - Mise à jour partielle d'une property
+     * Ne modifie que les champs envoyés, garde les autres intacts
+     */
+    @PatchMapping("/{id}")
+    public ResponseEntity<Property> partialUpdate(
+            @PathVariable Integer id,
+            @RequestBody Map<String, Object> updates
+    ) {
+        return ResponseEntity.ok(propertyService.partialUpdateProperty(id, updates));
+
+    }
+
+
+    @PostMapping("/{propertyId}/amenities/{amenityId}")
+    public ResponseEntity<Property> addAmenityToProperty(
+            @PathVariable Integer propertyId,
+            @PathVariable Integer amenityId
+    ) {
+        Property updated = propertyService.addAmenityToProperty(propertyId, amenityId);
+        return ResponseEntity.ok(updated);
+    }
+
+    /**
+     * Supprimer une amenity d'une property
+     */
+    @DeleteMapping("/{propertyId}/amenities/{amenityId}")
+    public ResponseEntity<Property> removeAmenityFromProperty(
+            @PathVariable Integer propertyId,
+            @PathVariable Integer amenityId
+    ) {
+        Property updated = propertyService.removeAmenityFromProperty(propertyId, amenityId);
+        return ResponseEntity.ok(updated);
+    }
+
+
+    /**
+     * Ajouter un discount à une property
+     */
+    @PostMapping("/{propertyId}/discounts")
+    public ResponseEntity<Property> addDiscountToProperty(
+            @PathVariable Integer propertyId,
+            @RequestBody Discount discount
+    ) {
+        Property updated = propertyService.addDiscountToProperty(propertyId, discount);
+        return ResponseEntity.ok(updated);
+    }
+
+    /**
+     * Supprimer un discount d'une property
+     */
+    @DeleteMapping("/{propertyId}/discounts/{discountId}")
+    public ResponseEntity<Property> removeDiscountFromProperty(
+            @PathVariable Integer propertyId,
+            @PathVariable Integer discountId
+    ) {
+        Property updated = propertyService.removeDiscountFromProperty(propertyId, discountId);
+        return ResponseEntity.ok(updated);
+    }
+
+    /**
+     * Modifier un discount
+     */
+    @PutMapping("/{propertyId}/discounts/{discountId}")
+    public ResponseEntity<Discount> updateDiscount(
+            @PathVariable Integer propertyId,
+            @PathVariable Integer discountId,
+            @RequestBody Discount discountData
+    ) {
+        Discount updated = propertyService.updateDiscount(discountId, discountData);
+        return ResponseEntity.ok(updated);
+    }
+
+    /**
+     * Définir une photo comme couverture
+     */
+    @PutMapping("/{propertyId}/photos/{photoId}/cover")
+    public ResponseEntity<Void> setPhotoCover(
+            @PathVariable Integer propertyId,
+            @PathVariable Integer photoId
+    ) {
+        propertyService.setPhotoCover(propertyId, photoId);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Réorganiser les photos
+     */
+    @PutMapping("/{propertyId}/photos/reorder")
+    public ResponseEntity<Void> reorderPhotos(
+            @PathVariable Integer propertyId,
+            @RequestBody Map<String, List<Integer>> request
+    ) {
+        List<Integer> photoIds = request.get("photoIds");
+        propertyService.reorderPhotos(propertyId, photoIds);
+        return ResponseEntity.ok().build();
     }
 }

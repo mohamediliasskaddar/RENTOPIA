@@ -2,6 +2,7 @@ package com.rentaldapp.bookingservice.controller;
 
 import com.rentaldapp.bookingservice.model.dto.CreateBookingDTO;
 import com.rentaldapp.bookingservice.model.dto.ReservationResponseDTO;
+import com.rentaldapp.bookingservice.model.enums.ReservationStatus;
 import com.rentaldapp.bookingservice.service.BookingService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ public class BookingController {
     @Autowired
     private BookingService bookingService;
 
-    @PostMapping
+    @PostMapping("/new")
     public ResponseEntity<ReservationResponseDTO> createBooking(
             @Valid @RequestBody CreateBookingDTO createBookingDTO,
             Authentication authentication) {
@@ -128,5 +129,35 @@ public class BookingController {
         } catch (NumberFormatException e) {
             throw new SecurityException("Invalid user ID in authentication");
         }
+    }
+
+
+
+
+
+
+
+    /**
+     * Récupérer toutes les réservations des propriétés du host connecté
+     * GET /bookings/host/me
+     */
+    @GetMapping("/host/me")
+    public ResponseEntity<List<ReservationResponseDTO>> getHostReservations(Authentication authentication) {
+        Integer hostId = extractUserIdFromAuthentication(authentication);
+        List<ReservationResponseDTO> reservations = bookingService.getHostReservations(hostId);
+        return ResponseEntity.ok(reservations);
+    }
+
+    /**
+     * Récupérer les réservations du host par statut
+     * GET /bookings/host/me/status?status=CONFIRMED
+     */
+    @GetMapping("/host/me/status")
+    public ResponseEntity<List<ReservationResponseDTO>> getHostReservationsByStatus(
+            Authentication authentication,
+            @RequestParam ReservationStatus status) {
+        Integer hostId = extractUserIdFromAuthentication(authentication);
+        List<ReservationResponseDTO> reservations = bookingService.getHostReservationsByStatus(hostId, status);
+        return ResponseEntity.ok(reservations);
     }
 }

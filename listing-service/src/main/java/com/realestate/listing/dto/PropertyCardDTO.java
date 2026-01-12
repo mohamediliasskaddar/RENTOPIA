@@ -34,4 +34,5 @@ public class PropertyCardDTO {
     // Optionnel : note moyenne (si vous avez un système de reviews)
     private Double averageRating;
     private Integer reviewCount;
+    private String status;
 }

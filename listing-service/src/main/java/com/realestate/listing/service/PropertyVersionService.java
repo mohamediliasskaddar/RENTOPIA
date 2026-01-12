@@ -122,4 +122,26 @@ public class PropertyVersionService {
     public Optional<PropertyVersion> getCurrentVersion(Integer propertyId) {
         return versionRepository.findTopByPropertyIdOrderByNumVersionDesc(propertyId);
     }
+
+    @Transactional(readOnly = true)
+    public Optional<PropertyVersion> getVersionByIdWithSnapshots(Integer id) {
+        return versionRepository.findById(id)
+                .map(version -> {
+                    // Force l'initialisation des lazy proxies
+                    if (version.getGeneralSnapshot() != null) {
+                        version.getGeneralSnapshot().getGeneralJson();
+                    }
+                    if (version.getAmenitiesSnapshot() != null) {
+                        version.getAmenitiesSnapshot().getAmenitiesJson();
+                    }
+                    if (version.getPhotosSnapshot() != null) {
+                        version.getPhotosSnapshot().getPhotosJson();
+                    }
+                    if (version.getRulesSnapshot() != null) {
+                        version.getRulesSnapshot().getChildrenAllowed();
+                    }
+                    return version;
+                });
+    }
+
 }

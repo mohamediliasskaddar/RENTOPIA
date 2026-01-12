@@ -21,9 +21,12 @@ public class WebSocketConfig implements WebSocketConfigurer {
     @Value("${websocket.endpoint}")
     private String endpoint;
 
+
+
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(messageWebSocketHandler, endpoint)
-                .setAllowedOrigins(allowedOrigins);
+        registry.addHandler(messageWebSocketHandler, "/ws")  // ← Path sans /api
+                .setAllowedOrigins(allowedOrigins)
+               ;
     }
 }

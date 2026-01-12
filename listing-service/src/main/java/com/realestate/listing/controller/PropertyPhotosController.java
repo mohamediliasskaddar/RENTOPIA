@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/properties/{propertyId}/photos")
-@CrossOrigin(origins = "*")
+
 public class PropertyPhotosController {
 
     @Autowired

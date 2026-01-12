@@ -517,4 +517,53 @@ public class BookingService {
 
         return dto;
     }
+
+    // BookingService.java - AJOUTER cette méthode
+
+    /**
+     * Récupérer toutes les réservations des propriétés d'un host
+     */
+    @Transactional(readOnly = true)
+    public List<ReservationResponseDTO> getHostReservations(Integer hostId) {
+        logger.info("📝 Getting reservations for host {}", hostId);
+
+        // 1. Récupérer toutes les propriétés du host via Property Service
+        List<Integer> propertyIds;
+        try {
+            List<PropertyDTO> properties = propertyServiceClient.getPropertiesByUserId(hostId);
+            if (properties == null || properties.isEmpty()) {
+                logger.info("No properties found for host {}", hostId);
+                return List.of();
+            }
+            propertyIds = properties.stream()
+                    .map(PropertyDTO::getPropertyId)
+                    .collect(Collectors.toList());
+            logger.info("Found {} properties for host {}", propertyIds.size(), hostId);
+        } catch (Exception e) {
+            logger.error("❌ Failed to fetch host properties", e);
+            throw new RuntimeException("Impossible de récupérer les propriétés du host");
+        }
+
+        // 2. Récupérer toutes les réservations de ces propriétés
+        List<Reservation> reservations = reservationRepository.findByPropertyIdIn(propertyIds);
+        logger.info("Found {} reservations for host {}", reservations.size(), hostId);
+
+        return reservations.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Récupérer les réservations d'un host par statut
+     */
+    @Transactional(readOnly = true)
+    public List<ReservationResponseDTO> getHostReservationsByStatus(Integer hostId, ReservationStatus status) {
+        List<ReservationResponseDTO> allReservations = getHostReservations(hostId);
+        return allReservations.stream()
+                .filter(r -> r.getStatus() == status)
+                .collect(Collectors.toList());
+    }
+
 }
+
+

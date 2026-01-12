@@ -12,8 +12,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/properties/{propertyId}/availability")
-@CrossOrigin(origins = "*")
+@RequestMapping("/properties/{propertyId}/availability")
 public class PropertyAvailabilityController {
 
     @Autowired private PropertyAvailabilityService service;
@@ -26,13 +25,14 @@ public class PropertyAvailabilityController {
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/unblock")
+    @PostMapping("/unblock")  // ✅ POST au lieu de DELETE
     public ResponseEntity<Void> unblock(
             @PathVariable Integer propertyId,
             @RequestBody BlockRequest request) {
         service.unblockPeriod(propertyId, request.start(), request.end());
         return ResponseEntity.ok().build();
     }
+
 
     @GetMapping("/blocked")
     public List<PropertyAvailability> getBlocked(

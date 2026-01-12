@@ -1,3 +1,5 @@
+// src/main/java/com/rental/review/controller/ReviewController.java
+
 package com.rental.review.controller;
 
 import com.rental.review.dto.*;
@@ -122,7 +124,7 @@ public class ReviewController {
      * Obtenir les statistiques d'une propriété
      * GET http://localhost:8087/api/reviews/property/{propertyId}/stats
      */
-    @GetMapping("/property/{propertyId}/stats")
+    @GetMapping("/api/property/{propertyId}/stats")
     public ResponseEntity<PropertyReviewStats> getPropertyStats(@PathVariable Integer propertyId) {
         log.info("Récupération des statistiques pour la propriété: {}", propertyId);
         PropertyReviewStats stats = reviewService.getPropertyStats(propertyId);
@@ -141,15 +143,23 @@ public class ReviewController {
     }
 
     /**
-     * Mettre à jour la note d'un avis
-     * PUT http://localhost:8087/api/reviews/{reviewId}/rating
+     * ✅ CORRIGÉ : Mettre à jour la note et retourner le ReviewResponse complet
+     * PUT http://localhost:8087/api/reviews/{reviewId}/rating?ratingValue=4.5
      */
     @PutMapping("/{reviewId}/rating")
-    public ResponseEntity<Rating> updateRating(
+    public ResponseEntity<ReviewResponse> updateRating(
             @PathVariable Long reviewId,
             @RequestParam Double ratingValue) {
-        log.info("Mise à jour de la note pour l'avis: {}", reviewId);
-        Rating rating = ratingService.updateRating(reviewId, ratingValue);
-        return ResponseEntity.ok(rating);
+        log.info("Mise à jour de la note pour l'avis: {} -> {}", reviewId, ratingValue);
+
+        // Mettre à jour le rating
+        ratingService.updateRating(reviewId, ratingValue);
+
+        // Récupérer le review complet avec le nouveau rating
+        ReviewResponse updatedReview = reviewService.getReviewById(reviewId);
+
+        log.info("Note mise à jour avec succès: {} -> {}", reviewId, updatedReview.getRatingValue());
+
+        return ResponseEntity.ok(updatedReview);
     }
 }

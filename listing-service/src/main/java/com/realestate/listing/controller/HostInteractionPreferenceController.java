@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/host-preferences")
-@CrossOrigin(origins = "*")
+
 public class HostInteractionPreferenceController {
 
     @Autowired

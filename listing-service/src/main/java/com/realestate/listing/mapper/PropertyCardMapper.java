@@ -36,6 +36,8 @@ public class PropertyCardMapper {
                 .pricePerNight(property.getPricePerNight())
                 .weekendPricePerNight(property.getWeekendPricePerNight())
                 .mainPhotoUrl(mainPhotoUrl)
+                .weekendPricePerNight(property.getWeekendPricePerNight())
+                .status(property.getStatus() != null ? property.getStatus().name() : null)  // ✅ AJOUTER
                 // TODO: Ajouter averageRating et reviewCount quand le système de reviews sera prêt
                 .averageRating(null)
                 .reviewCount(null)

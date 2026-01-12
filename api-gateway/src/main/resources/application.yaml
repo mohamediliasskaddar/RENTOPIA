@@ -92,9 +92,8 @@ spring:
         - id: booking-service
           uri: lb://booking-service  # ← minuscules
           predicates:
-            - Path=/api/bookings/**
-          filters:
-            - StripPrefix=1  # ← CORRIGÉ : 1 au lieu de 2
+            - Path=/bookings/**
+
         # Route pour Payment Service
         - id: payment-service
           uri: lb://PAYMENT-SERVICE
@@ -119,6 +118,13 @@ spring:
                 name: messagingServiceCircuitBreaker
                 fallbackUri: forward:/fallback/messaging-service
 
+                  # ✅ NOUVELLE ROUTE pour WebSocket
+        - id: messaging-websocket
+          uri: lb:ws://MESSAGING-SERVICE  # ← Noter le "lb:ws://"
+          predicates:
+              - Path=/api/ws/**
+          filters:
+              - StripPrefix=1
         # Route pour Notification Service
         - id: notification-service
           uri: lb://NOTIFICATION-SERVICE
@@ -137,7 +143,7 @@ spring:
           predicates:
             - Path=/api/reviews/property/**
           filters:
-            - StripPrefix=2  # /api/reviews/property/1 -> /property/1 (ne marchera pas)
+                - StripPrefix=2
         - id: review-service
           uri: lb://review-service
           predicates:

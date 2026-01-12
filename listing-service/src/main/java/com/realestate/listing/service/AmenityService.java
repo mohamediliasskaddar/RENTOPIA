@@ -2,7 +2,9 @@
 package com.realestate.listing.service;
 
 import com.realestate.listing.entity.Amenity;
+import com.realestate.listing.entity.Property;
 import com.realestate.listing.repository.AmenityRepository;
+import com.realestate.listing.repository.PropertyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +18,9 @@ public class AmenityService {
 
     @Autowired
     private AmenityRepository amenityRepository;
+
+    @Autowired
+    private PropertyRepository propertyRepository;
 
     // ======================
     // === CRUD DE BASE ===
@@ -67,4 +72,6 @@ public class AmenityService {
     public List<Amenity> searchByName(String name) {
         return amenityRepository.findByNameContainingIgnoreCase(name);
     }
+
+
 }

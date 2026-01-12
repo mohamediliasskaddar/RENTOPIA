@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/property-rules")
-@CrossOrigin(origins = "*")
+
 public class PropertyRuleController {
 
     @Autowired

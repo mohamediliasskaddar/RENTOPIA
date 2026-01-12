@@ -7,7 +7,7 @@ spring:
 
   # Configuration MySQL
   datasource:
-    url: jdbc:mysql://localhost:3306/rental_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:4306/rental_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
     password: # Mettez votre mot de passe MySQL ici
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -15,7 +15,7 @@ spring:
   # Configuration JPA
   jpa:
     hibernate:
-      ddl-auto: update   # La base existe déjà
+      ddl-auto: update  # La base existe déjà
     show-sql: true
     properties:
       hibernate:

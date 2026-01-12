@@ -66,4 +66,10 @@ public interface ReservationRepository extends JpaRepository<Reservation, Intege
     @Query("SELECT r FROM Reservation r WHERE r.checkOutDate = CURRENT_DATE " +
             "AND r.status = 'CHECKED_IN'")
     List<Reservation> findReservationsForCheckOutToday();
+
+    /**
+     * Récupérer toutes les réservations des propriétés d'un host
+     */
+    @Query("SELECT r FROM Reservation r WHERE r.propertyId IN :propertyIds ORDER BY r.createdAt DESC")
+    List<Reservation> findByPropertyIdIn(@Param("propertyIds") List<Integer> propertyIds);
 }

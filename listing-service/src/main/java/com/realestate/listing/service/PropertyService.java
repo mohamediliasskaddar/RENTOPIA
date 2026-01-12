@@ -3,9 +3,7 @@ package com.realestate.listing.service;
 
 import com.realestate.listing.entity.*;
 import com.realestate.listing.entity.Property.PropertyStatus;
-import com.realestate.listing.repository.DiscountRepository;
-import com.realestate.listing.repository.PropertyRepository;
-import com.realestate.listing.repository.PropertyVersionRepository;
+import com.realestate.listing.repository.*;
 import com.realestate.listing.service.PropertyVersionService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +16,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.Objects ;
 
 @Service
@@ -41,6 +37,10 @@ public class PropertyService {
 
     @Autowired
     private PriceHistoryService priceHistoryService;
+    @Autowired
+    private AmenityRepository amenityRepository;
+    @Autowired
+    private PropertyPhotosRepository photoRepository;
     // ======================
     // === CRUD DE BASE ===
     // ======================
@@ -61,6 +61,8 @@ public class PropertyService {
         return propertyRepository.findById(id);
     }
 
+    // PropertyService.java
+
     public Property createProperty(Property property) {
         // Anti-doublon
         if (propertyRepository.existsByTitleAndCityAndAdresseLine(
@@ -70,7 +72,29 @@ public class PropertyService {
             throw new IllegalArgumentException(
                     "A property with this title, city, and address already exists.");
         }
-        property.setStatus(Property.PropertyStatus.DRAFT); // Forcé
+
+        property.setStatus(Property.PropertyStatus.DRAFT);
+
+        // ✅ Gérer PropertyRule - Configurer la relation bidirectionnelle
+        if (property.getRules() != null) {
+            property.getRules().setProperty(property);
+        } else {
+            // Créer des règles par défaut si non fournies
+            PropertyRule defaultRules = new PropertyRule();
+            defaultRules.setProperty(property);
+            defaultRules.setChildrenAllowed(true);
+            defaultRules.setBabiesAllowed(true);
+            defaultRules.setPetsAllowed(false);
+            defaultRules.setSmokingAllowed(false);
+            defaultRules.setEventsAllowed(false);
+            property.setRules(defaultRules);
+        }
+
+        // ✅ Gérer HostInteractionPreference - Configurer la relation bidirectionnelle
+        if (property.getHostPreferences() != null) {
+            property.getHostPreferences().setProperty(property);
+        }
+
         return propertyRepository.save(property);
     }
 
@@ -279,5 +303,192 @@ public class PropertyService {
         return property;
     }
 
+// PropertyService.java
 
+    public Property partialUpdateProperty(Integer id, Map<String, Object> updates) {
+        Property property = propertyRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Property not found: " + id));
+
+        updates.forEach((key, value) -> {
+            switch (key) {
+                // Basic Info
+                case "title" -> property.setTitle((String) value);
+                case "description" -> property.setDescription((String) value);
+                case "propertyType" -> property.setPropertyType((String) value);
+                case "placeType" -> property.setPlaceType((String) value);
+                case "surfaceArea" -> property.setSurfaceArea(value != null ? ((Number) value).doubleValue() : null);
+                case "floorNumber" -> property.setFloorNumber(value != null ? ((Number) value).intValue() : null);
+
+                // Capacity
+                case "maxGuests" -> property.setMaxGuests(((Number) value).intValue());
+                case "bedrooms" -> property.setBedrooms(((Number) value).intValue());
+                case "beds" -> property.setBeds(((Number) value).intValue());
+                case "bathrooms" -> property.setBathrooms(((Number) value).intValue());
+
+                // Check-in/out
+                case "checkInTimeStart" -> property.setCheckInTimeStart((String) value);
+                case "checkInTimeEnd" -> property.setCheckInTimeEnd((String) value);
+                case "checkOutTime" -> property.setCheckOutTime((String) value);
+                case "instantBooking" -> property.setInstantBooking((Boolean) value);
+
+                // Stay Rules
+                case "minStayNights" -> property.setMinStayNights(((Number) value).intValue());
+                case "maxStayNights" -> property.setMaxStayNights(((Number) value).intValue());
+                case "bookingAdvanceDays" -> property.setBookingAdvanceDays(((Number) value).intValue());
+                case "cancellationPolicy" -> property.setCancellationPolicy((String) value);
+
+                // Location
+                case "adresseLine" -> property.setAdresseLine((String) value);
+                case "city" -> property.setCity((String) value);
+                case "country" -> property.setCountry((String) value);
+                case "postalCode" -> property.setPostalCode((String) value);
+                case "latitude" -> property.setLatitude(value != null ? ((Number) value).doubleValue() : null);
+                case "longitude" -> property.setLongitude(value != null ? ((Number) value).doubleValue() : null);
+                case "neighborhoodDescription" -> property.setNeighborhoodDescription((String) value);
+
+                // Pricing
+                case "pricePerNight" -> property.setPricePerNight(((Number) value).doubleValue());
+                case "weekendPricePerNight" -> property.setWeekendPricePerNight(((Number) value).doubleValue());
+
+                // Fees
+                case "cleaningFee" -> property.setCleaningFee(value != null ? ((Number) value).doubleValue() : null);
+                case "petFee" -> property.setPetFee(value != null ? ((Number) value).doubleValue() : null);
+                case "platformFeePercentage" -> property.setPlatformFeePercentage(value != null ? ((Number) value).doubleValue() : null);
+            }
+        });
+
+        return propertyRepository.save(property);
+    }
+
+    @Transactional
+    public Property addAmenityToProperty(Integer propertyId, Integer amenityId) {
+        Property property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new RuntimeException("Property not found: " + propertyId));
+
+        Amenity amenity = amenityRepository.findById(amenityId)
+                .orElseThrow(() -> new RuntimeException("Amenity not found: " + amenityId));
+
+        property.getAmenities().add(amenity);
+
+        return propertyRepository.save(property);
+    }
+
+    /**
+     * Supprimer une amenity d'une property (sans toucher aux autres données)
+     */
+    @Transactional
+    public Property removeAmenityFromProperty(Integer propertyId, Integer amenityId) {
+        Property property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new RuntimeException("Property not found: " + propertyId));
+
+        property.getAmenities().removeIf(a -> a.getAmenityId().equals(amenityId));
+
+        return propertyRepository.save(property);
+    }
+
+    /**
+     * Ajouter un discount à une property
+     */
+    @Transactional
+    public Property addDiscountToProperty(Integer propertyId, Discount discountData) {
+        Property property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new RuntimeException("Property not found: " + propertyId));
+
+        // Créer le nouveau discount
+        Discount discount = new Discount();
+        discount.setDiscountType(discountData.getDiscountType());
+        discount.setDiscountPercentage(discountData.getDiscountPercentage());
+        discount.setMinNights(discountData.getMinNights());
+        discount.setDescription(discountData.getDescription());
+
+        // Sauvegarder le discount
+        Discount savedDiscount = discountRepository.save(discount);
+
+        // Ajouter à la property
+        property.getDiscounts().add(savedDiscount);
+
+        return propertyRepository.save(property);
+    }
+
+    /**
+     * Supprimer un discount d'une property
+     */
+    @Transactional
+    public Property removeDiscountFromProperty(Integer propertyId, Integer discountId) {
+        Property property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new RuntimeException("Property not found: " + propertyId));
+
+        property.getDiscounts().removeIf(d -> d.getDiscountId().equals(discountId));
+
+        return propertyRepository.save(property);
+    }
+
+    /**
+     * Modifier un discount
+     */
+    @Transactional
+    public Discount updateDiscount(Integer discountId, Discount discountData) {
+        Discount discount = discountRepository.findById(discountId)
+                .orElseThrow(() -> new RuntimeException("Discount not found: " + discountId));
+
+        discount.setDiscountType(discountData.getDiscountType());
+        discount.setDiscountPercentage(discountData.getDiscountPercentage());
+        discount.setMinNights(discountData.getMinNights());
+        discount.setDescription(discountData.getDescription());
+
+        return discountRepository.save(discount);
+    }
+
+
+
+
+    @Transactional
+    public void setPhotoCover(Integer propertyId, Integer photoId) {
+        List<PropertyPhoto> photos = photoRepository.findByProperty_PropertyId(propertyId);
+
+        // Trier par displayOrder actuel
+        photos.sort((a, b) -> {
+            int orderA = a.getDisplayOrder() != null ? a.getDisplayOrder() : 0;
+            int orderB = b.getDisplayOrder() != null ? b.getDisplayOrder() : 0;
+            return Integer.compare(orderA, orderB);
+        });
+
+        // Trouver et retirer la photo cover de la liste
+        PropertyPhoto coverPhoto = null;
+        for (int i = 0; i < photos.size(); i++) {
+            if (photos.get(i).getPhotoId().equals(photoId)) {
+                coverPhoto = photos.remove(i);
+                break;
+            }
+        }
+
+        if (coverPhoto == null) {
+            throw new RuntimeException("Photo not found: " + photoId);
+        }
+
+        // Mettre la cover en premier
+        photos.add(0, coverPhoto);
+
+        // Mettre à jour isCover et displayOrder pour toutes les photos
+        for (int i = 0; i < photos.size(); i++) {
+            PropertyPhoto photo = photos.get(i);
+            photo.setIsCover(i == 0);  // Seule la première est cover
+            photo.setDisplayOrder(i + 1);  // Ordre de 1 à N
+        }
+
+        photoRepository.saveAll(photos);
+    }
+
+    /**
+     * Réorganiser les photos
+     */
+    @Transactional
+    public void reorderPhotos(Integer propertyId, List<Integer> photoIds) {
+        for (int i = 0; i < photoIds.size(); i++) {
+            PropertyPhoto photo = photoRepository.findById(photoIds.get(i))
+                    .orElseThrow(() -> new RuntimeException("Photo not found"));
+            photo.setDisplayOrder(i + 1);
+            photoRepository.save(photo);
+        }
+    }
 }
