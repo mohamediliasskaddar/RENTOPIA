@@ -12,12 +12,18 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/mohamediliasskaddar/RENTOPIA.git',
-                    credentialsId: 'github-token',
-                    name: 'ops'
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: 'main']],
+                    userRemoteConfigs: [[
+                        url: 'https://github.com/mohamediliasskaddar/RENTOPIA.git',
+                        credentialsId: 'github-token',
+                        name: 'origin'  // on renomme ops en origin ici
+                    ]]
+                ])
             }
         }
+
 
         stage('Login to ECR') {
             steps {
