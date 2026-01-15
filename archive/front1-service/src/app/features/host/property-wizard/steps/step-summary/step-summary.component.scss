@@ -1,0 +1,240 @@
+// src/app/features/host/property-wizard/steps/step-summary/step-summary.component.scss
+.step-summary {
+  .step-intro {
+    text-align: center;
+    margin-bottom: 32px;
+
+    h2 {
+      margin: 0 0 8px;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0;
+      color: #666;
+    }
+  }
+}
+
+.summary-content {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+// ========== PREVIEW CARD ==========
+.preview-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  margin-bottom: 32px;
+
+  .preview-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+  }
+
+  .no-image {
+    height: 200px;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    mat-icon {
+      font-size: 64px;
+      width: 64px;
+      height: 64px;
+      color: #bdbdbd;
+    }
+  }
+
+  .preview-info {
+    padding: 20px;
+
+    h3 {
+      margin: 0 0 8px;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .location {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: #666;
+      margin: 0 0 12px;
+      font-size: 14px;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+    }
+
+    .price {
+      margin: 0;
+      font-size: 18px;
+
+      strong {
+        color: var(--color-bg-dark, #16243e);
+      }
+    }
+  }
+}
+
+// ========== SUMMARY SECTIONS ==========
+.summary-sections {
+  background: white;
+  border-radius: 16px;
+  padding: 8px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 24px;
+}
+
+.summary-section {
+  padding: 16px 24px;
+
+  h4 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .section-content {
+    p {
+      margin: 0 0 4px;
+      font-size: 15px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  .capacity-grid {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+
+    span {
+      padding: 4px 12px;
+      background: #f5f5f5;
+      border-radius: 16px;
+      font-size: 13px;
+    }
+  }
+
+  .photos-preview {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+
+    img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .more-photos {
+      width: 60px;
+      height: 60px;
+      background: #f5f5f5;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: #666;
+    }
+  }
+
+  .pricing-grid {
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #f0f0f0;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      span:last-child {
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+// ========== STATUS NOTICE ==========
+.status-notice {
+  display: flex;
+  gap: 12px;
+  padding: 16px 20px;
+  background: #e3f2fd;
+  border-radius: 12px;
+
+  mat-icon {
+    color: #1976d2;
+    flex-shrink: 0;
+  }
+
+  .notice-content {
+    strong {
+      display: block;
+      margin-bottom: 4px;
+      color: #1565c0;
+    }
+
+    p {
+      margin: 0;
+      font-size: 14px;
+      color: #1976d2;
+    }
+  }
+}
+
+// Dans step-summary.component.scss, ajouter :
+
+.rules-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  .rule-badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    background: #ffebee;
+    color: #c62828;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+
+    &.allowed {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+  }
+}

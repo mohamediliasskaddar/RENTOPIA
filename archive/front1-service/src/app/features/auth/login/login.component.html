@@ -1,0 +1,138 @@
+<!-- src/app/features/auth/login/login.component.html -->
+
+<div class="login-container">
+
+  <!-- ========================================
+       LEFT SIDE: IMAGE HERO
+  ========================================= -->
+
+
+
+  <div class="login-hero" >
+
+
+    <div class="hero-overlay">
+      <div class="hero-content">
+        <h1 class="hero-title">Welcome back to Rentopia</h1>
+        <p class="hero-subtitle">
+          Your decentralized rental marketplace powered by blockchain
+        </p>
+        <div class="hero-features">
+          <div class="feature-item">
+            <mat-icon>verified_user</mat-icon>
+            <span>Secure & Transparent</span>
+          </div>
+          <div class="feature-item">
+            <mat-icon>account_balance_wallet</mat-icon>
+            <span>Powered  by  Web3</span>
+          </div>
+          <div class="feature-item">
+            <mat-icon>handshake</mat-icon>
+            <span>Direct Connections</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================
+       RIGHT SIDE: LOGIN FORM
+  ========================================= -->
+  <div class="login-form-side">
+    <div class="login-card-wrapper">
+
+      <!-- Logo & Title -->
+      <div class="login-header">
+        <div class="logo-container">
+          <mat-icon class="logo-icon">home</mat-icon>
+          <h1 class="app-title">Rentopia</h1>
+        </div>
+        <h2 class="login-title">Sign in to your account</h2>
+        <p class="login-description">
+          Connect your MetaMask wallet to continue
+        </p>
+      </div>
+
+      <!-- Main Content -->
+      <div class="login-content">
+
+        <!-- Warning if MetaMask is not installed -->
+        <div class="warning-box" *ngIf="!metaMaskInstalled">
+          <mat-icon class="warning-icon">warning</mat-icon>
+          <div class="warning-content">
+            <h3>MetaMask Required</h3>
+            <p>Please install MetaMask extension to continue</p>
+            <a
+              href="https://metamask.io/download/"
+              target="_blank"
+              class="install-link"
+            >
+              <mat-icon>get_app</mat-icon>
+              Install MetaMask
+            </a>
+          </div>
+        </div>
+
+        <!-- MetaMask login button -->
+        <button
+          mat-raised-button
+          color="primary"
+          class="metamask-button"
+          (click)="loginWithMetaMask()"
+          [disabled]="!metaMaskInstalled || isConnecting || (loading$ | async)"
+        >
+          <mat-spinner
+            *ngIf="isConnecting || (loading$ | async)"
+            diameter="20"
+            class="button-spinner"
+          ></mat-spinner>
+
+          <span *ngIf="!(isConnecting || (loading$ | async))">
+            <mat-icon class="button-icon">account_balance_wallet</mat-icon>
+            Connect with MetaMask
+          </span>
+
+          <span *ngIf="isConnecting || (loading$ | async)">
+            Connecting...
+          </span>
+        </button>
+
+        <!-- Divider -->
+        <div class="divider">
+          <span class="divider-text">New to Rentopia?</span>
+        </div>
+
+        <!-- Link to register -->
+        <button
+          mat-stroked-button
+          class="register-button"
+          (click)="goToRegister()"
+          [disabled]="isConnecting || (loading$ | async)"
+        >
+          <mat-icon class="button-icon">person_add</mat-icon>
+          Create an account
+        </button>
+
+        <!-- Info Box -->
+        <div class="info-box">
+          <mat-icon class="info-icon">info</mat-icon>
+          <p class="info-text">
+            Your wallet is your identity. No passwords, no data breaches.
+            <strong>Simple, secure, decentralized.</strong>
+          </p>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="login-footer">
+        <p class="footer-text">
+          By continuing, you agree to our
+          <a href="/terms" class="footer-link">Terms</a>
+          and
+          <a href="/privacy" class="footer-link">Privacy Policy</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+</div>

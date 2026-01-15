@@ -1,0 +1,152 @@
+<!-- src/app/features/host/property-wizard/property-wizard.component.html -->
+<div class="property-wizard">
+  <!-- Header -->
+  <header class="wizard-header">
+    <button mat-icon-button routerLink="/host/properties" class="back-btn">
+      <mat-icon>close</mat-icon>
+    </button>
+    <h1>Create a new property</h1>
+    <div class="spacer"></div>
+  </header>
+
+  <!-- Stepper -->
+  <mat-stepper linear #stepper class="wizard-stepper">
+
+    <!-- Step 1: Type -->
+    <mat-step [stepControl]="typeForm" label="Type">
+      <app-step-type [form]="typeForm"></app-step-type>
+
+      <div class="step-actions">
+        <button mat-button routerLink="/host/properties">Cancel</button>
+        <button mat-raised-button color="primary" matStepperNext [disabled]="typeForm.invalid">
+          Next
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </div>
+    </mat-step>
+
+    <!-- Step 2: Location -->
+    <mat-step [stepControl]="locationForm" label="Location">
+      <app-step-location [form]="locationForm"></app-step-location>
+
+      <div class="step-actions">
+        <button mat-button matStepperPrevious>
+          <mat-icon>arrow_back</mat-icon>
+          Back
+        </button>
+        <button mat-raised-button color="primary" matStepperNext [disabled]="locationForm.invalid">
+          Next
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </div>
+    </mat-step>
+
+    <!-- Step 3: Photos -->
+    <mat-step label="Photos" [optional]="false">
+      <app-step-photos
+        [photos]="photos"
+        (photosChange)="onPhotosChange($event)"
+      ></app-step-photos>
+
+      <div class="step-actions">
+        <button mat-button matStepperPrevious>
+          <mat-icon>arrow_back</mat-icon>
+          Back
+        </button>
+        <button mat-raised-button color="primary" matStepperNext [disabled]="photos.length === 0">
+          Next
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </div>
+    </mat-step>
+
+    <!-- Step 4: Details -->
+    <mat-step [stepControl]="detailsForm" label="Details">
+      <app-step-details [form]="detailsForm"></app-step-details>
+
+      <div class="step-actions">
+        <button mat-button matStepperPrevious>
+          <mat-icon>arrow_back</mat-icon>
+          Back
+        </button>
+        <button mat-raised-button color="primary" matStepperNext [disabled]="detailsForm.invalid">
+          Next
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </div>
+    </mat-step>
+
+    <!-- Step 5: Pricing -->
+    <mat-step [stepControl]="pricingForm" label="Pricing">
+      <app-step-pricing
+        [form]="pricingForm"
+        [surfaceArea]="detailsForm.get('surfaceArea')?.value || 80"
+        [bedrooms]="detailsForm.get('bedrooms')?.value || 2"
+        [amenitiesCount]="3">
+      </app-step-pricing>
+
+      <div class="step-actions">
+        <button mat-button matStepperPrevious>
+          <mat-icon>arrow_back</mat-icon>
+          Back
+        </button>
+        <button mat-raised-button color="primary" matStepperNext [disabled]="pricingForm.invalid">
+          Next
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </div>
+    </mat-step>
+
+    <!-- Step 6: Rules -->
+    <mat-step [stepControl]="rulesForm" label="Rules">
+      <app-step-rules [form]="rulesForm"></app-step-rules>
+
+      <div class="step-actions">
+        <button mat-button matStepperPrevious>
+          <mat-icon>arrow_back</mat-icon>
+          Back
+        </button>
+        <button mat-raised-button color="primary" matStepperNext [disabled]="rulesForm.invalid">
+          Next
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+      </div>
+    </mat-step>
+
+    <!-- Step 7: Summary -->
+    <mat-step label="Summary">
+      <app-step-summary
+        [propertyData]="getPropertyData()"
+        [photos]="photos"
+      ></app-step-summary>
+
+      <div class="step-actions">
+        <button mat-button matStepperPrevious [disabled]="creating">
+          <mat-icon>arrow_back</mat-icon>
+          Back
+        </button>
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="createProperty()"
+          [disabled]="creating"
+          class="create-btn"
+        >
+          @if (creating) {
+            @if (uploadingPhotos) {
+              <mat-spinner diameter="20"></mat-spinner>
+              <span>Uploading photo {{ currentUploadIndex }}/{{ photos.length }}...</span>
+            } @else {
+              <mat-spinner diameter="20"></mat-spinner>
+              <span>Creating property...</span>
+            }
+          } @else {
+            <mat-icon>check</mat-icon>
+            <span>Create Property</span>
+          }
+        </button>
+      </div>
+    </mat-step>
+
+  </mat-stepper>
+</div>

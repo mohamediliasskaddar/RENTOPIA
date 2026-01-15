@@ -1,0 +1,105 @@
+// src/app/features/host/property-wizard/steps/step-details/step-details.component.scss
+.step-details {
+  .step-intro {
+    text-align: center;
+    margin-bottom: 32px;
+
+    h2 {
+      margin: 0 0 8px;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0;
+      color: #666;
+    }
+  }
+
+  .section {
+    margin-bottom: 32px;
+
+    h3 {
+      margin: 0 0 16px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+  }
+
+  .full-width {
+    width: 100%;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .counter-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .counter-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: #f5f5f5;
+    border-radius: 12px;
+
+    .counter-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      mat-icon {
+        color: #666;
+      }
+
+      span {
+        font-weight: 500;
+      }
+    }
+
+    .counter-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      button {
+        border: 1px solid #e0e0e0;
+        background: white;
+
+        &:hover {
+          background: #fafafa;
+        }
+
+        &:disabled {
+          opacity: 0.5;
+        }
+      }
+
+      .counter-value {
+        min-width: 40px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .step-details {
+    .counter-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+  }
+}

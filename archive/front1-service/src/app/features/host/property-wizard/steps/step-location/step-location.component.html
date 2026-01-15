@@ -1,0 +1,119 @@
+<!-- src/app/features/host/property-wizard/steps/step-location/step-location.component.html -->
+<div class="step-location">
+  <div class="step-intro">
+    <h2>Where is your property located?</h2>
+    <p>Help guests find your property easily</p>
+  </div>
+
+  <form [formGroup]="form">
+    <!-- Country & City -->
+    <div class="form-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Country</mat-label>
+        <mat-select formControlName="country">
+          @for (country of countries; track country) {
+            <mat-option [value]="country">{{ country }}</mat-option>
+          }
+        </mat-select>
+        @if (form.get('country')?.hasError('required')) {
+          <mat-error>Country is required</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>City</mat-label>
+        <input matInput formControlName="city" placeholder="e.g., Casablanca">
+        @if (form.get('city')?.hasError('required')) {
+          <mat-error>City is required</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <!-- Address -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Street address</mat-label>
+      <input matInput formControlName="adresseLine" placeholder="e.g., 123 Main Street, Building A">
+      @if (form.get('adresseLine')?.hasError('required')) {
+        <mat-error>Address is required</mat-error>
+      }
+    </mat-form-field>
+
+    <!-- Postal Code -->
+    <mat-form-field appearance="outline" class="half-width">
+      <mat-label>Postal code</mat-label>
+      <input matInput formControlName="postalCode" placeholder="e.g., 20000">
+    </mat-form-field>
+
+    <!-- GPS Coordinates Section -->
+    <div class="coordinates-section">
+      <h3>
+        <mat-icon>gps_fixed</mat-icon>
+        GPS Coordinates (optional)
+      </h3>
+      <p class="hint">Help guests find your exact location</p>
+
+      <!-- Show current coordinates if set -->
+      @if (form.get('latitude')?.value && form.get('longitude')?.value) {
+        <div class="current-coordinates">
+          <mat-icon>place</mat-icon>
+          <span>
+            {{ form.get('latitude')?.value | number:'1.6-6' }},
+            {{ form.get('longitude')?.value | number:'1.6-6' }}
+          </span>
+          <button mat-icon-button (click)="form.patchValue({ latitude: null, longitude: null })" matTooltip="Clear">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+      }
+
+      <!-- Map Picker -->
+      @if (showMapPicker) {
+        <app-map-picker
+          [initialLat]="getInitialLat()"
+          [initialLng]="getInitialLng()"
+          (locationSelected)="onLocationSelected($event)"
+          (cancelled)="onMapCancelled()"
+        ></app-map-picker>
+      } @else {
+        <!-- Action Buttons -->
+        <div class="coordinates-actions">
+          <button mat-stroked-button type="button" (click)="getCurrentLocation()">
+            <mat-icon>my_location</mat-icon>
+            Use my current location
+          </button>
+          <button mat-stroked-button type="button" (click)="openMapPicker()">
+            <mat-icon>map</mat-icon>
+            Select on map
+          </button>
+        </div>
+
+        <!-- Manual Input (collapsible) -->
+        <details class="manual-input">
+          <summary>Enter coordinates manually</summary>
+          <div class="form-row coordinates-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Latitude</mat-label>
+              <input matInput type="number" formControlName="latitude" step="0.000001" placeholder="e.g., 33.5731">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Longitude</mat-label>
+              <input matInput type="number" formControlName="longitude" step="0.000001" placeholder="e.g., -7.5898">
+            </mat-form-field>
+          </div>
+        </details>
+      }
+    </div>
+
+    <!-- Neighborhood -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Neighborhood description (optional)</mat-label>
+      <textarea
+        matInput
+        formControlName="neighborhoodDescription"
+        rows="3"
+        placeholder="Describe the neighborhood, nearby attractions, transportation..."
+      ></textarea>
+    </mat-form-field>
+  </form>
+</div>

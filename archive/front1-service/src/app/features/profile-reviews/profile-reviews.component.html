@@ -1,0 +1,74 @@
+<!-- src/app/features/profile/components/profile-reviews/profile-reviews.component.html -->
+<!-- ✅ CLEAN ENGLISH VERSION -->
+
+<div class="profile-reviews-container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div>
+      <h2>My Reviews</h2>
+      <p class="subtitle">Reviews I've written about properties</p>
+    </div>
+
+  </div>
+
+  <!-- LOADING -->
+  <div *ngIf="loading$ | async" class="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading reviews...</p>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div *ngIf="!(loading$ | async) && (reviews$ | async)?.length === 0" class="empty-state">
+    <mat-icon>rate_review</mat-icon>
+    <h3>No Reviews Yet</h3>
+    <p>You haven't written any reviews yet.</p>
+    <button mat-raised-button color="primary" routerLink="/listings">
+      <mat-icon>search</mat-icon>
+      Explore Properties
+    </button>
+  </div>
+
+  <!-- REVIEWS LIST -->
+  <div *ngIf="!(loading$ | async) && (reviews$ | async)?.length! > 0" class="reviews-list">
+    <div *ngFor="let review of (visibleReviews$ | async)" class="review-card">
+
+      <!-- Property -->
+      <div class="property">
+        <div class="photo" [style.background-image]="'url(' + review.propertyMainPhoto + ')'" (click)="onViewProperty(review.propertyId)">
+          <div *ngIf="!review.propertyMainPhoto" class="no-photo">
+            <mat-icon>home</mat-icon>
+          </div>
+        </div>
+        <div class="info">
+          <h3 (click)="onViewProperty(review.propertyId)">{{ review.propertyTitle }}</h3>
+          <p class="location">
+            <mat-icon>location_on</mat-icon>
+            {{ review.propertyCity }}, {{ review.propertyCountry }}
+          </p>
+          <span class="type">{{ review.propertyType }}</span>
+        </div>
+      </div>
+
+      <!-- Review -->
+      <div class="content">
+        <div class="meta">
+          <div class="rating">
+            <mat-icon *ngFor="let star of getStars(review.ratingValue)" [class.filled]="star === 1">
+              {{ star === 1 ? 'star' : 'star_border' }}
+            </mat-icon>
+            <span class="value">{{ review.ratingValue }}/5</span>
+          </div>
+          <span class="date">{{ formatDate(review.createdAt) }}</span>
+        </div>
+        <p class="text">{{ review.reviewText }}</p>
+        <button mat-button color="primary" (click)="onViewProperty(review.propertyId)">
+          <mat-icon>visibility</mat-icon>
+          View Property
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>

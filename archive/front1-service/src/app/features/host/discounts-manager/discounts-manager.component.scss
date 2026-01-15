@@ -1,0 +1,297 @@
+// src/app/features/host/host-property-detail/components/discounts-manager/discounts-manager.component.scss
+.discounts-manager {
+  position: relative;
+}
+
+// ========== HEADER ==========
+.manager-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+
+  .header-info {
+    h3 {
+      margin: 0 0 4px;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: #666;
+      font-size: 14px;
+    }
+  }
+}
+
+// ========== FORM CARD ==========
+.discount-form-card {
+  margin-bottom: 24px;
+  border: 2px solid #1976d2;
+
+  mat-card-header {
+    margin-bottom: 16px;
+  }
+
+  .discount-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .full-width {
+      width: 100%;
+    }
+
+    .type-option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 4px 0;
+
+      mat-icon {
+        color: #666;
+      }
+
+      .type-info {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+
+        .type-label {
+          font-weight: 500;
+        }
+
+        .type-desc {
+          font-size: 12px;
+          color: #666;
+        }
+      }
+
+      .exists-icon {
+        color: #4CAF50;
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+    }
+
+    .percentage-field {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+
+      mat-form-field {
+        width: 200px;
+      }
+
+      .percentage-preview {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 16px;
+        background: #e8f5e9;
+        border-radius: 8px;
+
+        .preview-label {
+          font-size: 13px;
+          color: #666;
+        }
+
+        .preview-value {
+          font-size: 20px;
+          font-weight: 600;
+          color: #2e7d32;
+        }
+      }
+    }
+
+    .nights-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+  }
+
+  mat-card-actions {
+    padding: 16px;
+    margin: 0;
+
+    button {
+      min-width: 120px;
+    }
+  }
+}
+
+// ========== DISCOUNTS LIST ==========
+.discounts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.discount-card {
+  .discount-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 8px;
+  }
+
+  .discount-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    mat-icon {
+      color: white;
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .discount-info {
+    flex: 1;
+
+    .discount-title {
+      margin: 0 0 4px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .discount-details {
+      margin: 0;
+      font-size: 14px;
+      color: #666;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .percentage {
+        color: #2e7d32;
+        font-weight: 600;
+      }
+
+      .nights {
+        color: #666;
+      }
+    }
+  }
+
+  .discount-actions {
+    display: flex;
+    gap: 4px;
+  }
+}
+
+// ========== EMPTY STATE ==========
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  text-align: center;
+  background: #fafafa;
+  border-radius: 12px;
+  border: 2px dashed #e0e0e0;
+
+  mat-icon {
+    font-size: 56px;
+    width: 56px;
+    height: 56px;
+    color: #bdbdbd;
+    margin-bottom: 16px;
+  }
+
+  h4 {
+    margin: 0 0 8px;
+    font-size: 18px;
+    color: #1a1a1a;
+  }
+
+  p {
+    margin: 0 0 20px;
+    color: #666;
+    font-size: 14px;
+    max-width: 300px;
+  }
+}
+
+// ========== TIPS ==========
+.discount-tips {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: #fff8e1;
+  border-radius: 8px;
+  margin-top: 24px;
+
+  mat-icon {
+    color: #f9a825;
+    flex-shrink: 0;
+  }
+
+  .tip-content {
+    font-size: 14px;
+    color: #5d4037;
+    line-height: 1.5;
+
+    strong {
+      color: #e65100;
+    }
+  }
+}
+
+// ========== RESPONSIVE ==========
+@media (max-width: 768px) {
+  .manager-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+
+    button {
+      width: 100%;
+    }
+  }
+
+  .discount-form-card {
+    .discount-form {
+      .percentage-field {
+        flex-direction: column;
+        align-items: flex-start;
+
+        mat-form-field {
+          width: 100%;
+        }
+
+        .percentage-preview {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+
+      .nights-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  }
+
+  .discount-card {
+    .discount-content {
+      flex-wrap: wrap;
+    }
+
+    .discount-actions {
+      width: 100%;
+      justify-content: flex-end;
+      margin-top: 8px;
+    }
+  }
+}

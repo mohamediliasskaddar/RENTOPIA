@@ -1,0 +1,281 @@
+// src/app/features/host/property-wizard/steps/step-photos/step-photos.component.scss
+.step-photos {
+  .step-intro {
+    text-align: center;
+    margin-bottom: 32px;
+
+    h2 {
+      margin: 0 0 8px;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0;
+      color: #666;
+    }
+  }
+}
+
+// ========== UPLOAD AREA ==========
+.upload-area {
+  border: 2px dashed #bdbdbd;
+  border-radius: 12px;
+  padding: 48px;
+  text-align: center;
+  transition: all 0.2s ease;
+  background: #fafafa;
+  margin-bottom: 24px;
+
+  &:hover {
+    border-color: var(--color-bg-dark, #16243e);
+    background: #f0f4f8;
+  }
+
+  &.has-photos {
+    padding: 24px;
+  }
+
+  .upload-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+
+    mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      color: #666;
+      margin-bottom: 16px;
+    }
+
+    .upload-text {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .upload-hint {
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    .upload-formats {
+      font-size: 12px;
+      color: #999;
+    }
+  }
+}
+
+// ========== PHOTOS INFO ==========
+.photos-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  font-weight: 500;
+
+  .hint {
+    font-size: 13px;
+    color: #666;
+    font-weight: normal;
+  }
+}
+
+// ========== PHOTOS GRID ==========
+.photos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.photo-card {
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  .photo-preview {
+    position: relative;
+    aspect-ratio: 4/3;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f5f5f5;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .cover-badge {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: #FFD700;
+      color: #1a1a1a;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+
+      mat-icon {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+      }
+    }
+
+    .photo-order {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .photo-actions {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      display: flex;
+      gap: 4px;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+
+      button {
+        background: rgba(255, 255, 255, 0.9);
+        width: 32px;
+        height: 32px;
+
+        mat-icon {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+        }
+      }
+    }
+
+    &:hover .photo-actions {
+      opacity: 1;
+    }
+  }
+
+  .photo-name {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #666;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.add-more-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 4/3;
+  border: 2px dashed #bdbdbd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #666;
+
+  &:hover {
+    border-color: var(--color-bg-dark, #16243e);
+    background: #f5f5f5;
+  }
+
+  mat-icon {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+    margin-bottom: 8px;
+  }
+
+  span {
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+// ========== CDK DRAG ==========
+.cdk-drag-preview {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.3;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+// ========== TIPS ==========
+.photo-tips {
+  background: #fff8e1;
+  padding: 16px 20px;
+  border-radius: 8px;
+
+  h4 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 12px;
+    font-size: 14px;
+    color: #e65100;
+
+    mat-icon {
+      color: #f9a825;
+    }
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 20px;
+
+    li {
+      font-size: 13px;
+      color: #5d4037;
+      margin-bottom: 4px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .upload-area {
+    padding: 32px 16px;
+  }
+
+  .photos-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .photos-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}

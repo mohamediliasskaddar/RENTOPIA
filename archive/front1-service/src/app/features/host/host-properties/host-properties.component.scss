@@ -1,0 +1,256 @@
+// src/app/features/host/host-properties/host-properties.component.scss
+.host-properties-page {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #e0e0e0;
+
+  .header-content {
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+
+    .subtitle {
+      margin: 4px 0 0;
+      color: #666;
+      font-size: 14px;
+    }
+  }
+
+  button {
+    mat-icon {
+      margin-right: 8px;
+    }
+  }
+}
+
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: #f44336;
+    margin-bottom: 16px;
+  }
+
+  p {
+    color: #666;
+    margin: 16px 0;
+  }
+}
+
+.status-filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    &.active {
+      background-color: var(--color-bg-dark, #16243e);
+      color: white;
+    }
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
+.properties-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.property-card {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .property-image {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .status-chip {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+    }
+  }
+
+  mat-card-content {
+    padding: 16px;
+
+    .property-title {
+      margin: 0 0 8px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #1a1a1a;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .property-location {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: #666;
+      font-size: 14px;
+      margin: 0 0 12px;
+
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+      }
+    }
+
+    .property-details {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 12px;
+
+      span {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 13px;
+        color: #666;
+
+        mat-icon {
+          font-size: 16px;
+          width: 16px;
+          height: 16px;
+        }
+      }
+    }
+
+    .property-price {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-top: 12px;
+
+      .price-main {
+        display: flex;
+        align-items: baseline;
+        gap: 4px;
+
+        strong {
+          font-size: 18px;
+          font-weight: 600;
+          color: #222;
+        }
+
+        span {
+          font-size: 13px;
+          color: #717171;
+        }
+      }
+
+      .price-conversion {
+        font-size: 15px;
+        color: #999;
+      }
+    }
+  }
+
+  mat-card-actions {
+    padding: 8px 16px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    button:last-child {
+      margin-left: auto;
+    }
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: #bdbdbd;
+    margin-bottom: 24px;
+  }
+
+  h2 {
+    margin: 0 0 8px;
+    font-size: 24px;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  p {
+    margin: 0 0 24px;
+    color: #666;
+    font-size: 16px;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+
+    button {
+      width: 100%;
+    }
+  }
+
+  .properties-grid {
+    grid-template-columns: 1fr;
+  }
+}

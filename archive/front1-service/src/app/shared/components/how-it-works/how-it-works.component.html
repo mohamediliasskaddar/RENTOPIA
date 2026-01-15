@@ -1,0 +1,66 @@
+<!-- src/app/shared/components/how-it-works/how-it-works.component.html -->
+<!-- VERSION MODERNE AVEC VRAIES PHOTOS -->
+
+<section class="how-it-works-section">
+  <div class="container">
+
+    <h2 class="section-title">How It Works</h2>
+    <p class="section-subtitle">
+      Rent your perfect place in 3 simple steps with blockchain security
+    </p>
+
+    <div class="steps-grid">
+
+      <!-- Step 1 -->
+      <div class="step-card">
+        <div class="step-number">1</div>
+        <div class="step-image">
+          <img src="/assets/images/home3.jpg"
+               alt="Search Properties">
+        </div>
+        <div class="step-content">
+          <mat-icon class="step-icon">search</mat-icon>
+          <h3>Search & Discover</h3>
+          <p>Browse verified properties with smart filters and transparent blockchain details</p>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step-card">
+        <div class="step-number">2</div>
+        <div class="step-image">
+          <img src="/assets/images/eth2.jpg"
+               alt="Book with Crypto">
+        </div>
+        <div class="step-content">
+          <mat-icon class="step-icon">account_balance_wallet</mat-icon>
+          <h3>Book with Ethereum</h3>
+          <p>Secure your reservation instantly with cryptocurrency payments and smart contracts</p>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step-card">
+        <div class="step-number">3</div>
+        <div class="step-image">
+          <img src="/assets/images/home4.jpg"
+               alt="Check-in">
+        </div>
+        <div class="step-content">
+          <mat-icon class="step-icon">vpn_key</mat-icon>
+          <h3>Check-in & Enjoy</h3>
+          <p>Receive access details from your host and enjoy your comfortable stay</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="cta-section">
+      <button class="btn-cta" (click)="navigateToListings()">
+        Start Exploring
+        <span class="arrow">→</span>
+      </button>
+    </div>
+
+  </div>
+</section>

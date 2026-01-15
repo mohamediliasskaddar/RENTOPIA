@@ -1,0 +1,31 @@
+<!-- src/app/features/reviews/components/review-card/review-card.component.html -->
+<div class="review-card">
+
+  <!-- Header avec avatar + nom + date -->
+  <div class="review-header">
+    <div class="user-info">
+      <div class="avatar">
+        {{ getInitials(review.guestName) }}
+      </div>
+      <div class="user-details">
+        <h4 class="user-name">{{ review.guestName || 'Anonymous Guest' }}</h4>
+        <span class="review-date">{{ formatDate(review.createdAt) }}</span>
+      </div>
+    </div>
+
+    <!-- Rating étoiles -->
+    <div class="review-rating">
+      <app-rating-stars
+        [rating]="review.ratingValue || 0"
+        [showValue]="false"
+        size="small">
+      </app-rating-stars>
+    </div>
+  </div>
+
+  <!-- Contenu du review -->
+  <div class="review-content">
+    <p class="review-text">{{ review.reviewText }}</p>
+  </div>
+
+</div>

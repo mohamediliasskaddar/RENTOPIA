@@ -1,0 +1,86 @@
+/* review-card.component.scss */
+
+.review-card {
+  height:200px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  }
+
+  /* ⭐ Rating Header */
+  .rating-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .stars-container {
+      display: flex;
+      gap: 4px;
+
+      .star {
+        font-size: 22px;
+        width: 22px;
+        height: 22px;
+
+        &.filled {
+          color:  #FFD700;
+        }
+
+        &.empty {
+          color: #ccc;
+        }
+      }
+    }
+
+    .rating-number {
+      font-size: 16px;
+      font-weight: 600;
+      color: #FFD700;
+
+      span {
+        font-size: 13px;
+        color: #999;
+        margin-left: 2px;
+      }
+    }
+  }
+
+  /* 💬 Comment */
+  .comment {
+    background: #f5f5f5;
+    border-radius: 8px;
+    padding: 12px;
+
+    p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.6;
+      color:black;
+    }
+  }
+
+  /* 📅 Date */
+  .date {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #777;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+      color: rgba(16, 52, 91, 0.5);
+    }
+  }
+}

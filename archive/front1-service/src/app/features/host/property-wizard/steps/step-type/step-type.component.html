@@ -1,0 +1,66 @@
+<!-- src/app/features/host/property-wizard/steps/step-type/step-type.component.html -->
+<div class="step-type">
+  <div class="step-intro">
+    <h2>What type of place will guests have?</h2>
+    <p>Choose the option that best describes your property</p>
+  </div>
+
+  <form [formGroup]="form">
+    <!-- Property Type -->
+    <div class="section">
+      <h3>Property type</h3>
+      <div class="type-grid">
+        @for (type of propertyTypes; track type.value) {
+          <div
+            class="type-card"
+            [class.selected]="form.get('propertyType')?.value === type.value"
+            (click)="selectPropertyType(type.value)"
+          >
+            <mat-icon>{{ type.icon }}</mat-icon>
+            <span class="type-label">{{ type.label }}</span>
+            <span class="type-desc">{{ type.description }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Place Type -->
+    <div class="section">
+      <h3>Place type</h3>
+      <div class="type-grid place-types">
+        @for (type of placeTypes; track type.value) {
+          <div
+            class="type-card"
+            [class.selected]="form.get('placeType')?.value === type.value"
+            (click)="selectPlaceType(type.value)"
+          >
+            <mat-icon>{{ type.icon }}</mat-icon>
+            <span class="type-label">{{ type.label }}</span>
+            <span class="type-desc">{{ type.description }}</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Title -->
+    <div class="section">
+      <h3>Give your property a title</h3>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Property title</mat-label>
+        <input
+          matInput
+          formControlName="title"
+          placeholder="e.g., Cozy apartment in the heart of the city"
+          maxlength="100"
+        >
+        <mat-hint align="end">{{ form.get('title')?.value?.length || 0 }}/100</mat-hint>
+        @if (form.get('title')?.hasError('required')) {
+          <mat-error>Title is required</mat-error>
+        }
+        @if (form.get('title')?.hasError('minlength')) {
+          <mat-error>Title must be at least 10 characters</mat-error>
+        }
+      </mat-form-field>
+    </div>
+  </form>
+</div>

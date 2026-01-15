@@ -1,0 +1,295 @@
+// src/app/features/host/host-property-detail/components/availability-calendar/availability-calendar.component.scss
+.availability-calendar {
+  position: relative;
+}
+
+// ========== HEADER ==========
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+
+  .header-title {
+    h3 {
+      margin: 0 0 4px;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .subtitle {
+      margin: 0;
+      color: #666;
+      font-size: 14px;
+    }
+  }
+}
+
+// ========== LEGEND ==========
+.calendar-legend {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 20px;
+  padding: 12px 16px;
+  background: #f5f5f5;
+  border-radius: 8px;
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+
+    .legend-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+
+      &.available {
+        background: white;
+        border: 1px solid #e0e0e0;
+      }
+
+      &.blocked {
+        background: #ffebee;
+        border: 1px solid #ef5350;
+      }
+
+      &.booked {
+        background: #e3f2fd;
+        border: 1px solid #2196f3;
+      }
+
+      &.selected {
+        background: #e8f5e9;
+        border: 2px solid #4CAF50;
+      }
+    }
+  }
+}
+
+// ========== SELECTION ACTIONS ==========
+.selection-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: #e8f5e9;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+
+  .selection-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    color: #2e7d32;
+
+    mat-icon {
+      color: #4CAF50;
+    }
+  }
+
+  .action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+
+    .reason-select {
+      width: 150px;
+
+      ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+        display: none;
+      }
+    }
+  }
+}
+
+// ========== CALENDAR GRID ==========
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.month-card {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px;
+
+  .month-header {
+    text-align: center;
+    margin-bottom: 12px;
+
+    h4 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+  }
+
+  .weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    margin-bottom: 8px;
+
+    .weekday {
+      text-align: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: #666;
+      padding: 4px 0;
+    }
+  }
+
+  .days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+  }
+}
+
+// ========== DAY STYLES ==========
+.day {
+  position: relative;
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: default;
+  transition: all 0.15s ease;
+  background: white;
+  border: 1px solid transparent;
+
+  .day-number {
+    font-weight: 500;
+  }
+
+  .day-indicator {
+    position: absolute;
+    bottom: 2px;
+
+    mat-icon {
+      font-size: 10px;
+      width: 10px;
+      height: 10px;
+    }
+  }
+
+  &.other-month {
+    opacity: 0.3;
+  }
+
+  &.past {
+    opacity: 0.4;
+    text-decoration: line-through;
+  }
+
+  &.today {
+    .day-number {
+      background: var(--color-bg-dark, #16243e);
+      color: white;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+
+  &.selectable {
+    cursor: pointer;
+
+    &:hover {
+      background: #f5f5f5;
+      border-color: #bdbdbd;
+    }
+  }
+
+  &.blocked {
+    background: #ffebee;
+    border-color: #ef5350;
+
+    .day-indicator mat-icon {
+      color: #d32f2f;
+    }
+  }
+
+  &.booked {
+    background: #e3f2fd;
+    border-color: #2196f3;
+
+    .day-indicator mat-icon {
+      color: #1976d2;
+    }
+  }
+
+  &.selected {
+    background: #e8f5e9;
+    border: 2px solid #4CAF50;
+
+    .day-number {
+      font-weight: 600;
+    }
+  }
+}
+
+// ========== SAVING OVERLAY ==========
+.saving-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border-radius: 12px;
+  z-index: 10;
+
+  span {
+    font-weight: 500;
+    color: #666;
+  }
+}
+
+// ========== RESPONSIVE ==========
+@media (max-width: 1200px) {
+  .calendar-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .calendar-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .calendar-legend {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .selection-actions {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .action-buttons {
+      width: 100%;
+      justify-content: flex-start;
+    }
+  }
+}

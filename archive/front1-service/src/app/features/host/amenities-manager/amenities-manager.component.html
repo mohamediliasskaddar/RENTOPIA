@@ -1,0 +1,106 @@
+<!-- src/app/features/host/host-property-detail/components/amenities-manager/amenities-manager.component.html -->
+<div class="amenities-manager">
+  <!-- Header -->
+  <div class="manager-header">
+    <div class="header-info">
+      <h3>Property Amenities</h3>
+      <p class="subtitle">{{ currentAmenityIds.size }} amenities selected</p>
+    </div>
+    <button
+      mat-stroked-button
+      [color]="editMode ? 'warn' : 'primary'"
+      (click)="toggleEditMode()"
+    >
+      <mat-icon>{{ editMode ? 'close' : 'edit' }}</mat-icon>
+      {{ editMode ? 'Done' : 'Manage Amenities' }}
+    </button>
+  </div>
+
+  <!-- Loading -->
+  @if (loading) {
+    <div class="loading-container">
+      <mat-spinner diameter="32"></mat-spinner>
+      <span>Loading amenities...</span>
+    </div>
+  }
+
+  <!-- View Mode: Show current amenities -->
+  @if (!editMode && !loading) {
+    @if (currentAmenities.length > 0) {
+      <div class="current-amenities">
+        @for (entry of getCurrentAmenitiesByCategory() | keyvalue; track entry.key) {
+          <div class="amenity-category">
+            <h4 class="category-title">{{ entry.key }}</h4>
+            <div class="amenities-chips">
+              @for (amenity of entry.value; track amenity.amenityId) {
+                <div class="amenity-chip">
+                  <mat-icon>{{ amenity.icon || 'check_circle' }}</mat-icon>
+                  <span>{{ amenity.name }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="empty-state">
+        <mat-icon>wifi_off</mat-icon>
+        <h4>No Amenities</h4>
+        <p>Click "Manage Amenities" to add amenities to your property.</p>
+      </div>
+    }
+  }
+
+  <!-- Edit Mode: Show all amenities with checkboxes -->
+  @if (editMode && !loading) {
+    <div class="edit-amenities">
+      <p class="edit-hint">
+        <mat-icon>info</mat-icon>
+        Click on an amenity to add or remove it from your property.
+      </p>
+
+      <mat-accordion multi>
+        @for (entry of amenitiesByCategory | keyvalue; track entry.key) {
+          <mat-expansion-panel [expanded]="getSelectedCountInCategory(entry.key) > 0">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                {{ entry.key }}
+              </mat-panel-title>
+              <mat-panel-description>
+                {{ getSelectedCountInCategory(entry.key) }} / {{ entry.value.length }} selected
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+
+            <div class="amenities-grid">
+              @for (amenity of entry.value; track amenity.amenityId) {
+                <div
+                  class="amenity-item"
+                  [class.selected]="isSelected(amenity.amenityId)"
+                  [class.saving]="saving"
+                  (click)="toggleAmenity(amenity)"
+                >
+                  <mat-checkbox
+                    [checked]="isSelected(amenity.amenityId)"
+                    [disabled]="saving"
+                    (click)="$event.stopPropagation()"
+                    (change)="toggleAmenity(amenity)"
+                  ></mat-checkbox>
+                  <mat-icon class="amenity-icon">{{ amenity.icon || 'check_circle' }}</mat-icon>
+                  <span class="amenity-name">{{ amenity.name }}</span>
+                </div>
+              }
+            </div>
+          </mat-expansion-panel>
+        }
+      </mat-accordion>
+    </div>
+  }
+
+  <!-- Saving overlay -->
+  @if (saving) {
+    <div class="saving-indicator">
+      <mat-spinner diameter="20"></mat-spinner>
+      <span>Saving...</span>
+    </div>
+  }
+</div>

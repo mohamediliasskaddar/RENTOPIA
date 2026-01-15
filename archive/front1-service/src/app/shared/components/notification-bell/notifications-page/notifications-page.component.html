@@ -1,0 +1,112 @@
+<br><br><br>
+<div class="notifications-page">
+  <!-- Header -->
+  <header class="page-header">
+    <div class="header-left">
+      <h1>Notifications</h1>
+      <p class="subtitle">{{ unreadCount }} unread</p>
+    </div>
+    @if (unreadCount > 0) {
+      <button mat-button class="mark-all-btn" (click)="markAllAsRead()">
+        <mat-icon>done_all</mat-icon>
+        Mark all as read
+      </button>
+    }
+  </header>
+
+  <!-- Tabs -->
+  <div class="tabs-container">
+    <button
+      class="tab-btn"
+      [class.active]="selectedTab === 0"
+      (click)="selectedTab = 0"
+    >
+      All
+      <span class="count">{{ allNotifications.length }}</span>
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="selectedTab === 1"
+      (click)="selectedTab = 1"
+    >
+      Unread
+      @if (unreadCount > 0) {
+        <span class="count unread">{{ unreadCount }}</span>
+      }
+    </button>
+  </div>
+
+  <!-- Loading -->
+  @if (loading) {
+    <div class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Loading notifications...</p>
+    </div>
+  }
+
+  <!-- Empty State -->
+  @else if (currentNotifications.length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">
+        <mat-icon>notifications_none</mat-icon>
+      </div>
+      <h3>{{ selectedTab === 0 ? 'No notifications yet' : 'All caught up!' }}</h3>
+      <p>{{ selectedTab === 0 ? 'We\'ll notify you when something important happens' : 'You\'ve read all your notifications' }}</p>
+    </div>
+  }
+
+  <!-- Notifications List -->
+  @else {
+    <div class="notifications-list">
+      @for (notification of currentNotifications; track trackById($index, notification)) {
+        <div
+          class="notification-item"
+          [class.unread]="!notification.isRead"
+          (click)="onNotificationClick(notification)"
+        >
+          <!-- Unread Indicator -->
+          @if (!notification.isRead) {
+            <div class="unread-dot"></div>
+          }
+
+          <!-- Icon -->
+          <div class="notif-icon" [class]="'icon-' + notification.notificationType.toLowerCase()">
+            <mat-icon>{{ getIcon(notification.notificationType) }}</mat-icon>
+          </div>
+
+          <!-- Content -->
+          <div class="notif-content">
+            <div class="notif-meta">
+              <span class="notif-type">{{ getTypeLabel(notification.notificationType) }}</span>
+              <span class="notif-date">{{ formatDate(notification.createdAt) }}</span>
+            </div>
+            <h4 class="notif-title">{{ notification.title }}</h4>
+            <p class="notif-message">{{ notification.message }}</p>
+          </div>
+
+          <!-- Actions -->
+          <div class="notif-actions">
+            @if (!notification.isRead) {
+              <button
+                mat-icon-button
+                class="action-btn"
+                (click)="markAsRead(notification, $event)"
+                matTooltip="Mark as read"
+              >
+                <mat-icon>check</mat-icon>
+              </button>
+            }
+            <button
+              mat-icon-button
+              class="action-btn delete-btn"
+              (click)="deleteNotification(notification, $event)"
+              matTooltip="Delete"
+            >
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
