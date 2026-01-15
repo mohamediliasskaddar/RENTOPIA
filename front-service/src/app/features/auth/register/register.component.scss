@@ -1,0 +1,669 @@
+// src/app/features/auth/register/register.component.scss
+
+// ============================
+// CONTAINER PRINCIPAL - SPLIT SCREEN
+// ============================
+.register-container {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  position: relative;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ============================
+// LEFT SIDE: IMAGE HERO
+// ============================
+.register-hero {
+  position: relative;
+  background-image: url('/assets/images/register-hero.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+
+  @media (max-width: 1024px) {
+    display: none;
+  }
+
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        135deg,
+        rgba(0, 0, 0, 0.7) 0%,
+        rgba(0, 0, 0, 0.5) 100%
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+  }
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    color: white;
+    max-width: 500px;
+  }
+
+  .hero-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin: 0 0 1rem 0;
+    line-height: 1.2;
+    letter-spacing: -1px;
+
+    @media (max-width: 1280px) {
+      font-size: 2.5rem;
+    }
+  }
+
+  .hero-subtitle {
+    font-size: 1.125rem;
+    line-height: 1.6;
+    margin: 0 0 3rem 0;
+    opacity: 0.95;
+    font-weight: 300;
+  }
+
+  .hero-features {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.25rem;
+
+      mat-icon {
+        font-size: 32px;
+        width: 32px;
+        height: 32px;
+        color: #e67e22;
+        flex-shrink: 0;
+      }
+
+      .feature-text {
+        strong {
+          display: block;
+          font-size: 1.125rem;
+          font-weight: 600;
+          margin-bottom: 0.25rem;
+        }
+
+        p {
+          margin: 0;
+          font-size: 0.95rem;
+          opacity: 0.9;
+          line-height: 1.5;
+        }
+      }
+    }
+  }
+}
+
+// ============================
+// RIGHT SIDE: REGISTER FORM
+// ============================
+.register-form-side {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: white;
+  overflow-y: auto;
+
+  @media (max-width: 600px) {
+    padding: 1.5rem;
+  }
+}
+
+.register-card-wrapper {
+  width: 100%;
+  max-width: 520px;
+  animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ============================
+// HEADER
+// ============================
+.register-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.logo-icon {
+  font-size: 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  color: #10345B;
+}
+
+.app-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #222;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.header-subtitle {
+  font-size: 0.95rem;
+  color: #717171;
+  margin: 0;
+  font-weight: 400;
+}
+
+// ============================
+// STEPPER VERTICAL MODERNE
+// ============================
+::ng-deep {
+  .mat-vertical-stepper-header {
+    padding: 1rem !important;
+    margin-bottom: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: #f7f7f7 !important;
+    }
+
+    .mat-step-icon {
+      background-color: #e0e0e0 !important;
+      color: #717171 !important;
+      border: 2px solid white;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+      width: 32px !important;
+      height: 32px !important;
+      transition: all 0.3s ease;
+    }
+
+    .mat-step-icon-selected {
+      background: #10345B !important;
+      color: white !important;
+      transform: scale(1.05);
+      box-shadow: 0 2px 8px rgba(16, 52, 91, 0.3);
+    }
+
+    .mat-step-icon-state-done {
+      background: #00a699 !important;
+      color: white !important;
+    }
+
+    .mat-step-label {
+      font-weight: 500;
+      color: #717171;
+      font-size: 0.9rem;
+    }
+
+    .mat-step-label-active {
+      color: #222 !important;
+      font-weight: 600;
+    }
+  }
+
+  .mat-vertical-content-container {
+    padding-left: 3rem !important;
+  }
+
+  .mat-vertical-stepper-content {
+    padding-top: 0.5rem !important;
+  }
+
+  // Style des form fields
+  .mat-mdc-form-field {
+    .mat-mdc-text-field-wrapper {
+      background-color: white;
+    }
+
+    .mdc-text-field--outlined {
+      .mdc-notched-outline__leading,
+      .mdc-notched-outline__notch,
+      .mdc-notched-outline__trailing {
+        border-color: #b0b0b0;
+      }
+
+      &:hover .mdc-notched-outline {
+        .mdc-notched-outline__leading,
+        .mdc-notched-outline__notch,
+        .mdc-notched-outline__trailing {
+          border-color: #222;
+        }
+      }
+
+      &.mdc-text-field--focused .mdc-notched-outline {
+        .mdc-notched-outline__leading,
+        .mdc-notched-outline__notch,
+        .mdc-notched-outline__trailing {
+          border-color: #10345B;
+          border-width: 2px;
+        }
+      }
+    }
+
+    .mat-mdc-form-field-icon-prefix mat-icon {
+      color: #717171;
+    }
+  }
+
+  .mat-stepper-vertical {
+    background: transparent !important;
+  }
+}
+
+// ============================
+// CONTENU DES ÉTAPES
+// ============================
+.step-content {
+  padding: 1rem 0 1.5rem;
+}
+
+.step-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 0.5rem;
+}
+
+.step-description {
+  font-size: 0.875rem;
+  color: #717171;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+// ============================
+// WARNING BOX
+// ============================
+.warning-box {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #fff8e1;
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+
+  .warning-icon {
+    color: #f57c00;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .warning-content {
+    flex: 1;
+
+    h3 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #222;
+      margin: 0 0 0.5rem;
+    }
+
+    p {
+      font-size: 0.85rem;
+      color: #717171;
+      margin: 0 0 0.75rem;
+      line-height: 1.5;
+    }
+  }
+
+  .install-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #222;
+    text-decoration: underline;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: color 0.2s;
+
+    &:hover {
+      color: #000;
+    }
+
+    mat-icon {
+      font-size: 1.125rem;
+      width: 1.125rem;
+      height: 1.125rem;
+    }
+  }
+}
+
+// ============================
+// BOUTON METAMASK
+// ============================
+.metamask-button {
+  width: 100%;
+  height: 52px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px !important;
+  text-transform: none;
+  margin-bottom: 1.5rem;
+  transition: all 0.2s ease;
+  background: linear-gradient(to right, #10345B, #0d2847) !important;
+
+  &:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(16, 52, 91, 0.3) !important;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .button-spinner {
+    margin-right: 0.5rem;
+  }
+
+  .button-icon {
+    margin-right: 0.5rem;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+  }
+}
+
+// ============================
+// WALLET INFO
+// ============================
+.wallet-info {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #e8f5e9;
+  border: 1px solid #4caf50;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+
+  .info-icon {
+    color: #2e7d32;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .info-content {
+    flex: 1;
+
+    .info-label {
+      font-size: 0.8rem;
+      color: #717171;
+      margin: 0 0 0.25rem;
+      font-weight: 500;
+    }
+
+    .wallet-address {
+      font-size: 0.75rem;
+      color: #222;
+      font-family: 'Courier New', monospace;
+      word-break: break-all;
+      margin: 0;
+      background-color: rgba(0, 0, 0, 0.04);
+      padding: 0.5rem;
+      border-radius: 4px;
+    }
+  }
+}
+
+// ============================
+// FORMULAIRE
+// ============================
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  .full-width {
+    width: 100%;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+
+    @media (max-width: 600px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .half-width {
+    width: 100%;
+  }
+}
+
+// ============================
+// ACTIONS DES ÉTAPES
+// ============================
+.step-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.5rem;
+
+  button {
+    height: 48px;
+    font-weight: 600;
+    border-radius: 8px !important;
+    text-transform: none;
+    transition: all 0.2s ease;
+    font-size: 0.95rem;
+
+    &:not(:disabled):hover {
+      transform: translateY(-2px);
+    }
+
+    mat-icon {
+      vertical-align: middle;
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .back-button {
+    flex: 0 0 auto;
+    min-width: 120px;
+    border: 1px solid #b0b0b0 !important;
+    color: #717171 !important;
+
+    &:hover {
+      border-color: #222 !important;
+      color: #222 !important;
+    }
+  }
+
+  .next-button,
+  .submit-button {
+    flex: 1;
+    background: linear-gradient(to right, #10345B, #0d2847) !important;
+    color: white !important;
+
+    &:hover {
+      box-shadow: 0 4px 12px rgba(16, 52, 91, 0.3) !important;
+    }
+  }
+
+  .button-spinner {
+    margin-right: 0.5rem;
+  }
+}
+
+// ============================
+// DIVIDER
+// ============================
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 2rem 0 1.5rem 0;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #ebebeb;
+  }
+
+  .divider-text {
+    padding: 0 1rem;
+    font-size: 0.875rem;
+    color: #717171;
+    font-weight: 400;
+  }
+}
+
+// ============================
+// BOUTON LOGIN
+// ============================
+.login-button {
+  width: 100%;
+  height: 48px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px !important;
+  text-transform: none;
+  transition: all 0.2s ease;
+  border: 1px solid #222 !important;
+  color: #222 !important;
+
+  &:not(:disabled):hover {
+    background: #222 !important;
+    color: white !important;
+    transform: translateY(-2px);
+  }
+
+  .button-icon {
+    margin-right: 0.5rem;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+// ============================
+// FOOTER
+// ============================
+.register-footer {
+  text-align: center;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #ebebeb;
+
+  .footer-text {
+    font-size: 0.8rem;
+    color: #717171;
+    margin: 0;
+
+    .footer-link {
+      color: #222;
+      text-decoration: underline;
+      transition: color 0.2s;
+      font-weight: 500;
+
+      &:hover {
+        color: #000;
+      }
+    }
+  }
+}
+
+// ============================
+// SNACKBAR
+// ============================
+::ng-deep {
+  .error-snackbar,
+  .info-snackbar,
+  .success-snackbar {
+    .mat-mdc-button {
+      color: white !important;
+    }
+  }
+
+  .error-snackbar {
+    background-color: #d93025 !important;
+    color: white !important;
+  }
+
+  .info-snackbar {
+    background-color: #222 !important;
+    color: white !important;
+  }
+
+  .success-snackbar {
+    background-color: #00a699 !important;
+    color: white !important;
+  }
+}
+
+// ============================
+// RESPONSIVE
+// ============================
+@media (max-width: 1024px) {
+  .register-form-side {
+    min-height: 100vh;
+  }
+}
+
+@media (max-width: 600px) {
+  .register-form-side {
+    padding: 1.5rem;
+  }
+
+  .app-title {
+    font-size: 1.5rem;
+  }
+
+  .step-title {
+    font-size: 1rem;
+  }
+
+  .step-actions {
+    flex-direction: column;
+
+    .back-button {
+      order: 2;
+    }
+
+    .next-button,
+    .submit-button {
+      order: 1;
+    }
+
+    button {
+      width: 100%;
+      min-width: auto;
+    }
+  }
+}

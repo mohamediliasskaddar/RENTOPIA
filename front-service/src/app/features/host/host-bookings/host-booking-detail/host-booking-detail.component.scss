@@ -1,0 +1,410 @@
+// src/app/features/host/host-booking-detail/host-booking-detail.component.scss
+.booking-detail {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// ========== HEADER ==========
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+
+  .back-btn {
+    color: #666;
+  }
+
+  .header-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .status-chip {
+      padding: 4px 12px;
+      border-radius: 16px;
+      color: white;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+  }
+}
+
+// ========== LOADING & ERROR ==========
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px;
+  text-align: center;
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: #bdbdbd;
+    margin-bottom: 16px;
+  }
+
+  p {
+    color: #666;
+    margin-bottom: 16px;
+  }
+}
+
+// ========== CONTENT GRID ==========
+.content-grid {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 24px;
+}
+
+// ========== LEFT COLUMN ==========
+.left-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+// Property Card
+.property-card {
+  overflow: hidden;
+
+  .property-image {
+    height: 180px;
+    cursor: pointer;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .no-image {
+      width: 100%;
+      height: 100%;
+      background: #f5f5f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      mat-icon {
+        font-size: 48px;
+        width: 48px;
+        height: 48px;
+        color: #bdbdbd;
+      }
+    }
+  }
+
+  mat-card-content {
+    padding: 16px;
+
+    h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .location {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 12px;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+    }
+
+    .view-property-btn {
+      width: 100%;
+    }
+  }
+}
+
+// Guest Card
+.guest-card {
+  .guest-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    mat-icon {
+      font-size: 24px;
+      color: #bdbdbd;
+    }
+  }
+
+  mat-card-content {
+    padding-top: 16px;
+  }
+
+  .guest-info-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0;
+    color: #666;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      color: #999;
+    }
+  }
+}
+
+// ========== RIGHT COLUMN ==========
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+// Details Card
+.details-card {
+  mat-card-content {
+    padding-top: 16px;
+  }
+
+  mat-divider {
+    margin: 16px 0;
+  }
+
+  .dates-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    .date-item {
+      text-align: center;
+
+      .date-label {
+        font-size: 12px;
+        color: #999;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+      }
+
+      .date-value {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 2px;
+      }
+
+      .date-time {
+        font-size: 13px;
+        color: #666;
+      }
+    }
+
+    .date-separator {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+
+      mat-icon {
+        color: #ccc;
+      }
+
+      .nights {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--color-bg-dark, #16243e);
+        background: #f0f4f8;
+        padding: 4px 10px;
+        border-radius: 12px;
+      }
+    }
+  }
+
+  .price-section {
+    h4 {
+      margin: 0 0 12px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      font-size: 14px;
+
+      &.discount {
+        color: #2e7d32;
+      }
+
+      &.total {
+        font-weight: 700;
+        font-size: 16px;
+        padding-top: 12px;
+      }
+    }
+  }
+
+  .blockchain-section {
+    h4 {
+      margin: 0 0 12px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      font-size: 14px;
+
+      .label {
+        color: #666;
+      }
+
+      .value {
+        &.hash {
+          font-family: monospace;
+          font-size: 12px;
+        }
+
+        &.released {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          color: #2e7d32;
+
+          mat-icon {
+            font-size: 16px;
+            width: 16px;
+            height: 16px;
+          }
+        }
+      }
+    }
+  }
+
+  .timestamps {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
+    color: #999;
+
+    .cancelled {
+      color: #f44336;
+    }
+  }
+}
+
+// Actions Card
+.actions-card {
+  .actions-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    button {
+      mat-icon {
+        margin-right: 8px;
+      }
+    }
+
+    .no-actions {
+      color: #999;
+      text-align: center;
+      padding: 16px;
+      margin: 0;
+    }
+  }
+
+  .action-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 16px;
+    color: #666;
+  }
+}
+
+// ========== RESPONSIVE ==========
+@media (max-width: 900px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .left-column {
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    .property-card,
+    .guest-card {
+      flex: 1;
+      min-width: 280px;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .booking-detail {
+    padding: 16px;
+  }
+
+  .page-header {
+    .header-info {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+
+      h1 {
+        font-size: 20px;
+      }
+    }
+  }
+
+  .left-column {
+    flex-direction: column;
+
+    .property-card,
+    .guest-card {
+      min-width: 100%;
+    }
+  }
+
+  .details-card .dates-section {
+    flex-direction: column;
+    gap: 8px;
+
+    .date-separator {
+      flex-direction: row;
+    }
+  }
+}

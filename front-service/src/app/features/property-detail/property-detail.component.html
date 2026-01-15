@@ -1,0 +1,370 @@
+<!-- src/app/features/property-detail/property-detail.component.html -->
+<!-- VERSION AVEC RATING + REVIEWS INTÉGRÉS -->
+<br><br><br>
+<!-- LOADING STATE -->
+<div *ngIf="loading" class="loading-container">
+  <div class="spinner"></div>
+  <p>Loading property details...</p>
+</div>
+
+<!-- ERROR STATE -->
+<div *ngIf="error && !loading" class="error-container">
+  <mat-icon>error_outline</mat-icon>
+  <h2>{{ error }}</h2>
+  <button mat-raised-button color="primary" (click)="goBack()">
+    Back to listings
+  </button>
+</div>
+
+<!-- PROPERTY DETAILS -->
+<div *ngIf="property && !loading" class="property-detail">
+
+  <!-- HEADER AVEC RATING ✅ -->
+  <div class="header">
+    <button mat-icon-button class="back-button" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1 class="property-title">{{ property.title }}</h1>
+
+    <!-- ✅ MODIFIÉ : Meta-row avec rating -->
+    <div class="property-meta-row">
+      <!-- Localisation -->
+      <div class="property-location">
+        <mat-icon>location_on</mat-icon>
+        <span>{{ property.city }}, {{ property.country }}</span>
+      </div>
+
+      <!-- ✅ NOUVEAU : Rating -->
+      <div class="property-rating" >
+        <mat-icon class="star-icon">star</mat-icon>
+        <span class="rating-value">{{ averageRating.toFixed(1) }}</span>
+        <span class="rating-count">({{ totalReviews }} reviews)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHOTO GALLERY -->
+  <div class="photo-gallery">
+    <div class="main-photo">
+      <img [src]="mainPhoto" [alt]="property.title">
+    </div>
+
+    <div class="secondary-photos">
+      <div
+        *ngFor="let photo of visiblePhotos.slice(1, 5); let i = index"
+        class="secondary-photo"
+        [class.last-photo]="i === 3 && hasMorePhotos">
+        <img [src]="photo" [alt]="property.title">
+
+        <button
+          *ngIf="i === 3 && hasMorePhotos"
+          mat-raised-button
+          class="show-all-btn"
+          (click)="openPhotoGallery()">
+          <mat-icon>grid_view</mat-icon>
+          Show all {{ allPhotos.length }} photos
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="content-wrapper">
+
+    <!-- LEFT COLUMN: Property Info -->
+    <div class="left-column">
+
+      <!-- QUICK INFO -->
+      <section class="quick-info">
+        <h2>{{ property.propertyType | titlecase }} in {{ property.city }}</h2>
+        <div class="property-specs">
+          <span><mat-icon>people</mat-icon> {{ property.maxGuests }} guests</span>
+          <span><mat-icon>hotel</mat-icon> {{ property.bedrooms }} bedrooms</span>
+          <span><mat-icon>king_bed</mat-icon> {{ property.beds }} beds</span>
+          <span><mat-icon>bathroom</mat-icon> {{ property.bathrooms }} bathrooms</span>
+        </div>
+      </section>
+
+      <mat-divider></mat-divider>
+
+      <section class="stay-conditions" *ngIf="property.minStayNights || property.maxStayNights">
+        <h3>Stay conditions</h3>
+        <div class="stay-grid">
+          <div class="stay-item" *ngIf="property.minStayNights">
+            <mat-icon>nightlight</mat-icon>
+            <div>
+              <strong>Minimum stay</strong>
+              <p>{{ property.minStayNights }} nights</p>
+            </div>
+          </div>
+          <div class="stay-item" *ngIf="property.maxStayNights">
+            <mat-icon>calendar_month</mat-icon>
+            <div>
+              <strong>Maximum stay</strong>
+              <p>{{ property.maxStayNights }} nights</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <mat-divider></mat-divider>
+
+      <!-- HOST SUMMARY -->
+      <div class="host-summary">
+        <div class="host-summary-content">
+          <div class="host-avatar">
+            <img [src]="hostPhotoUrl" alt="Host profile picture">
+          </div>
+          <div class="host-text">
+            <div class="host-name">Hosted by {{ hostFullName }}</div>
+            <div class="host-meta">Host since {{ hostJoinedYear }}</div>
+          </div>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- DESCRIPTION -->
+      <section class="description-section">
+        <h3>About this place</h3>
+        <p class="description-text">{{ property.description }}</p>
+      </section>
+
+      <mat-divider></mat-divider>
+
+      <!-- AMENITIES -->
+      <section class="amenities-section" *ngIf="property.amenities && property.amenities.length > 0">
+        <h3>What this place offers</h3>
+        <div class="amenities-grid">
+          <div *ngFor="let amenity of property.amenities" class="amenity-item">
+            <mat-icon>{{ amenity.icon || 'check_circle' }}</mat-icon>
+            <span>{{ amenity.name }}</span>
+          </div>
+        </div>
+      </section>
+
+      <mat-divider></mat-divider>
+
+      <!-- LOCATION -->
+      <section class="location-section" *ngIf="property.latitude && property.longitude">
+        <h3>Where you'll be</h3>
+        <p class="location-address">
+          {{ property.adresseLine }}, {{ property.city }}, {{ property.postalCode }}
+        </p>
+        <div
+          class="map-container"
+          leaflet
+          [leafletOptions]="mapOptions"
+          [leafletLayers]="mapLayers">
+        </div>
+        <p class="neighborhood-desc" *ngIf="property.neighborhoodDescription">
+          {{ property.neighborhoodDescription }}
+        </p>
+      </section>
+
+      <mat-divider></mat-divider>
+
+
+      <!-- ✅ REVIEWS SECTION -->
+      <section class="reviews-section">
+        <h3>
+          <mat-icon>star</mat-icon>
+          {{ averageRating.toFixed(1) }} · {{ totalReviews }} {{ totalReviews === 1 ? 'review' : 'reviews' }}
+        </h3>
+
+        <app-review-list
+          [reviews]="(reviews$ | async) ?? []"
+          [stats]="(reviewStats$ | async) ?? null"
+          [loading]="(reviewsLoading$ | async) ?? false">
+        </app-review-list>
+      </section>
+
+
+
+      <mat-divider></mat-divider>
+
+      <!-- HOUSE RULES -->
+      <section class="rules-section" *ngIf="property.rules">
+        <h3>Things to know</h3>
+        <div class="rules-list">
+          <div class="rule-row">
+            <mat-icon>schedule</mat-icon>
+            <div>
+              <strong>Check-in</strong>
+              <p>{{ property.checkInTimeStart }} – {{ property.checkInTimeEnd }}</p>
+            </div>
+          </div>
+          <div class="rule-row">
+            <mat-icon>logout</mat-icon>
+            <div>
+              <strong>Check-out</strong>
+              <p>{{ property.checkOutTime }}</p>
+            </div>
+          </div>
+          <div class="rule-row">
+            <mat-icon>child_friendly</mat-icon>
+            <div>
+              <strong>Children</strong>
+              <p>{{ property.rules.childrenAllowed ? 'Allowed' : 'Not allowed' }}</p>
+            </div>
+          </div>
+          <div class="rule-row">
+            <mat-icon>pets</mat-icon>
+            <div>
+              <strong>Pets</strong>
+              <p>
+                {{ property.rules.petsAllowed ? 'Allowed' : 'Not allowed' }}
+                <span *ngIf="property.rules.petsAllowed && property.petFee">
+                  ({{ property.petFee }}€ fee)
+                </span>
+              </p>
+            </div>
+          </div>
+          <div class="rule-row">
+            <mat-icon>smoking_rooms</mat-icon>
+            <div>
+              <strong>Smoking</strong>
+              <p>{{ property.rules.smokingAllowed ? 'Allowed' : 'Not allowed' }}</p>
+            </div>
+          </div>
+          <div class="rule-row">
+            <mat-icon>celebration</mat-icon>
+            <div>
+              <strong>Events</strong>
+              <p>{{ property.rules.eventsAllowed ? 'Allowed' : 'Not allowed' }}</p>
+            </div>
+          </div>
+          <div class="rule-row">
+            <mat-icon>event_available</mat-icon>
+            <div>
+              <strong>Cancellation policy</strong>
+              <p>{{ property.cancellationPolicy }}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <mat-divider></mat-divider>
+
+      <section class="host-preferences-section" *ngIf="property.hostPreferences">
+        <h3>Host preferences</h3>
+        <div class="preferences-grid">
+          <div class="preference-item" *ngIf="property.hostPreferences.communicationStyle">
+            <mat-icon>chat</mat-icon>
+            <div>
+              <strong>Communication style</strong>
+              <p>{{ property.hostPreferences.communicationStyle }}</p>
+            </div>
+          </div>
+          <div class="preference-item" *ngIf="property.hostPreferences.checkInProcess">
+            <mat-icon>key</mat-icon>
+            <div>
+              <strong>Check-in process</strong>
+              <p>{{ property.hostPreferences.checkInProcess }}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <mat-divider></mat-divider>
+
+
+      <!-- ========================================
+           SECTION HOST PROFESSIONNELLE
+           À REMPLACER dans property-detail.component.html
+           ======================================== -->
+
+      <!-- ========================================
+         HOST SECTION SIMPLE ET PROFESSIONNELLE
+         À REMPLACER dans property-detail.component.html
+         ======================================== -->
+
+      <section class="host-section-simple" *ngIf="host">
+
+        <h3 class="section-title">Meet your host</h3>
+
+        <div class="host-card-simple">
+
+          <!-- Avatar + Nom -->
+          <div class="host-header">
+            <div class="host-avatar-wrapper">
+              <img [src]="hostPhotoUrl" [alt]="hostFullName" class="host-avatar">
+              <mat-icon class="verified-icon" *ngIf="host.emailVerified">verified</mat-icon>
+            </div>
+            <div class="host-info">
+              <h4 class="host-name">{{ hostFullName }}</h4>
+              <p class="host-joined">Joined in {{ hostJoinedYear }}</p>
+            </div>
+          </div>
+
+          <!-- Infos de contact -->
+          <div class="host-contact-info">
+            <div class="contact-item" *ngIf="host.tel">
+              <mat-icon>phone</mat-icon>
+              <span>{{ host.tel }}</span>
+            </div>
+            <div class="contact-item" *ngIf="host.email">
+              <mat-icon>email</mat-icon>
+              <span>{{ host.email }}</span>
+            </div>
+            <div class="contact-item" *ngIf="host.languages && host.languages.length > 0">
+              <mat-icon>language</mat-icon>
+              <span>{{ hostLanguages }}</span>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+    </div>
+
+    <!-- RIGHT COLUMN: Booking Card -->
+    <div class="right-column">
+      <!--
+      <div class="booking-card">
+        <div class="price-header">
+          <div class="price">
+            <span class="amount">{{ pricePerNight }}€</span>
+            <span class="period">/ night</span>
+          </div>
+          <div *ngIf="hasWeekendPrice" class="weekend-price">
+            <span class="amount">{{ weekendPrice }}€</span>
+            <span class="period">/ weekend night</span>
+          </div>
+          <mat-chip *ngIf="property.instantBooking" class="instant-booking-chip">
+            <mat-icon>bolt</mat-icon>
+            Instant Booking
+          </mat-chip>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="booking-form">
+          <p class="coming-soon">Booking form coming soon...</p>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="additional-fees" *ngIf="property.cleaningFee || property.petFee">
+          <h4>Additional fees</h4>
+          <div class="fee-item" *ngIf="property.cleaningFee">
+            <span>Cleaning fee</span>
+            <span>{{ property.cleaningFee }}€</span>
+          </div>
+          <div class="fee-item" *ngIf="property.petFee">
+            <span>Pet fee</span>
+            <span>{{ property.petFee }}€</span>
+          </div>
+        </div>
+      </div>
+      -->
+      <app-booking-card
+        *ngIf="property"
+        [property]="property"
+        [propertyId]="propertyId">
+      </app-booking-card>
+    </div>
+
+  </div>
+</div>

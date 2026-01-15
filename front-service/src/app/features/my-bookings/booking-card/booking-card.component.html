@@ -1,0 +1,121 @@
+<!-- src/app/features/my-bookings/components/booking-card/booking-card.component.html -->
+<br> <br>
+<!-- src/app/features/my-bookings/components/booking-card/booking-card.component.html -->
+
+<div class="booking-card">
+
+  <!-- Photo -->
+  <div
+    class="photo"
+    [style.background-image]="mainPhoto ? 'url(' + mainPhoto + ')' : 'none'"
+    (click)="onViewProperty()">
+    <div *ngIf="!mainPhoto" class="no-photo">
+      <mat-icon>home</mat-icon>
+    </div>
+
+    <!-- Status Badge -->
+    <div class="status-badge" [style.background-color]="statusColor">
+      {{ statusLabel }}
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- Property Info -->
+    <div class="property-info">
+      <h3 (click)="onViewProperty()">{{ booking.propertySnapshot.title }}</h3>
+      <p class="location">
+        <mat-icon>location_on</mat-icon>
+        {{ booking.propertySnapshot.city }}, {{ booking.propertySnapshot.country }}
+      </p>
+      <div class="features">
+        <span class="feature">
+          <mat-icon>hotel</mat-icon>
+          {{ booking.propertySnapshot.bedrooms }} bed{{ booking.propertySnapshot.bedrooms > 1 ? 's' : '' }}
+        </span>
+        <span class="feature">
+          <mat-icon>person</mat-icon>
+          {{ booking.propertySnapshot.maxGuests }} guest{{ booking.propertySnapshot.maxGuests > 1 ? 's' : '' }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Booking Dates -->
+    <div class="dates">
+      <div class="date-item">
+        <span class="label">Check-in</span>
+        <span class="value">{{ formatDate(checkInDate) }}</span>
+      </div>
+      <div class="separator">
+        <mat-icon>arrow_forward</mat-icon>
+      </div>
+      <div class="date-item">
+        <span class="label">Check-out</span>
+        <span class="value">{{ formatDate(checkOutDate) }}</span>
+      </div>
+      <div class="nights-badge">
+        {{ nights }} night{{ nights > 1 ? 's' : '' }}
+      </div>
+    </div>
+
+    <!-- Price & Actions -->
+    <div class="footer">
+      <div class="price">
+        <span class="label">Total Price</span>
+        <span class="value">{{ (booking.totalPrice || 0).toFixed(2) }} ETH</span>
+      </div>
+
+      <div class="actions">
+        <button
+          *ngIf="canChat"
+          mat-stroked-button
+          color="primary"
+          (click)="onMessageHost()">
+          <mat-icon>message</mat-icon>
+          Message Host
+        </button>
+        <button
+          mat-stroked-button
+          color="primary"
+          (click)="onViewDetails()">
+          <mat-icon>visibility</mat-icon>
+          View Details
+        </button>
+        <!-- ✅ AJOUTER: Bouton Leave Review -->
+        <!-- src/app/features/my-bookings/components/booking-card/booking-card.component.html -->
+        <!-- MODIFIEZ LES BOUTONS POUR TEST -->
+        <button
+
+          *ngIf="canReview && !hasReviewed"
+          mat-stroked-button
+          color="accent"
+          (click)="onLeaveReview()"
+         >
+          <mat-icon>rate_review</mat-icon>
+        Leave Review
+        </button>
+
+        <button
+          *ngIf="hasReviewed"
+          mat-stroked-button
+          color="primary"
+          (click)="onViewReview()"
+   >
+          <mat-icon>star</mat-icon>
+           View Review
+        </button>
+
+        <button
+          *ngIf="canCancel && isUpcoming"
+          mat-stroked-button
+          color="warn"
+          (click)="onCancel()">
+          <mat-icon>cancel</mat-icon>
+          Cancel
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

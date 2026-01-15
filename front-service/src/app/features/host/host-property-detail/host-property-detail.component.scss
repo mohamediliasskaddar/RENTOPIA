@@ -1,0 +1,952 @@
+// src/app/features/host/host-property-detail/host-property-detail.component.scss
+.property-detail-page {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// ========== LOADING & ERROR ==========
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: #f44336;
+    margin-bottom: 16px;
+  }
+
+  h2 {
+    margin: 0 0 8px;
+    color: #1a1a1a;
+  }
+
+  p {
+    color: #666;
+    margin: 0 0 24px;
+  }
+}
+
+// ========== SAVING INDICATOR ==========
+.saving-indicator {
+  position: fixed;
+  top: 80px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #1976d2;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+
+  span {
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+// ========== HEADER ==========
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #e0e0e0;
+
+  .header-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+
+    .back-btn {
+      margin-top: 4px;
+    }
+  }
+
+  .header-content {
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+
+      h1 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 600;
+        color: #1a1a1a;
+      }
+
+      .status-badge {
+        padding: 4px 12px;
+        border-radius: 16px;
+        font-size: 12px;
+        font-weight: 500;
+        color: white;
+      }
+    }
+
+    .location {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin: 8px 0 0;
+      color: #666;
+      font-size: 14px;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 12px;
+  }
+}
+
+// ========== TABS ==========
+mat-tab-group {
+  ::ng-deep .mat-mdc-tab {
+    min-width: 120px;
+
+    .mat-mdc-tab-label-content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+}
+
+.tab-content {
+  padding: 24px 0;
+}
+
+// ========== INFO CARDS ==========
+.overview-grid,
+.location-grid,
+.pricing-grid,
+.rules-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+
+  .full-width {
+    grid-column: span 2;
+  }
+}
+
+.info-card {
+  position: relative;
+
+  mat-card-header {
+    margin-bottom: 16px;
+
+    mat-icon[mat-card-avatar] {
+      background: var(--color-bg-dark, #16243e);
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .edit-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+    }
+
+    .add-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+    }
+  }
+
+  .info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .info-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .label {
+        color: #666;
+        font-size: 14px;
+      }
+
+      .value {
+        font-weight: 500;
+        color: #1a1a1a;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+
+        &.clickable {
+          cursor: pointer;
+          color: #1976d2;
+
+          &:hover {
+            text-decoration: underline;
+          }
+
+          mat-icon {
+            font-size: 16px;
+            width: 16px;
+            height: 16px;
+          }
+        }
+
+        mat-icon {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+        }
+      }
+    }
+  }
+
+  .description-text {
+    color: #333;
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .map-btn {
+    margin-top: 16px;
+    width: 100%;
+  }
+}
+
+// ========== EDIT FORMS ==========
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  mat-form-field {
+    width: 100%;
+  }
+
+  .full-width-field {
+    width: 100%;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+
+    &.four-cols {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 8px;
+    padding-top: 16px;
+    border-top: 1px solid #eee;
+  }
+
+  mat-slide-toggle {
+    margin: 8px 0;
+  }
+}
+
+.rules-form {
+  .toggle-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+}
+
+// ========== CAPACITY ==========
+.capacity-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  text-align: center;
+
+  .capacity-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 16px;
+    background: #f5f5f5;
+    border-radius: 12px;
+
+    mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+      color: var(--color-bg-dark, #16243e);
+    }
+
+    .number {
+      font-size: 24px;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+
+    .label {
+      font-size: 12px;
+      color: #666;
+    }
+  }
+}
+
+// ========== PHOTOS ==========
+.photos-section {
+  .photos-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+    }
+  }
+
+  .main-photo {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    background: #f5f5f5;
+
+    img {
+      width: 100%;
+      height: 500px;
+      object-fit: cover;
+    }
+
+    .photo-counter {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+    }
+  }
+
+  .photo-thumbnails {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+
+    .thumbnail {
+      position: relative;
+      flex-shrink: 0;
+      width: 100px;
+      height: 100px;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 3px solid transparent;
+      transition: all 0.2s ease;
+
+      &:hover {
+        border-color: #bdbdbd;
+      }
+
+      &.active {
+        border-color: var(--color-bg-dark, #16243e);
+      }
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .order-badge {
+        position: absolute;
+        top: 4px;
+        left: 4px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+      }
+    }
+  }
+}
+
+// ========== PRICING ==========
+.pricing-card {
+  .price-items {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .price-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #eee;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &.main {
+        .price {
+          font-size: 24px;
+          color: var(--color-bg-dark, #16243e);
+        }
+      }
+
+      .label {
+        color: #666;
+      }
+
+      .price {
+        font-weight: 600;
+        font-size: 18px;
+        color: #1a1a1a;
+      }
+    }
+  }
+}
+
+.discounts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  .discount-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: #f5f5f5;
+    border-radius: 8px;
+
+    mat-icon {
+      color: #4CAF50;
+    }
+
+    .discount-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+
+      .discount-type {
+        font-weight: 500;
+        text-transform: capitalize;
+      }
+
+      .discount-details {
+        font-size: 13px;
+        color: #666;
+      }
+    }
+  }
+}
+
+.no-data {
+  color: #999;
+  font-style: italic;
+}
+
+// ========== AMENITIES ==========
+.amenities-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+
+  h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+  }
+}
+
+.amenities-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+  .amenity-category-card {
+    mat-card-title {
+      text-transform: capitalize;
+    }
+  }
+
+  .amenities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+
+    .amenity-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px;
+      background: #f5f5f5;
+      border-radius: 8px;
+
+      mat-icon {
+        color: #4CAF50;
+      }
+
+      span {
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+// ========== RULES ==========
+.rules-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  .rule-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: #f5f5f5;
+    border-radius: 8px;
+
+    mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+
+    span {
+      font-size: 14px;
+    }
+  }
+}
+
+// ========== EMPTY STATE ==========
+.empty-state,
+.coming-soon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  background: #fafafa;
+  border-radius: 12px;
+  border: 2px dashed #e0e0e0;
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: #bdbdbd;
+    margin-bottom: 16px;
+  }
+
+  h3 {
+    margin: 0 0 8px;
+    color: #1a1a1a;
+  }
+
+  p {
+    margin: 0 0 20px;
+    color: #666;
+  }
+}
+
+// ========== RESPONSIVE ==========
+@media (max-width: 992px) {
+  .capacity-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .edit-form .form-row.four-cols {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    gap: 16px;
+
+    .header-actions {
+      width: 100%;
+
+      button {
+        flex: 1;
+      }
+    }
+  }
+
+  .overview-grid,
+  .location-grid,
+  .pricing-grid,
+  .rules-grid {
+    grid-template-columns: 1fr;
+
+    .full-width {
+      grid-column: span 1;
+    }
+  }
+
+  .capacity-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .edit-form .form-row {
+    grid-template-columns: 1fr;
+
+    &.four-cols {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .photos-section .main-photo img {
+    height: 300px;
+  }
+
+  .saving-indicator {
+    top: auto;
+    bottom: 24px;
+    right: 50%;
+    transform: translateX(50%);
+  }
+}
+.discounts-section {
+  margin-top: 32px;
+  padding-top: 32px;
+  border-top: 1px solid #e0e0e0;
+}
+
+// Ajouter ces styles à host-property-detail.component.scss
+
+// ========== AI PRICE SUGGESTION ==========
+.ai-suggestion-card {
+  background: linear-gradient(135deg, #16243e 0%, #1a2d4d 100%);
+  color: white;
+
+  mat-card-header {
+    .ai-icon {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+
+      mat-icon {
+        color: white;
+      }
+    }
+
+    mat-card-title {
+      color: white;
+      font-weight: 600;
+    }
+
+    mat-card-subtitle {
+      color: rgba(255, 255, 255, 0.9);
+    }
+  }
+
+  mat-card-content {
+    padding-top: 20px;
+  }
+}
+
+.ai-prompt {
+  text-align: center;
+  padding: 32px 20px;
+
+  .prompt-text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 0 0 24px;
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.95);
+
+    mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 32px;
+    font-size: 15px;
+    font-weight: 500;
+
+    mat-spinner {
+      margin-right: 8px;
+    }
+  }
+}
+
+.ai-suggestion-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  color: #1a1a1a;
+}
+
+.price-comparison {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 24px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-radius: 12px;
+
+  .current-price-section,
+  .suggested-price-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+
+    .label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #666;
+      font-weight: 600;
+    }
+
+    .current-price,
+    .suggested-price {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1a1a1a;
+    }
+
+    .suggested-price {
+      color: #16243e;
+    }
+
+    .eur-equivalent {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .price-difference {
+      font-size: 16px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.8);
+      margin-top: 4px;
+    }
+  }
+
+  .arrow-icon {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+    color: #667eea;
+    flex-shrink: 0;
+  }
+}
+
+.confidence-range {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #16243e;
+
+  mat-icon {
+    color: #16243e;
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    margin-top: 2px;
+  }
+
+  .range-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .range-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      color: #666;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .range-values {
+      font-size: 15px;
+      font-weight: 500;
+      color: #1a1a1a;
+    }
+  }
+}
+
+.ai-recommendation {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: #e8f5e9;
+  border-radius: 8px;
+  border-left: 4px solid #4caf50;
+
+  mat-icon {
+    color: #4caf50;
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  p {
+    margin: 0;
+    line-height: 1.6;
+    color: #2e7d32;
+    font-size: 14px;
+  }
+}
+
+.suggestion-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #eee;
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+// AI hint in edit form
+.form-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #e3f2fd;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border-left: 4px solid #2196f3;
+
+  &.ai-hint {
+    background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%);
+    border-left-color: #667eea;
+
+    mat-icon {
+      color: #667eea;
+    }
+
+    span {
+      font-size: 14px;
+      color: #1a1a1a;
+      font-weight: 500;
+    }
+  }
+}
+
+// Loading state in button
+button {
+  mat-spinner {
+    display: inline-block;
+    vertical-align: middle;
+  }
+}
+
+// ========== RESPONSIVE ==========
+@media (max-width: 768px) {
+  .price-comparison {
+    flex-direction: column;
+    gap: 16px;
+
+    .arrow-icon {
+      transform: rotate(90deg);
+    }
+
+    .current-price-section,
+    .suggested-price-section {
+      width: 100%;
+    }
+  }
+
+  .ai-prompt {
+    padding: 24px 16px;
+
+    .prompt-text {
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+}
+
+// Snackbar custom styles (à ajouter dans styles.scss global)
+.success-snackbar {
+  background: #4caf50 !important;
+  color: white !important;
+}
+
+.error-snackbar {
+  background: #f44336 !important;
+  color: white !important;
+}

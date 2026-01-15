@@ -1,0 +1,152 @@
+<!-- src/app/features/host/host-property-detail/components/photos-manager/photos-manager.component.html -->
+<div class="photos-manager">
+
+  <!-- Header -->
+  <div class="manager-header">
+    <div class="header-info">
+      <h3>Property Photos</h3>
+      <p class="subtitle">{{ sortedPhotos.length }} photo(s) • Drag to reorder</p>
+    </div>
+    <label for="photo-upload" class="upload-btn">
+      <mat-icon>add_photo_alternate</mat-icon>
+      Add Photos
+      <input
+        type="file"
+        id="photo-upload"
+        accept="image/*"
+        multiple
+        (change)="onFilesSelected($event)"
+        hidden
+      >
+    </label>
+  </div>
+
+  <!-- Upload Progress -->
+  @if (uploading) {
+    <div class="upload-progress">
+      <div class="progress-info">
+        <mat-spinner diameter="20"></mat-spinner>
+        <span>Uploading photo {{ currentUploadIndex }} of {{ uploadQueue.length }}...</span>
+      </div>
+      <mat-progress-bar mode="determinate" [value]="uploadProgress"></mat-progress-bar>
+    </div>
+  }
+
+  <!-- Reordering Indicator -->
+  @if (reordering) {
+    <div class="reordering-indicator">
+      <mat-spinner diameter="16"></mat-spinner>
+      <span>Saving order...</span>
+    </div>
+  }
+
+  <!-- Drop Zone (when no photos) -->
+  @if (sortedPhotos.length === 0 && !uploading) {
+    <div
+      class="drop-zone empty"
+      (drop)="onDrop($event)"
+      (dragover)="onDragOver($event)"
+    >
+      <mat-icon>cloud_upload</mat-icon>
+      <h4>No photos yet</h4>
+      <p>Drag and drop photos here or click "Add Photos" above</p>
+      <span class="formats">JPEG, PNG, WebP • Max 10MB per file</span>
+    </div>
+  }
+
+  <!-- Photos Grid -->
+  @if (sortedPhotos.length > 0) {
+    <div
+      class="photos-grid"
+      cdkDropList
+      cdkDropListOrientation="horizontal"
+      (cdkDropListDropped)="onPhotoDrop($event)"
+      (drop)="onDrop($event)"
+      (dragover)="onDragOver($event)"
+    >
+      @for (photo of sortedPhotos; track photo.photoId; let i = $index) {
+        <div
+          class="photo-card"
+          cdkDrag
+          [class.is-cover]="photo.isCover"
+          [class.is-deleting]="deleting === photo.photoId"
+        >
+          <!-- Drag Handle -->
+          <div class="drag-handle" cdkDragHandle>
+            <mat-icon>drag_indicator</mat-icon>
+          </div>
+
+          <!-- Photo Image -->
+          <div class="photo-image">
+            <img [src]="getPhotoUrl(photo)" [alt]="'Photo ' + (i + 1)">
+
+            <!-- Cover Badge -->
+            @if (photo.isCover) {
+              <div class="cover-badge">
+                <mat-icon>star</mat-icon>
+                Cover
+              </div>
+            }
+
+            <!-- Order Number -->
+            <div class="order-number">{{ i + 1 }}</div>
+
+            <!-- Loading Overlay -->
+            @if (deleting === photo.photoId || settingCover === photo.photoId) {
+              <div class="loading-overlay">
+                <mat-spinner diameter="32"></mat-spinner>
+              </div>
+            }
+          </div>
+
+          <!-- Photo Actions -->
+          <div class="photo-actions">
+            @if (!photo.isCover) {
+              <button
+                mat-icon-button
+                (click)="setCover(photo)"
+                matTooltip="Set as cover"
+                [disabled]="deleting !== null || settingCover !== null"
+              >
+                <mat-icon>star_border</mat-icon>
+              </button>
+            } @else {
+              <button mat-icon-button disabled matTooltip="Current cover">
+                <mat-icon class="cover-icon">star</mat-icon>
+              </button>
+            }
+
+            <button
+              mat-icon-button
+              color="warn"
+              (click)="deletePhoto(photo)"
+              matTooltip="Delete photo"
+              [disabled]="deleting !== null || settingCover !== null"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Add More Card -->
+      <label for="photo-upload" class="add-more-card">
+        <mat-icon>add</mat-icon>
+        <span>Add more</span>
+      </label>
+    </div>
+  }
+
+  <!-- Tips -->
+  <div class="photo-tips">
+    <mat-icon>lightbulb</mat-icon>
+    <div class="tips-content">
+      <strong>Tips for great photos:</strong>
+      <ul>
+        <li>Use natural lighting and show the entire space</li>
+        <li>The cover photo appears in search results - make it count!</li>
+        <li>Drag photos to reorder them</li>
+      </ul>
+    </div>
+  </div>
+</div>

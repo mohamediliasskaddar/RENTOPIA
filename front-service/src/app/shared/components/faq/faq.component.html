@@ -1,0 +1,115 @@
+<!-- src/app/features/faq/faq.component.html -->
+
+<div class="faq-page">
+
+  <!-- HERO SECTION -->
+  <section class="hero-section">
+    <div class="container">
+      <mat-icon class="hero-icon">quiz</mat-icon>
+      <h1>Frequently Asked Questions</h1>
+      <p class="subtitle">
+        Find answers to common questions about booking, payments, hosting, and blockchain technology
+      </p>
+
+      <!-- SEARCH BAR -->
+      <div class="search-container">
+        <mat-form-field class="search-field" appearance="outline">
+          <mat-icon matPrefix>search</mat-icon>
+          <input
+            matInput
+            [(ngModel)]="searchQuery"
+            placeholder="Search questions..."
+            type="text">
+          <button
+            *ngIf="searchQuery"
+            matSuffix
+            mat-icon-button
+            (click)="clearSearch()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </mat-form-field>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORIES -->
+  <section class="categories-section">
+    <div class="container">
+      <div class="categories-grid">
+        <button
+          *ngFor="let category of categories"
+          class="category-chip"
+          [class.active]="selectedCategory === category.name"
+          (click)="selectCategory(category.name)">
+          <mat-icon>{{ category.icon }}</mat-icon>
+          <span class="category-name">{{ getCategoryLabel(category.name) }}</span>
+          <span class="category-count">{{ category.count }}</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ LIST -->
+  <section class="faq-list-section">
+    <div class="container">
+
+      <!-- Results count -->
+      <div class="results-info" *ngIf="searchQuery || selectedCategory !== 'all'">
+        <p>
+          <strong>{{ filteredFAQs.length }}</strong>
+          {{ filteredFAQs.length === 1 ? 'question' : 'questions' }} found
+        </p>
+      </div>
+
+      <!-- FAQ Accordion -->
+      <mat-accordion class="faq-accordion" *ngIf="filteredFAQs.length > 0">
+        <mat-expansion-panel *ngFor="let faq of filteredFAQs">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <mat-icon class="question-icon">help_outline</mat-icon>
+              <span>{{ faq.question }}</span>
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <div class="answer-content">
+            <p>{{ faq.answer }}</p>
+          </div>
+        </mat-expansion-panel>
+      </mat-accordion>
+
+      <!-- No results -->
+      <div class="no-results" *ngIf="filteredFAQs.length === 0">
+        <mat-icon>search_off</mat-icon>
+        <h3>No questions found</h3>
+        <p>Try adjusting your search or browse all categories</p>
+        <button mat-raised-button color="primary" (click)="searchQuery = ''; selectedCategory = 'all'">
+          Show All Questions
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CTA SECTION -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-content">
+        <mat-icon class="cta-icon">support_agent</mat-icon>
+        <h2>Still need help?</h2>
+        <p>Our support team is available 24/7 to answer your questions</p>
+        <div class="cta-buttons">
+
+
+          <a routerLink="/contact" class="btn-primary" mat-raised-button>
+            <mat-icon>support_agent</mat-icon>
+            Contact Support
+          </a>
+          <a routerLink="/trust-safety" class="btn-secondary" mat-stroked-button>
+            <mat-icon>shield</mat-icon>
+            Trust & Safety
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>

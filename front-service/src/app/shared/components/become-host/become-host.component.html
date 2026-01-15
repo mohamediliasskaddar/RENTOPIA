@@ -1,0 +1,100 @@
+<!-- src/app/shared/components/become-host/become-host.component.html -->
+<!-- VERSION MODERNE AVEC VRAIE PHOTO -->
+
+<section class="become-host-section" *ngIf="shouldDisplay">
+  <div class="container">
+
+    <!-- LEFT: PHOTO AVEC STATS FLOTTANTS -->
+    <div class="content-left">
+      <div class="host-image-container">
+        <img src="/assets/images/home5.jpg"
+             alt="Become a Host">
+
+        <!-- Stats flottants sur la photo -->
+        <div class="floating-stats">
+          <div class="stat-badge">
+            <div class="stat-value">5K+</div>
+            <div class="stat-label">Active Hosts</div>
+          </div>
+          <div class="stat-badge">
+            <div class="stat-value">2%</div>
+            <div class="stat-label">Platform Fees</div>
+          </div>
+          <div class="stat-badge">
+            <div class="stat-value">24/7</div>
+            <div class="stat-label">Support</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: CONTENU TEXTE -->
+    <div class="content-right">
+
+      <div class="badge">
+        <mat-icon>apartment</mat-icon>
+        <span>{{ badgeText }}</span>
+      </div>
+
+      <h2>{{ title }}</h2>
+
+      <p class="subtitle">
+        {{ subtitle }}
+      </p>
+
+      <!-- Benefits List -->
+      <div class="benefits-list">
+        <div class="benefit-item" *ngFor="let benefit of benefits">
+          <div class="benefit-icon">
+            <mat-icon>{{ benefit.icon }}</mat-icon>
+          </div>
+          <div class="benefit-text">
+            <h3>{{ benefit.title }}</h3>
+            <p>{{ benefit.description }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA Button -->
+      <button class="cta-btn" (click)="navigateToHostSignup()">
+        {{ ctaButtonText }}
+        <span class="arrow">→</span>
+      </button>
+
+    </div>
+
+  </div>
+  <div *ngIf="isBecomeHostRoute"  >
+    <div class="extra-card" >
+      <h3>Why Become a Host?</h3>
+      <p>
+        Hosting on our platform lets you earn in cryptocurrency securely and transparently.
+        Connect with travelers worldwide and manage your properties with complete control.
+      </p>
+      <p>
+        Enjoy 24/7 support, flexible pricing, and the freedom to expand your hosting business.
+      </p>
+    </div>
+
+    <div class="extra-card">
+      <h3>Get Started Easily</h3>
+      <p>
+        Listing your property is fast and straightforward. Fill in the details, set your pricing,
+        and start receiving bookings in minutes.
+      </p>
+      <p>
+        Our platform guides you through every step, ensuring your first property is listed successfully
+        and optimized for maximum visibility.
+      </p>
+    </div>
+
+    <div class="extra-card">
+      <h3>Earn Globally</h3>
+      <p>
+        Connect with travelers from around the world and maximize your bookings.
+        Flexible pricing and calendar management help you earn more efficiently.
+      </p>
+    </div>
+  </div>
+
+</section>

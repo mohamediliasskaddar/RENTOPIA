@@ -1,0 +1,307 @@
+<!-- src/app/features/auth/register/register.component.html -->
+
+<div class="register-container">
+
+  <!-- ========================================
+       LEFT SIDE: IMAGE HERO
+  ========================================= -->
+  <div class="register-hero">
+    <div class="hero-overlay">
+      <div class="hero-content">
+        <h1 class="hero-title">Join Rentopia Today</h1>
+        <p class="hero-subtitle">
+          Create your account and start your decentralized rental journey
+        </p>
+        <div class="hero-features">
+          <div class="feature-item">
+            <mat-icon>security</mat-icon>
+            <div class="feature-text">
+              <strong>Blockchain Security</strong>
+              <p>Your data protected by Web3 technology</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <mat-icon>speed</mat-icon>
+            <div class="feature-text">
+              <strong>Quick Setup</strong>
+              <p>Get started in just 2 simple steps</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <mat-icon>verified_user</mat-icon>
+            <div class="feature-text">
+              <strong>Verified Identity</strong>
+              <p>No passwords, just your wallet</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================
+       RIGHT SIDE: REGISTER FORM
+  ========================================= -->
+  <div class="register-form-side">
+    <div class="register-card-wrapper">
+
+      <!-- Logo & Title -->
+      <div class="register-header">
+        <div class="logo-container">
+          <mat-icon class="logo-icon">home</mat-icon>
+          <h1 class="app-title">Rentopia</h1>
+        </div>
+        <p class="header-subtitle">Create your account</p>
+      </div>
+
+      <!-- Stepper Content -->
+      <div class="register-content">
+        <mat-stepper [linear]="isLinear" #stepper orientation="vertical">
+
+          <!-- ========================================
+               ÉTAPE 1 : CONNEXION METAMASK
+          ========================================= -->
+          <mat-step [completed]="firstStepCompleted" [editable]="false">
+            <ng-template matStepLabel>Connect MetaMask</ng-template>
+
+            <div class="step-content">
+              <h2 class="step-title">Step 1: Your Ethereum Wallet</h2>
+              <p class="step-description">
+                Connect your MetaMask wallet to create your blockchain identity
+              </p>
+
+              <!-- Warning si MetaMask pas installé -->
+              <div class="warning-box" *ngIf="!metaMaskInstalled">
+                <mat-icon class="warning-icon">warning</mat-icon>
+                <div class="warning-content">
+                  <h3>MetaMask Required</h3>
+                  <p>Please install MetaMask to continue</p>
+                  <a href="https://metamask.io/download/" target="_blank" class="install-link">
+                    <mat-icon>get_app</mat-icon>
+                    Install MetaMask
+                  </a>
+                </div>
+              </div>
+
+              <!-- Bouton connexion MetaMask -->
+              <button
+                mat-raised-button
+                color="primary"
+                class="metamask-button"
+                (click)="connectMetaMask()"
+                [disabled]="!metaMaskInstalled || isConnecting || walletConnected"
+              >
+                <mat-spinner
+                  *ngIf="isConnecting"
+                  diameter="20"
+                  class="button-spinner"
+                ></mat-spinner>
+
+                <span *ngIf="!isConnecting && !walletConnected">
+                  <mat-icon class="button-icon">account_balance_wallet</mat-icon>
+                  Connect MetaMask
+                </span>
+
+                <span *ngIf="isConnecting">
+                  Connecting...
+                </span>
+
+                <span *ngIf="walletConnected && !isConnecting">
+                  <mat-icon class="button-icon">check_circle</mat-icon>
+                  Wallet Connected
+                </span>
+              </button>
+
+              <!-- Affichage wallet connecté -->
+              <div class="wallet-info" *ngIf="walletConnected && walletAddress">
+                <mat-icon class="info-icon">check_circle</mat-icon>
+                <div class="info-content">
+                  <p class="info-label">Wallet address:</p>
+                  <p class="wallet-address">{{ walletAddress }}</p>
+                </div>
+              </div>
+
+              <!-- Bouton suivant -->
+              <div class="step-actions">
+                <button
+                  mat-raised-button
+                  color="primary"
+                  matStepperNext
+                  [disabled]="!walletConnected"
+                  class="next-button"
+                >
+                  Next Step
+                  <mat-icon>arrow_forward</mat-icon>
+                </button>
+              </div>
+            </div>
+          </mat-step>
+
+          <!-- ========================================
+               ÉTAPE 2 : FORMULAIRE D'INSCRIPTION
+          ========================================= -->
+          <mat-step>
+            <ng-template matStepLabel>Personal Information</ng-template>
+
+            <div class="step-content">
+              <h2 class="step-title">Step 2: Your Details</h2>
+              <p class="step-description">
+                Complete your profile to finish registration
+              </p>
+
+              <!-- Formulaire -->
+              <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+
+                <!-- Nom & Prénom (2 colonnes) -->
+                <div class="form-row">
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>Last Name</mat-label>
+                    <input
+                      matInput
+                      formControlName="nom"
+                      placeholder="Your last name"
+                      required
+                    />
+                    <mat-icon matPrefix>person</mat-icon>
+                    <mat-error *ngIf="registerForm.get('nom')?.invalid">
+                      {{ getErrorMessage('nom') }}
+                    </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="half-width">
+                    <mat-label>First Name</mat-label>
+                    <input
+                      matInput
+                      formControlName="prenom"
+                      placeholder="Your first name"
+                      required
+                    />
+                    <mat-icon matPrefix>person_outline</mat-icon>
+                    <mat-error *ngIf="registerForm.get('prenom')?.invalid">
+                      {{ getErrorMessage('prenom') }}
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <!-- Email -->
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Email</mat-label>
+                  <input
+                    matInput
+                    type="email"
+                    formControlName="email"
+                    placeholder="your@email.com"
+                    required
+                  />
+                  <mat-icon matPrefix>email</mat-icon>
+                  <mat-error *ngIf="registerForm.get('email')?.invalid">
+                    {{ getErrorMessage('email') }}
+                  </mat-error>
+                </mat-form-field>
+
+                <!-- Téléphone (optionnel) -->
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Phone Number</mat-label>
+                  <input
+                    matInput
+                    type="tel"
+                    formControlName="tel"
+                    placeholder="+1 234 567 8900"
+                  />
+                  <mat-icon matPrefix>phone</mat-icon>
+                  <mat-hint>Optional</mat-hint>
+                </mat-form-field>
+
+                <!-- Mot de passe -->
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Password</mat-label>
+                  <input
+                    matInput
+                    [type]="hidePassword ? 'password' : 'text'"
+                    formControlName="password"
+                    placeholder="Minimum 8 characters"
+                    required
+                  />
+                  <mat-icon matPrefix>lock</mat-icon>
+                  <button
+                    mat-icon-button
+                    matSuffix
+                    type="button"
+                    (click)="hidePassword = !hidePassword"
+                    [attr.aria-label]="'Show password'"
+                  >
+                    <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                  </button>
+                  <mat-error *ngIf="registerForm.get('password')?.invalid">
+                    {{ getErrorMessage('password') }}
+                  </mat-error>
+                </mat-form-field>
+
+                <!-- Actions -->
+                <div class="step-actions">
+                  <button
+                    mat-stroked-button
+                    type="button"
+                    matStepperPrevious
+                    class="back-button"
+                  >
+                    <mat-icon>arrow_back</mat-icon>
+                    Back
+                  </button>
+
+                  <button
+                    mat-raised-button
+                    color="primary"
+                    type="submit"
+                    [disabled]="registerForm.invalid || (loading$ | async)"
+                    class="submit-button"
+                  >
+                    <mat-spinner
+                      *ngIf="loading$ | async"
+                      diameter="20"
+                      class="button-spinner"
+                    ></mat-spinner>
+                    <span *ngIf="!(loading$ | async)">
+                      Create Account
+                      <mat-icon>check</mat-icon>
+                    </span>
+                    <span *ngIf="loading$ | async">
+                      Creating...
+                    </span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </mat-step>
+        </mat-stepper>
+
+        <!-- Divider -->
+        <div class="divider">
+          <span class="divider-text">Already have an account?</span>
+        </div>
+
+        <!-- Lien vers login -->
+        <button
+          mat-stroked-button
+          class="login-button"
+          (click)="goToLogin()"
+        >
+          <mat-icon class="button-icon">login</mat-icon>
+          Sign In
+        </button>
+
+        <!-- Footer -->
+        <div class="register-footer">
+          <p class="footer-text">
+            By signing up, you agree to our
+            <a href="/terms" class="footer-link">Terms</a>
+            and
+            <a href="/privacy" class="footer-link">Privacy Policy</a>
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,257 @@
+<!-- src/app/features/my-bookings/booking-detail-dialog/booking-detail-dialog.component.html -->
+<!-- ✅ VERSION RESTRUCTURÉE - Sans double scrollbar -->
+
+<div class="booking-detail-dialog">
+
+  <!-- Loading -->
+  <div *ngIf="loading$ | async" class="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading booking details...</p>
+  </div>
+
+  <!-- Content -->
+  <ng-container *ngIf="(booking$ | async) || data.booking as booking">
+
+    <!-- ========================================
+         HEADER - FIXED (ne scroll pas)
+         ======================================== -->
+    <div class="dialog-header">
+      <div
+        class="photo-banner"
+        [style.background-image]="getMainPhoto(booking) ? 'url(' + getMainPhoto(booking) + ')' : 'none'">
+        <div class="overlay"></div>
+        <div class="header-content">
+          <div class="status-badge" [style.background-color]="getStatusColor(booking.status)">
+            {{ getStatusLabel(booking.status) }}
+          </div>
+          <h2>{{ booking.propertySnapshot.title }}</h2>
+          <p class="location">
+            <mat-icon>location_on</mat-icon>
+            {{ booking.propertySnapshot.city }}, {{ booking.propertySnapshot.country }}
+          </p>
+        </div>
+        <button mat-icon-button class="close-btn" (click)="onClose()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- ========================================
+         SCROLLABLE CONTENT
+         ======================================== -->
+    <mat-dialog-content>
+
+      <!-- Booking Summary -->
+      <div class="section booking-summary">
+        <div class="dates-row">
+          <div class="date-block">
+            <span class="label">Check-in</span>
+            <span class="date">{{ formatDate(booking.checkIn) }}</span>
+            <span class="time">{{ formatTime(booking.propertySnapshot.checkInTimeStart) }}</span>
+          </div>
+          <div class="arrow">
+            <mat-icon>arrow_forward</mat-icon>
+            <span class="nights">{{ getNights(booking) }} nights</span>
+          </div>
+          <div class="date-block">
+            <span class="label">Check-out</span>
+            <span class="date">{{ formatDate(booking.checkOut) }}</span>
+            <span class="time">{{ formatTime(booking.propertySnapshot.checkOutTime) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Tabs -->
+      <mat-tab-group class="detail-tabs">
+
+        <!-- ========== TAB: Property ========== -->
+        <mat-tab label="Property">
+          <div class="tab-content">
+
+            <!-- Description -->
+            <div class="info-block">
+              <h4>About this place</h4>
+              <p>{{ booking.propertySnapshot.description || 'No description available' }}</p>
+            </div>
+
+            <!-- Features -->
+            <div class="info-block">
+              <h4>Features</h4>
+              <div class="features-grid">
+                <div class="feature">
+                  <mat-icon>hotel</mat-icon>
+                  <span>{{ booking.propertySnapshot.bedrooms }} Bedroom{{ booking.propertySnapshot.bedrooms > 1 ? 's' : '' }}</span>
+                </div>
+                <div class="feature">
+                  <mat-icon>king_bed</mat-icon>
+                  <span>{{ booking.propertySnapshot.beds }} Bed{{ booking.propertySnapshot.beds > 1 ? 's' : '' }}</span>
+                </div>
+                <div class="feature">
+                  <mat-icon>bathtub</mat-icon>
+                  <span>{{ booking.propertySnapshot.bathrooms }} Bathroom{{ booking.propertySnapshot.bathrooms > 1 ? 's' : '' }}</span>
+                </div>
+                <div class="feature">
+                  <mat-icon>group</mat-icon>
+                  <span>{{ booking.propertySnapshot.maxGuests }} Guest{{ booking.propertySnapshot.maxGuests > 1 ? 's' : '' }} max</span>
+                </div>
+                <div class="feature" *ngIf="booking.propertySnapshot.surfaceArea">
+                  <mat-icon>square_foot</mat-icon>
+                  <span>{{ booking.propertySnapshot.surfaceArea }} m²</span>
+                </div>
+                <div class="feature" *ngIf="booking.propertySnapshot.floorNumber">
+                  <mat-icon>layers</mat-icon>
+                  <span>Floor {{ booking.propertySnapshot.floorNumber }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Amenities -->
+            <div class="info-block" *ngIf="booking.propertySnapshot.amenities && booking.propertySnapshot.amenities.length > 0">
+              <h4>Amenities</h4>
+              <div class="amenities-list">
+                <mat-chip-set>
+                  <mat-chip *ngFor="let amenity of booking.propertySnapshot.amenities">
+                    <mat-icon *ngIf="amenity.icon">{{ amenity.icon }}</mat-icon>
+                    {{ amenity.name }}
+                  </mat-chip>
+                </mat-chip-set>
+              </div>
+            </div>
+
+          </div>
+        </mat-tab>
+
+        <!-- ========== TAB: House Rules ========== -->
+        <mat-tab label="House Rules">
+          <div class="tab-content">
+            <div class="rules-list" *ngIf="booking.propertySnapshot.rules as rules">
+              <div class="rule-item">
+                <mat-icon [class.allowed]="rules.childrenAllowed">
+                  {{ rules.childrenAllowed ? 'check_circle' : 'cancel' }}
+                </mat-icon>
+                <span>Children {{ rules.childrenAllowed ? 'allowed' : 'not allowed' }}</span>
+              </div>
+              <div class="rule-item">
+                <mat-icon [class.allowed]="rules.babiesAllowed">
+                  {{ rules.babiesAllowed ? 'check_circle' : 'cancel' }}
+                </mat-icon>
+                <span>Babies {{ rules.babiesAllowed ? 'allowed' : 'not allowed' }}</span>
+              </div>
+              <div class="rule-item">
+                <mat-icon [class.allowed]="rules.petsAllowed">
+                  {{ rules.petsAllowed ? 'check_circle' : 'cancel' }}
+                </mat-icon>
+                <span>Pets {{ rules.petsAllowed ? 'allowed' : 'not allowed' }}</span>
+              </div>
+              <div class="rule-item">
+                <mat-icon [class.allowed]="rules.smokingAllowed">
+                  {{ rules.smokingAllowed ? 'check_circle' : 'cancel' }}
+                </mat-icon>
+                <span>Smoking {{ rules.smokingAllowed ? 'allowed' : 'not allowed' }}</span>
+              </div>
+              <div class="rule-item">
+                <mat-icon [class.allowed]="rules.eventsAllowed">
+                  {{ rules.eventsAllowed ? 'check_circle' : 'cancel' }}
+                </mat-icon>
+                <span>Events {{ rules.eventsAllowed ? 'allowed' : 'not allowed' }}</span>
+              </div>
+            </div>
+
+
+          </div>
+        </mat-tab>
+
+        <!-- ========== TAB: Price Details ========== -->
+        <mat-tab label="Price Details">
+          <div class="tab-content">
+            <div class="price-breakdown">
+              <div class="price-row">
+                <span>Price per night</span>
+                <div class="price-column">
+                  <span class="price-value">{{ (booking.propertySnapshot.pricePerNight || 0) | ethPrice:false:true }}</span>
+                  <span class="price-conversion">≈ €{{ ((booking.propertySnapshot.pricePerNight || 0) * 3200).toFixed(2) }}</span>
+                </div>
+              </div>
+
+              <div class="price-row" *ngIf="booking.propertySnapshot.weekendPricePerNight">
+                <span>Weekend price per night</span>
+                <div class="price-column">
+                  <span class="price-value">{{ (booking.propertySnapshot.weekendPricePerNight || 0) | ethPrice:false:true }}</span>
+                  <span class="price-conversion">≈ €{{ ((booking.propertySnapshot.weekendPricePerNight || 0) * 3200).toFixed(2) }}</span>
+                </div>
+              </div>
+
+              <div class="price-row" *ngIf="booking.propertySnapshot.cleaningFee">
+                <span>Cleaning fee</span>
+                <div class="price-column">
+                  <span class="price-value">{{ (booking.propertySnapshot.cleaningFee || 0) | ethPrice:false:true }}</span>
+                  <span class="price-conversion">≈ €{{ ((booking.propertySnapshot.cleaningFee || 0) * 3200).toFixed(2) }}</span>
+                </div>
+              </div>
+
+              <div class="price-row" *ngIf="booking.propertySnapshot.petFee">
+                <span>Pet fee</span>
+                <div class="price-column">
+                  <span class="price-value">{{ (booking.propertySnapshot.petFee || 0) | ethPrice:false:true }}</span>
+                  <span class="price-conversion">≈ €{{ ((booking.propertySnapshot.petFee || 0) * 3200).toFixed(2) }}</span>
+                </div>
+              </div>
+
+              <div class="price-row total">
+                <span>Total</span>
+                <div class="price-column">
+                  <span class="price-value">{{ booking.totalPrice | ethPrice:false:true }}</span>
+                  <span class="price-conversion">≈ €{{ (booking.totalPrice * 3200).toFixed(2) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- ========== TAB: Photos ========== -->
+        <mat-tab label="Photos" *ngIf="booking.propertySnapshot.photos && booking.propertySnapshot.photos.length > 1">
+          <div class="tab-content">
+            <div class="photos-grid">
+              <div
+                class="photo-item"
+                *ngFor="let photo of booking.propertySnapshot.photos"
+                [style.background-image]="'url(' + photo.photoUrl + ')'">
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+      </mat-tab-group>
+
+    </mat-dialog-content>
+
+    <!-- ========================================
+         ACTIONS - FIXED (ne scroll pas)
+         ======================================== -->
+    <mat-dialog-actions>
+
+
+      <!-- Spacer -->
+      <span style="flex: 1"></span>
+
+      <!-- Cancel Button -->
+      <button
+        mat-raised-button
+        color="warn"
+        *ngIf="canCancel(booking)"
+        (click)="onCancel()">
+        <mat-icon>cancel</mat-icon>
+        Cancel Booking
+      </button>
+
+      <!-- Close Button -->
+      <button mat-stroked-button (click)="onClose()">
+        Close
+      </button>
+    </mat-dialog-actions>
+
+  </ng-container>
+
+</div>

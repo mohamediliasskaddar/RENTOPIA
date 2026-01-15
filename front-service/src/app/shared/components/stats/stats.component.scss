@@ -1,0 +1,312 @@
+
+// src/app/shared/components/stats/stats.component.scss
+
+// ============================
+// SECTION
+// ============================
+.stats-section {
+  padding: 80px 0;
+  width: 100%;
+  background: #fafafa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+
+  // ✨ NOUVEAU : Subtle pattern background avec orange
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+      radial-gradient(circle at 20% 50%, rgba(230, 126, 34, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 80% 50%, rgba(230, 126, 34, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+  }
+}
+
+.container {
+  width: 100%;
+  max-width: 1300px;
+  padding: 0 20px;
+  position: relative;
+  z-index: 1;
+}
+
+// ============================
+// HEADER
+// ============================
+.stats-header {
+  text-align: center;
+  margin-bottom: 50px;
+
+  h2 {
+    font-size: 2.3rem;
+    font-weight: 700;
+    color: #10345B;
+    margin: 0 0 15px 0;
+
+    // ✨ NOUVEAU : Subtle orange underline
+    position: relative;
+    display: inline-block;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, #e67e22 0%, #d35400 100%);
+      border-radius: 2px;
+    }
+  }
+
+  p {
+    font-size: 1.15rem;
+    color: #666;
+    margin: 15px 0 0 0;
+  }
+
+  @media (max-width: 768px) {
+    margin-bottom: 40px;
+
+    h2 {
+      font-size: 2rem;
+    }
+
+    p {
+      font-size: 1.05rem;
+    }
+  }
+}
+
+// ============================
+// GRILLE 4 COLONNES
+// ============================
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px;
+
+  @media (max-width: 992px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+  }
+
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+// ============================
+// STAT CARDS
+// ============================
+.stat-card {
+  background: white;
+  padding: 40px 30px;
+  border-radius: 18px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e9ecef;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+
+  // ✨ NOUVEAU : Orange accent border (toujours visible)
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #e67e22 0%, #d35400 100%);
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+  }
+
+  // Effet de brillance au hover
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent,
+        rgba(230, 126, 34, 0.1),
+        transparent
+    );
+    transform: rotate(45deg);
+    transition: all 0.6s ease;
+    opacity: 0;
+  }
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(230, 126, 34, 0.15);
+    border-color: rgba(230, 126, 34, 0.3);
+
+    &::after {
+      opacity: 1;
+      height: 5px;
+    }
+
+    &::before {
+      opacity: 1;
+      animation: shine 1.5s ease;
+    }
+
+    .stat-icon mat-icon {
+      transform: scale(1.15);
+      color: #e67e22;
+    }
+  }
+
+  // ✨ NOUVEAU : Variation de couleur pour chaque card
+  &:nth-child(1) .stat-icon mat-icon {
+    color: #10345B;
+  }
+
+  &:nth-child(2) .stat-icon mat-icon {
+    color: #e67e22; // Orange visible !
+  }
+
+  &:nth-child(3) .stat-icon mat-icon {
+    color: #10345B;
+  }
+
+  &:nth-child(4) .stat-icon mat-icon {
+    color: #e67e22; // Orange visible !
+  }
+}
+
+// ============================
+// ICON
+// ============================
+.stat-icon {
+  margin-bottom: 20px;
+  position: relative;
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  }
+
+  // ✨ NOUVEAU : Cercle décoratif orange derrière l'icône
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 70px;
+    height: 70px;
+    background: radial-gradient(
+        circle,
+        rgba(230, 126, 34, 0.08) 0%,
+        transparent 70%
+    );
+    border-radius: 50%;
+    z-index: -1;
+  }
+}
+
+// ============================
+// VALUE (compteur animé)
+// ============================
+.stat-value {
+  font-size: 3rem;
+  font-weight: 800;
+  margin-bottom: 10px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+
+  // ✨ NOUVEAU : Gradient bleu → orange sur les chiffres
+  background: linear-gradient(135deg, #10345B 0%, #1a4d7a 50%, #e67e22 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+
+  @media (max-width: 768px) {
+    font-size: 2.5rem;
+  }
+}
+
+// ============================
+// LABEL
+// ============================
+.stat-label {
+  font-size: 1rem;
+  color: #666;
+  font-weight: 500;
+  line-height: 1.4;
+
+  @media (max-width: 768px) {
+    font-size: 0.95rem;
+  }
+}
+
+// ============================
+// ANIMATION BRILLANCE
+// ============================
+@keyframes shine {
+  0% {
+    left: -50%;
+    top: -50%;
+  }
+  100% {
+    left: 150%;
+    top: 150%;
+  }
+}
+
+// ============================
+// RESPONSIVE
+// ============================
+@media (max-width: 992px) {
+  .stats-section {
+    padding: 60px 0;
+  }
+
+  .stat-card {
+    padding: 35px 25px;
+  }
+
+  .stat-icon mat-icon {
+    font-size: 42px;
+    width: 42px;
+    height: 42px;
+  }
+}
+
+@media (max-width: 576px) {
+  .stats-section {
+    padding: 50px 0;
+  }
+
+  .stat-card {
+    padding: 30px 20px;
+  }
+
+  .stat-icon mat-icon {
+    font-size: 38px;
+    width: 38px;
+    height: 38px;
+  }
+
+  .stat-value {
+    font-size: 2.2rem;
+  }
+}

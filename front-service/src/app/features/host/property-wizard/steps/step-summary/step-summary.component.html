@@ -1,0 +1,191 @@
+<!-- src/app/features/host/property-wizard/steps/step-summary/step-summary.component.html -->
+<div class="step-summary">
+  <div class="step-intro">
+    <h2>Review your listing</h2>
+    <p>Make sure everything looks good before creating</p>
+  </div>
+
+  <div class="summary-content">
+    <!-- Preview Card -->
+    <div class="preview-card">
+      @if (getCoverPhoto()) {
+        <img [src]="getCoverPhoto()" alt="Cover" class="preview-image">
+      } @else {
+        <div class="no-image">
+          <mat-icon>image</mat-icon>
+        </div>
+      }
+      <div class="preview-info">
+        <h3>{{ propertyData?.title || 'Your Property' }}</h3>
+        <p class="location">
+          <mat-icon>location_on</mat-icon>
+          {{ propertyData?.city }}, {{ propertyData?.country }}
+        </p>
+        <p class="price">
+          <strong>{{ propertyData?.pricePerNight | currency:'USD' }}</strong> / night
+        </p>
+      </div>
+    </div>
+
+    <!-- Details List -->
+    <div class="summary-sections">
+      <!-- Type -->
+      <div class="summary-section">
+        <h4>
+          <mat-icon>home</mat-icon>
+          Property Type
+        </h4>
+        <div class="section-content">
+          <p>{{ getPropertyTypeLabel(propertyData?.propertyType) }} • {{ getPlaceTypeLabel(propertyData?.placeType) }}</p>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Location -->
+      <div class="summary-section">
+        <h4>
+          <mat-icon>location_on</mat-icon>
+          Location
+        </h4>
+        <div class="section-content">
+          <p>{{ propertyData?.adresseLine }}</p>
+          <p>{{ propertyData?.city }}, {{ propertyData?.country }} {{ propertyData?.postalCode }}</p>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Capacity -->
+      <div class="summary-section">
+        <h4>
+          <mat-icon>people</mat-icon>
+          Capacity
+        </h4>
+        <div class="section-content capacity-grid">
+          <span>{{ propertyData?.maxGuests }} guests</span>
+          <span>{{ propertyData?.bedrooms }} bedrooms</span>
+          <span>{{ propertyData?.beds }} beds</span>
+          <span>{{ propertyData?.bathrooms }} bathrooms</span>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Photos -->
+      <div class="summary-section">
+        <h4>
+          <mat-icon>photo_library</mat-icon>
+          Photos
+        </h4>
+        <div class="section-content">
+          <p>{{ photos.length }} photos uploaded</p>
+          <div class="photos-preview">
+            @for (photo of photos.slice(0, 5); track photo.preview) {
+              <img [src]="photo.preview" alt="Photo">
+            }
+            @if (photos.length > 5) {
+              <div class="more-photos">+{{ photos.length - 5 }}</div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Pricing -->
+      <div class="summary-section">
+        <h4>
+          <mat-icon>attach_money</mat-icon>
+          Pricing
+        </h4>
+        <div class="section-content pricing-grid">
+          <div class="price-row">
+            <span>Base price</span>
+            <span>{{ propertyData?.pricePerNight | currency:'USD' }} / night</span>
+          </div>
+          <div class="price-row">
+            <span>Weekend price</span>
+            <span>{{ propertyData?.weekendPricePerNight | currency:'USD' }} / night</span>
+          </div>
+          @if (propertyData?.cleaningFee) {
+            <div class="price-row">
+              <span>Cleaning fee</span>
+              <span>{{ propertyData?.cleaningFee | currency:'USD' }}</span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Rules -->
+      <div class="summary-section">
+        <h4>
+          <mat-icon>rule</mat-icon>
+          Rules
+        </h4>
+        <div class="section-content">
+          <p>Check-in: {{ propertyData?.checkInTimeStart }} - {{ propertyData?.checkInTimeEnd }}</p>
+          <p>Check-out: {{ propertyData?.checkOutTime }}</p>
+          <p>Instant booking: {{ propertyData?.instantBooking ? 'Yes' : 'No' }}</p>
+          <p>Cancellation: {{ propertyData?.cancellationPolicy }}</p>
+        </div>
+      </div>
+    </div>
+    <mat-divider></mat-divider>
+
+    <!-- House Rules -->
+    <div class="summary-section">
+      <h4>
+        <mat-icon>gavel</mat-icon>
+        House Rules
+      </h4>
+      <div class="section-content rules-list">
+    <span class="rule-badge" [class.allowed]="propertyData?.childrenAllowed">
+      <mat-icon>{{ propertyData?.childrenAllowed ? 'check' : 'close' }}</mat-icon>
+      Children
+    </span>
+        <span class="rule-badge" [class.allowed]="propertyData?.babiesAllowed">
+      <mat-icon>{{ propertyData?.babiesAllowed ? 'check' : 'close' }}</mat-icon>
+      Babies
+    </span>
+        <span class="rule-badge" [class.allowed]="propertyData?.petsAllowed">
+      <mat-icon>{{ propertyData?.petsAllowed ? 'check' : 'close' }}</mat-icon>
+      Pets
+    </span>
+        <span class="rule-badge" [class.allowed]="propertyData?.smokingAllowed">
+      <mat-icon>{{ propertyData?.smokingAllowed ? 'check' : 'close' }}</mat-icon>
+      Smoking
+    </span>
+        <span class="rule-badge" [class.allowed]="propertyData?.eventsAllowed">
+      <mat-icon>{{ propertyData?.eventsAllowed ? 'check' : 'close' }}</mat-icon>
+      Events
+    </span>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- Host Preferences -->
+    <div class="summary-section">
+      <h4>
+        <mat-icon>person</mat-icon>
+        Host Preferences
+      </h4>
+      <div class="section-content">
+        <p><strong>Communication:</strong> {{ propertyData?.communicationStyle }}</p>
+        <p><strong>Response time:</strong> {{ propertyData?.responseTime }}</p>
+        <p><strong>Check-in:</strong> {{ propertyData?.checkInProcess }}</p>
+      </div>
+    </div>
+    <!-- Status Notice -->
+    <div class="status-notice">
+      <mat-icon>info</mat-icon>
+      <div class="notice-content">
+        <strong>Your listing will be saved as Draft</strong>
+        <p>You can add amenities, discounts and more details after creation. Then publish when ready!</p>
+      </div>
+    </div>
+  </div>
+</div>

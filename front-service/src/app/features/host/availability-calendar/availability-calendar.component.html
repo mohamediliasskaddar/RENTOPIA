@@ -1,0 +1,134 @@
+<!-- src/app/features/host/host-property-detail/components/availability-calendar/availability-calendar.component.html -->
+<div class="availability-calendar">
+  <!-- Header -->
+  <div class="calendar-header">
+    <div class="header-title">
+      <h3>Availability Calendar</h3>
+      <p class="subtitle">Click and drag to select dates, then block or unblock them</p>
+    </div>
+
+    @if (loading) {
+      <mat-spinner diameter="24"></mat-spinner>
+    }
+  </div>
+
+  <!-- Legend -->
+  <div class="calendar-legend">
+    <div class="legend-item">
+      <span class="legend-color available"></span>
+      <span>Available</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-color blocked"></span>
+      <span>Blocked</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-color booked"></span>
+      <span>Booked</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-color selected"></span>
+      <span>Selected</span>
+    </div>
+  </div>
+
+  <!-- Selection Actions -->
+  @if (selectionMode === 'selected' && selectionStart && selectionEnd) {
+    <div class="selection-actions">
+      <div class="selection-info">
+        <mat-icon>date_range</mat-icon>
+        <span>{{ getSelectionInfo() }}</span>
+      </div>
+
+      <div class="action-buttons">
+        <mat-form-field appearance="outline" class="reason-select">
+          <mat-label>Reason</mat-label>
+          <mat-select [(value)]="blockReason">
+            @for (reason of blockReasons; track reason.value) {
+              <mat-option [value]="reason.value">{{ reason.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        @if (selectionHasUnblockedDates()) {
+          <button
+            mat-raised-button
+            color="warn"
+            (click)="blockSelectedDates()"
+            [disabled]="saving"
+          >
+            <mat-icon>block</mat-icon>
+            Block Dates
+          </button>
+        }
+
+        @if (selectionHasBlockedDates()) {
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="unblockSelectedDates()"
+            [disabled]="saving"
+          >
+            <mat-icon>check_circle</mat-icon>
+            Unblock Dates
+          </button>
+        }
+
+        <button mat-stroked-button (click)="clearSelection()">
+          <mat-icon>close</mat-icon>
+          Clear
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Calendar Grid -->
+  <div class="calendar-grid">
+    @for (month of months; track month.name) {
+      <div class="month-card">
+        <div class="month-header">
+          <h4>{{ month.name }}</h4>
+        </div>
+
+        <div class="weekdays">
+          @for (day of weekDays; track day) {
+            <div class="weekday">{{ day }}</div>
+          }
+        </div>
+
+        <div class="days-grid">
+          @for (day of month.days; track day.date.getTime()) {
+            <div
+              class="day"
+              [class.other-month]="!day.isCurrentMonth"
+              [class.today]="day.isToday"
+              [class.blocked]="day.isBlocked"
+              [class.booked]="day.isBooked"
+              [class.selected]="day.isSelected"
+              [class.past]="day.isPast"
+              [class.selectable]="day.isCurrentMonth && !day.isPast"
+              (click)="onDayClick(day)"
+              [matTooltip]="getDayTooltip(day)"
+              matTooltipPosition="above"
+            >
+              <span class="day-number">{{ day.dayNumber }}</span>
+              @if (day.isBlocked || day.isBooked) {
+                <span class="day-indicator">
+                  <mat-icon>{{ day.isBooked ? 'person' : 'block' }}</mat-icon>
+                </span>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Saving indicator -->
+  @if (saving) {
+    <div class="saving-overlay">
+      <mat-spinner diameter="32"></mat-spinner>
+      <span>Saving...</span>
+    </div>
+  }
+</div>

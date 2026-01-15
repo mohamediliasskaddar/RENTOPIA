@@ -1,0 +1,60 @@
+<!-- src/app/features/profile/components/add-language-dialog/add-language-dialog.component.html -->
+<!-- ✅ VERSION AVEC ENDPOINT API + LOADING -->
+
+<h2 mat-dialog-title>Add Language</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="languageForm" class="language-form">
+
+    <!-- Language Selection -->
+    <mat-form-field appearance="outline">
+      <mat-label>Select Language</mat-label>
+      <mat-select formControlName="languageId">
+
+        <!-- Loading state -->
+        <mat-option *ngIf="loadingLanguages" disabled>
+          Loading languages...
+        </mat-option>
+
+        <!-- Languages list -->
+        <mat-option *ngFor="let language of (languages$ | async)" [value]="language.id">
+          {{ language.name }} ({{ language.code }})
+        </mat-option>
+
+        <!-- Empty state -->
+        <mat-option *ngIf="!(loadingLanguages) && (languages$ | async)?.length === 0" disabled>
+          No languages available
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="languageForm.get('languageId')?.hasError('required')">
+        Please select a language
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Proficiency Level -->
+    <mat-form-field appearance="outline">
+      <mat-label>Proficiency Level</mat-label>
+      <mat-select formControlName="proficiencyLevel">
+        <mat-option *ngFor="let level of proficiencyLevels" [value]="level.value">
+          {{ level.label }}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="languageForm.get('proficiencyLevel')?.hasError('required')">
+        Please select a level
+      </mat-error>
+    </mat-form-field>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="onSubmit()"
+    [disabled]="languageForm.invalid || loading || loadingLanguages">
+    <span *ngIf="!loading">Add</span>
+    <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+  </button>
+</mat-dialog-actions>

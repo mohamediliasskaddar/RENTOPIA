@@ -1,0 +1,91 @@
+<!-- src/app/features/reviews/components/review-form/review-form.component.html -->
+<!-- ✅ VERSION PROFESSIONNELLE -->
+
+<h2 mat-dialog-title>
+  <mat-icon style="vertical-align: middle; margin-right: 8px;">
+    {{ isEditMode ? 'edit' : 'rate_review' }}
+  </mat-icon>
+  {{ isEditMode ? 'Edit Your Review' : 'Share Your Experience' }}
+</h2>
+
+<div mat-dialog-content>
+  <form [formGroup]="reviewForm" class="review-form">
+
+    <!-- Rating Stars -->
+    <div class="rating-section">
+      <label class="rating-label">
+        How would you rate your stay?
+      </label>
+      <div class="stars-container">
+        <mat-icon
+          *ngFor="let star of stars"
+          class="star"
+          [class.filled]="star <= rating"
+          [class.empty]="star > rating"
+          (click)="onRatingChange(star)"
+          [attr.aria-label]="'Rate ' + star + ' stars'">
+          {{ star <= rating ? 'star' : 'star_border' }}
+        </mat-icon>
+      </div>
+      <div class="rating-value" *ngIf="rating > 0">
+        {{ rating === 5 ? 'Excellent' :
+        rating === 4 ? 'Very Good' :
+          rating === 3 ? 'Good' :
+            rating === 2 ? 'Fair' : 'Poor' }}
+        ({{ rating }}/5)
+      </div>
+      <mat-error *ngIf="reviewForm.get('ratingValue')?.invalid && reviewForm.get('ratingValue')?.touched">
+        Please select a rating
+      </mat-error>
+    </div>
+
+    <!-- Review Text -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Tell us about your experience</mat-label>
+      <textarea
+        matInput
+        formControlName="reviewText"
+        rows="6"
+        placeholder="What did you like? What could be improved? Share details that might help other travelers..."
+        maxlength="2000">
+      </textarea>
+      <mat-hint align="start">
+        <mat-icon style="font-size: 14px; width: 14px; height: 14px; vertical-align: middle;">
+          info
+        </mat-icon>
+        Be specific and honest
+      </mat-hint>
+      <mat-hint align="end">
+        {{ reviewForm.get('reviewText')?.value  || 0 }} / 2000
+      </mat-hint>
+      <mat-error *ngIf="reviewForm.get('reviewText')?.hasError('required')">
+        Please share your experience
+      </mat-error>
+      <mat-error *ngIf="reviewForm.get('reviewText')?.hasError('minlength')">
+        Please write at least 10 characters
+      </mat-error>
+    </mat-form-field>
+
+  </form>
+</div>
+
+<div mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()" [disabled]="loading">
+    Cancel
+  </button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="onSubmit()"
+    [disabled]="reviewForm.invalid || rating === 0 || loading"
+  >
+    <mat-icon *ngIf="loading">
+      <mat-spinner diameter="20"></mat-spinner>
+    </mat-icon>
+    <mat-icon *ngIf="!loading && !isEditMode" style="margin-right: 8px;">send</mat-icon>
+    <mat-icon *ngIf="!loading && isEditMode" style="margin-right: 8px;">check</mat-icon>
+    <span *ngIf="!loading" >
+      {{ isEditMode ? 'Update Review' : 'Submit Review' }}
+    </span>
+  </button>
+</div>
