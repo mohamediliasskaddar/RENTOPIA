@@ -12,3 +12,12 @@ docker-prep.sh
 .env.cloud
 ./media-service/.env
 ./blockchain-service/.env
+
+.terraform/  
+terraform.tfvars              # Contient des secrets
+*.tfstate                    # State files
+*.tfstate.*                  # Backup state files
+.terraform.lock.hcl          # Lock file (optionnel)
+.env                         # Variables d'environnement
+secrets.auto.tfvars          # Fichiers auto avec secrets
+
