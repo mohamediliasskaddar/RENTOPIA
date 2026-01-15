@@ -268,7 +268,7 @@ services:
     networks:
       - rental-net
     depends_on:
-      - api-gateway #pas l'appel de mettre tou parce qu'il sont inclus dans api-gatwya dependecies
+      - api-gateway
 
   # ================= Monitoring =================
   prometheus:
