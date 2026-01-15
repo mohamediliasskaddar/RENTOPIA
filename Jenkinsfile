@@ -10,7 +10,9 @@ pipeline {
 
     stage('Checkout') {
       steps {
-        git branch: 'main', url: 'https://github.com/mohamediliasskaddar/RENTOPIA.git', credentialsId: 'github-credentials'
+        git branch: 'main',
+            url: 'https://github.com/mohamediliasskaddar/RENTOPIA.git',
+            credentialsId: 'github-credentials'
       }
     }
 
