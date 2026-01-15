@@ -14,7 +14,8 @@ pipeline {
             steps {
                 git branch: 'main',
                     url: 'https://github.com/mohamediliasskaddar/RENTOPIA.git',
-                    credentialsId: 'github-token'
+                    credentialsId: 'github-token',
+                    name: 'ops'
             }
         }
 
