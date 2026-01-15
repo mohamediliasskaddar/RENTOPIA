@@ -1,0 +1,41 @@
+<br><br><br><br>
+<div class="host-layout">
+  <!-- Top Navigation Bar -->
+  <header class="host-header">
+    <div class="header-container">
+
+
+      <!-- Navigation -->
+      <nav class="header-nav">
+        @for (item of navItems; track item.path) {
+          <a
+            [routerLink]="item.path"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{exact: item.path === '/host/properties'}"
+            class="nav-link"
+          >
+            <mat-icon>{{ item.icon }}</mat-icon>
+            <span>{{ item.label }}</span>
+          </a>
+        }
+        <a
+          routerLink="/host/bookings"
+          routerLinkActive="active"
+          class="nav-link"
+        >
+          <mat-icon>calendar_today</mat-icon>
+          <span>Reservations</span>
+        </a>
+      </nav>
+
+
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="host-content">
+    <div class="content-wrapper">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

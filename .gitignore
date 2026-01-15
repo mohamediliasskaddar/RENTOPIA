@@ -12,3 +12,4 @@ docker-prep.sh
 .env.cloud
 ./media-service/.env
 ./blockchain-service/.env
+./archive

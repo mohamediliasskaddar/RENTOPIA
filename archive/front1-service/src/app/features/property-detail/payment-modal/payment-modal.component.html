@@ -1,0 +1,239 @@
+<!-- src/app/features/property-detail/components/payment-modal/payment-modal.component.html -->
+
+<div class="payment-modal">
+
+  <!-- HEADER -->
+  <div class="modal-header">
+    <h2 mat-dialog-title>
+      <mat-icon>payment</mat-icon>
+      Confirmer et payer
+    </h2>
+    <button
+      mat-icon-button
+      class="close-btn"
+      (click)="cancel()"
+      [disabled]="isPolling || isConfirmed">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <!-- CONTENT -->
+  <div mat-dialog-content class="modal-content">
+
+    <!-- RÉCAPITULATIF RÉSERVATION -->
+    <div class="booking-summary">
+      <h3>Récapitulatif</h3>
+      <div class="summary-row">
+        <span>Propriété</span>
+        <strong>{{ data.property.title }}</strong>
+      </div>
+      <div class="summary-row">
+        <span>Dates</span>
+        <strong>
+          {{ data.checkIn | date:'dd/MM/yyyy' }} - {{ data.checkOut | date:'dd/MM/yyyy' }}
+        </strong>
+      </div>
+      <div class="summary-row">
+        <span>Nuits</span>
+        <strong>{{ data.totalNights }}</strong>
+      </div>
+      <div class="summary-row">
+        <span>Invités</span>
+        <strong>{{ data.numGuests }}</strong>
+      </div>
+      <mat-divider></mat-divider>
+
+      <!-- ✅ CORRECTION : Affichage du montant en ETH d'abord -->
+      <div class="summary-row total-row">
+        <span><strong>Montant à payer</strong></span>
+        <div class="amount-display">
+          <strong class="total-amount">{{ totalAmountEth.toFixed(4) }} ETH</strong>
+          <span class="eur-conversion">≈ {{ totalAmountEur.toFixed(2) }}€</span>
+        </div>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- ÉTAPES DE PAIEMENT -->
+    <div class="payment-steps">
+
+      <!-- ÉTAPE 1 : CONNEXION WALLET -->
+      <div class="step" [class.active]="currentStep === 0" [class.completed]="currentStep > 0">
+        <div class="step-header">
+          <div class="step-icon">
+            <mat-icon *ngIf="currentStep > 0">check_circle</mat-icon>
+            <mat-icon *ngIf="currentStep === 0">account_balance_wallet</mat-icon>
+            <mat-spinner *ngIf="currentStep === 0 && loading" diameter="24"></mat-spinner>
+          </div>
+          <div class="step-content">
+            <h4>1. Connexion MetaMask</h4>
+            <p *ngIf="!isWalletConnected">Connectez votre wallet pour continuer</p>
+            <p *ngIf="isWalletConnected" class="success-text">
+              Connecté : {{ walletAddress | slice:0:6 }}...{{ walletAddress | slice:-4 }}
+            </p>
+          </div>
+        </div>
+        <button
+          *ngIf="!isWalletConnected"
+          mat-raised-button
+          color="primary"
+          (click)="connectWallet()"
+          [disabled]="loading">
+          <mat-icon>account_balance_wallet</mat-icon>
+          Connecter MetaMask
+        </button>
+      </div>
+
+      <mat-divider *ngIf="currentStep >= 1"></mat-divider>
+
+      <!-- ÉTAPE 2 : VÉRIFICATION SOLDE -->
+      <div
+        *ngIf="currentStep >= 1"
+        class="step"
+        [class.active]="currentStep === 1"
+        [class.completed]="currentStep > 1"
+        [class.error]="hasSufficientBalance === false">
+        <div class="step-header">
+          <div class="step-icon">
+            <mat-icon *ngIf="currentStep > 1">check_circle</mat-icon>
+            <mat-icon *ngIf="currentStep === 1 && hasSufficientBalance !== false">account_balance</mat-icon>
+            <mat-icon *ngIf="hasSufficientBalance === false" class="error-icon">error</mat-icon>
+            <mat-spinner *ngIf="currentStep === 1 && loading" diameter="24"></mat-spinner>
+          </div>
+          <div class="step-content">
+            <h4>2. Vérification du solde</h4>
+            <p *ngIf="hasSufficientBalance === null">
+              Vérifiez que vous avez au moins <strong>{{ totalAmountEth.toFixed(4) }} ETH</strong>
+            </p>
+            <p *ngIf="hasSufficientBalance === true" class="success-text">
+              Solde suffisant
+            </p>
+            <p *ngIf="hasSufficientBalance === false" class="error-text">
+              Solde insuffisant ({{ totalAmountEth.toFixed(4) }} ETH requis)
+            </p>
+          </div>
+        </div>
+        <button
+          *ngIf="currentStep === 1 && hasSufficientBalance === null"
+          mat-raised-button
+          color="primary"
+          (click)="verifyBalance()"
+          [disabled]="loading">
+          <mat-icon>account_balance</mat-icon>
+          Vérifier le solde
+        </button>
+      </div>
+
+      <mat-divider *ngIf="currentStep >= 2"></mat-divider>
+
+      <!-- ÉTAPE 3 : SIGNATURE TRANSACTION -->
+      <div
+        *ngIf="currentStep >= 2"
+        class="step"
+        [class.active]="currentStep === 2"
+        [class.completed]="currentStep > 2">
+        <div class="step-header">
+          <div class="step-icon">
+            <mat-icon *ngIf="currentStep > 2">check_circle</mat-icon>
+            <mat-icon *ngIf="currentStep === 2">create</mat-icon>
+            <mat-spinner *ngIf="currentStep === 2 && loading" diameter="24"></mat-spinner>
+          </div>
+          <div class="step-content">
+            <h4>3. Signature de la transaction</h4>
+            <p *ngIf="!txHash">
+              Signez la transaction de <strong>{{ totalAmountEth.toFixed(4) }} ETH</strong> dans MetaMask
+            </p>
+            <p *ngIf="txHash" class="success-text">
+              Transaction signée
+            </p>
+          </div>
+        </div>
+        <button
+          *ngIf="currentStep === 2 && !txHash"
+          mat-raised-button
+          color="primary"
+          (click)="signTransaction()"
+          [disabled]="loading || !hasSufficientBalance">
+          <mat-icon>create</mat-icon>
+          Signer avec MetaMask
+        </button>
+      </div>
+
+      <mat-divider *ngIf="currentStep >= 3"></mat-divider>
+
+      <!-- ÉTAPE 4 : CONFIRMATION ON-CHAIN -->
+      <div
+        *ngIf="currentStep >= 3"
+        class="step"
+        [class.active]="currentStep === 3 || currentStep === 4"
+        [class.completed]="isConfirmed">
+        <div class="step-header">
+          <div class="step-icon">
+            <mat-icon *ngIf="isConfirmed">check_circle</mat-icon>
+            <mat-spinner *ngIf="isPolling" diameter="24"></mat-spinner>
+            <mat-icon *ngIf="!isPolling && !isConfirmed">hourglass_empty</mat-icon>
+          </div>
+          <div class="step-content">
+            <h4>4. Confirmation on-chain</h4>
+            <p *ngIf="isPolling">
+              Confirmation en cours... {{ pollingProgress }}%
+            </p>
+            <p *ngIf="isConfirmed" class="success-text">
+              Transaction confirmée !
+            </p>
+            <p *ngIf="txHash" class="tx-hash">
+              <a
+                [href]="'https://sepolia.etherscan.io/tx/' + txHash"
+                target="_blank"
+                rel="noopener noreferrer">
+                Voir sur Etherscan
+                <mat-icon>open_in_new</mat-icon>
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <mat-divider *ngIf="isConfirmed"></mat-divider>
+
+      <!-- ÉTAPE 5 : SUCCÈS -->
+      <div *ngIf="isConfirmed" class="step completed success-step">
+        <div class="step-header">
+          <div class="step-icon">
+            <mat-icon class="success-icon">check_circle</mat-icon>
+          </div>
+          <div class="step-content">
+            <h4>5. Réservation confirmée !</h4>
+            <p class="success-text">
+              Votre réservation a été confirmée avec succès.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- MESSAGE D'ERREUR -->
+    <div *ngIf="error" class="error-message">
+      <mat-icon>error</mat-icon>
+      <span>{{ error }}</span>
+    </div>
+
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <!-- FOOTER -->
+  <div mat-dialog-actions class="modal-footer">
+    <button
+      mat-button
+      (click)="cancel()"
+      [disabled]="isPolling || isConfirmed">
+      Annuler
+    </button>
+  </div>
+
+</div>

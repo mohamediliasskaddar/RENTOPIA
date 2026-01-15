@@ -1,0 +1,179 @@
+<!-- src/app/features/host/host-property-detail/components/discounts-manager/discounts-manager.component.html -->
+<div class="discounts-manager">
+  <!-- Header -->
+  <div class="manager-header">
+    <div class="header-info">
+      <h3>Pricing Discounts</h3>
+      <p class="subtitle">Offer discounts to attract more guests</p>
+    </div>
+    @if (!showAddForm) {
+      <button mat-raised-button color="primary" (click)="showAdd()">
+        <mat-icon>add</mat-icon>
+        Add Discount
+      </button>
+    }
+  </div>
+
+  <!-- Add/Edit Form -->
+  @if (showAddForm) {
+    <mat-card class="discount-form-card">
+      <mat-card-header>
+        <mat-card-title>
+          {{ editingDiscount ? 'Edit Discount' : 'Add New Discount' }}
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="discountForm" class="discount-form">
+          <!-- Discount Type -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Discount Type</mat-label>
+            <mat-select formControlName="discountType">
+              @for (type of discountTypes; track type.value) {
+                <mat-option
+                  [value]="type.value"
+                  [disabled]="!editingDiscount && discountTypeExists(type.value)"
+                >
+                  <div class="type-option">
+                    <mat-icon>{{ type.icon }}</mat-icon>
+                    <div class="type-info">
+                      <span class="type-label">{{ type.label }}</span>
+                      <span class="type-desc">{{ type.description }}</span>
+                    </div>
+                    @if (!editingDiscount && discountTypeExists(type.value)) {
+                      <mat-icon class="exists-icon">check_circle</mat-icon>
+                    }
+                  </div>
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Discount Percentage -->
+          <div class="percentage-field">
+            <mat-form-field appearance="outline">
+              <mat-label>Discount Percentage</mat-label>
+              <input
+                matInput
+                type="number"
+                formControlName="discountPercentage"
+                min="1"
+                max="90"
+              >
+              <span matTextSuffix>%</span>
+              @if (discountForm.get('discountPercentage')?.hasError('min')) {
+                <mat-error>Minimum 1%</mat-error>
+              }
+              @if (discountForm.get('discountPercentage')?.hasError('max')) {
+                <mat-error>Maximum 90%</mat-error>
+              }
+            </mat-form-field>
+
+            <div class="percentage-preview">
+              <span class="preview-label">Guest pays</span>
+              <span class="preview-value">{{ 100 - (discountForm.get('discountPercentage')?.value || 0) }}%</span>
+              <span class="preview-label">of regular price</span>
+            </div>
+          </div>
+
+          <!-- Min/Max Nights -->
+          <div class="nights-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Minimum Nights</mat-label>
+              <input
+                matInput
+                type="number"
+                formControlName="minNights"
+                min="1"
+              >
+              <mat-hint>Minimum stay required</mat-hint>
+            </mat-form-field>
+
+
+          </div>
+        </form>
+      </mat-card-content>
+      <mat-card-actions align="end">
+        <button mat-button (click)="cancelForm()" [disabled]="saving">Cancel</button>
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="saveDiscount()"
+          [disabled]="discountForm.invalid || saving"
+        >
+          @if (saving) {
+            <mat-spinner diameter="20"></mat-spinner>
+          } @else {
+            {{ editingDiscount ? 'Update' : 'Add' }} Discount
+          }
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  }
+
+  <!-- Current Discounts List -->
+  <div class="discounts-list">
+    @if (currentDiscounts.length === 0 && !showAddForm) {
+      <div class="empty-state">
+        <mat-icon>local_offer</mat-icon>
+        <h4>No Discounts Yet</h4>
+        <p>Add discounts to attract more guests and increase bookings.</p>
+        <button mat-stroked-button color="primary" (click)="showAdd()">
+          <mat-icon>add</mat-icon>
+          Add Your First Discount
+        </button>
+      </div>
+    } @else {
+      @for (discount of currentDiscounts; track discount.discountId) {
+        <mat-card class="discount-card">
+          <div class="discount-content">
+            <div class="discount-icon">
+              <mat-icon>{{ getDiscountTypeInfo(discount.discountType)?.icon || 'local_offer' }}</mat-icon>
+            </div>
+            <div class="discount-info">
+              <h4 class="discount-title">
+                {{ getDiscountTypeInfo(discount.discountType)?.label || discount.discountType }}
+              </h4>
+              <p class="discount-details">
+                <span class="percentage">{{ discount.discountPercentage }}% off</span>
+                @if (discount.minNights) {
+                  <span class="nights">• Min {{ discount.minNights }} nights</span>
+                }
+
+              </p>
+            </div>
+            <div class="discount-actions">
+              <button
+                mat-icon-button
+                (click)="editDiscount(discount)"
+                matTooltip="Edit"
+                [disabled]="saving"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                color="warn"
+                (click)="deleteDiscount(discount)"
+                matTooltip="Delete"
+                [disabled]="saving"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+        </mat-card>
+      }
+    }
+  </div>
+
+  <!-- Discount Tips -->
+  @if (!showAddForm && currentDiscounts.length > 0) {
+    <div class="discount-tips">
+      <mat-icon>lightbulb</mat-icon>
+      <div class="tip-content">
+        <strong>Pro tip:</strong> Weekly discounts of 10-15% and monthly discounts of 20-25%
+        are most effective at increasing bookings.
+      </div>
+    </div>
+  }
+</div>

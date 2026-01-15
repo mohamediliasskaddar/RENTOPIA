@@ -1,0 +1,175 @@
+<!-- src/app/features/my-bookings/my-bookings.component.html -->
+<br><br><br><br>
+<div class="my-bookings-container">
+
+  <!-- Header with Stats -->
+  <div class="header">
+
+
+    <!-- Stats Cards -->
+    <div class="stats" *ngIf="stats$ | async as stats">
+      <div class="stat-card">
+        <mat-icon>event</mat-icon>
+        <div class="stat-content">
+          <span class="number">{{ stats.total }}</span>
+          <span class="label">Total</span>
+        </div>
+      </div>
+
+      <div class="stat-card upcoming">
+        <mat-icon>schedule</mat-icon>
+        <div class="stat-content">
+          <span class="number">{{ stats.upcoming }}</span>
+          <span class="label">Upcoming</span>
+        </div>
+      </div>
+
+      <div class="stat-card past">
+        <mat-icon>check_circle</mat-icon>
+        <div class="stat-content">
+          <span class="number">{{ stats.past }}</span>
+          <span class="label">Past</span>
+        </div>
+      </div>
+
+      <div class="stat-card spent">
+
+        <div class="stat-content">
+
+
+          <div class="price-column">
+            <span class="number">{{ stats.totalSpent | ethPrice:false:true }}</span>
+            <span class="price-conversion">≈ €{{ (stats.totalSpent * 3200).toFixed(0) }}</span>
+
+          </div>
+          <span class="label">Total Spent</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading$ | async" class="loading">
+    <mat-spinner diameter="48"></mat-spinner>
+    <p>Loading your bookings...</p>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!(loading$ | async)" class="content">
+
+    <!-- Tabs -->
+    <mat-tab-group
+      [(selectedIndex)]="selectedTab"
+      (selectedIndexChange)="onTabChange($event)"
+      class="booking-tabs">
+
+      <!-- All Bookings -->
+      <mat-tab label="All">
+        <ng-template matTabContent>
+          <div class="bookings-list">
+            <div *ngIf="(allBookings$ | async)?.length === 0" class="empty-state">
+              <mat-icon>event_busy</mat-icon>
+              <h3>No Bookings Yet</h3>
+              <p>Start exploring properties and make your first booking!</p>
+              <button mat-raised-button color="primary" routerLink="/listings">
+                <mat-icon>search</mat-icon>
+                Explore Properties
+              </button>
+            </div>
+
+
+            <app-booking-card
+              *ngFor="let booking of allBookingsWithReviews$ | async"
+              [booking]="booking"
+              (viewDetails)="onViewDetails($event)"
+              (cancel)="onCancelBooking($event)"
+              (viewProperty)="onViewProperty($event)"
+              (reviewSubmitted)="onReviewSubmitted()">
+            </app-booking-card>
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <!-- Upcoming -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>schedule</mat-icon>
+          Upcoming
+          <span class="badge" *ngIf="(stats$ | async)?.upcoming as count">{{ count }}</span>
+        </ng-template>
+        <ng-template matTabContent>
+          <div class="bookings-list">
+            <div *ngIf="(upcomingBookings$ | async)?.length === 0" class="empty-state">
+              <mat-icon>event</mat-icon>
+              <h3>No Upcoming Bookings</h3>
+              <p>You don't have any upcoming reservations</p>
+            </div>
+
+            <app-booking-card
+              *ngFor="let booking of (upcomingBookings$ | async)"
+              [booking]="booking"
+              (viewDetails)="onViewDetails($event)"
+              (cancel)="onCancelBooking($event)"
+              (viewProperty)="onViewProperty($event)">
+            </app-booking-card>
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <!-- Past -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>check_circle</mat-icon>
+          Past
+          <span class="badge" *ngIf="(stats$ | async)?.past as count">{{ count }}</span>
+        </ng-template>
+        <ng-template matTabContent>
+          <div class="bookings-list">
+            <div *ngIf="(pastBookings$ | async)?.length === 0" class="empty-state">
+              <mat-icon>history</mat-icon>
+              <h3>No Past Bookings</h3>
+              <p>Your completed reservations will appear here</p>
+            </div>
+
+            <app-booking-card
+              *ngFor="let booking of (pastBookingsWithReviews$ | async)"
+              [booking]="booking"
+              (viewDetails)="onViewDetails($event)"
+              (cancel)="onCancelBooking($event)"
+              (viewProperty)="onViewProperty($event)"
+              (reviewSubmitted)="onReviewSubmitted()"> <!-- ✅ NOUVEAU -->
+            </app-booking-card>
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <!-- Cancelled -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>cancel</mat-icon>
+          Cancelled
+          <span class="badge" *ngIf="(stats$ | async)?.cancelled as count">{{ count }}</span>
+        </ng-template>
+        <ng-template matTabContent>
+          <div class="bookings-list">
+            <div *ngIf="(cancelledBookings$ | async)?.length === 0" class="empty-state">
+              <mat-icon>check</mat-icon>
+              <h3>No Cancelled Bookings</h3>
+              <p>Great! You haven't cancelled any reservations</p>
+            </div>
+
+            <app-booking-card
+              *ngFor="let booking of (cancelledBookings$ | async)"
+              [booking]="booking"
+              (viewDetails)="onViewDetails($event)"
+              (viewProperty)="onViewProperty($event)">
+            </app-booking-card>
+          </div>
+        </ng-template>
+      </mat-tab>
+
+    </mat-tab-group>
+
+  </div>
+
+</div>

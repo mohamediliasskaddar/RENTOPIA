@@ -1,0 +1,35 @@
+/* src/app/features/profile/components/add-language-dialog/add-language-dialog.component.scss */
+
+h2[mat-dialog-title] {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111;
+  margin: 0;
+}
+
+mat-dialog-content {
+  min-width: 400px;
+  padding: 24px 0;
+
+  @media (max-width: 576px) {
+    min-width: 300px;
+  }
+
+  .language-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    mat-form-field {
+      width: 100%;
+    }
+  }
+}
+
+mat-dialog-actions {
+  padding: 16px 0 0 0;
+
+  button {
+    min-width: 100px;
+  }
+}

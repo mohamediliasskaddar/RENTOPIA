@@ -1,0 +1,115 @@
+// src/app/features/host/property-wizard/property-wizard.component.scss
+.property-wizard {
+  min-height: 100vh;
+  background: #fafafa;
+
+}
+
+// ========== HEADER ==========
+.wizard-header {
+  display: flex;
+  align-items: center;
+  padding: 16px 24px;
+  background: white;
+  border-bottom: 1px solid #e0e0e0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  .back-btn {
+    margin-right: 16px;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .spacer {
+    flex: 1;
+  }
+}
+
+// ========== STEPPER ==========
+.wizard-stepper {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  background: transparent;
+
+  ::ng-deep {
+    .mat-horizontal-stepper-header-container {
+      margin-bottom: 32px;
+    }
+
+    .mat-step-header {
+      padding: 8px 16px;
+
+      .mat-step-icon {
+        background: #e0e0e0;
+
+        &.mat-step-icon-selected {
+          background: var(--color-bg-dark, #16243e);
+        }
+
+        &.mat-step-icon-state-done {
+          background: #4CAF50;
+        }
+      }
+
+      .mat-step-label {
+        font-weight: 500;
+
+        &.mat-step-label-selected {
+          font-weight: 600;
+        }
+      }
+    }
+
+    .mat-horizontal-content-container {
+      padding: 0;
+    }
+
+    .mat-stepper-horizontal-line {
+      border-color: #e0e0e0;
+    }
+  }
+}
+
+// ========== STEP CONTENT ==========
+.step-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #e0e0e0;
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .create-btn {
+    min-width: 180px;
+
+    mat-spinner {
+      margin-right: 8px;
+    }
+  }
+}
+
+// ========== RESPONSIVE ==========
+@media (max-width: 768px) {
+  .wizard-stepper {
+    padding: 16px;
+
+    ::ng-deep {
+      .mat-horizontal-stepper-header-container {
+        display: none;
+      }
+    }
+  }
+}

@@ -1,0 +1,396 @@
+// src/app/features/contact/contact.component.scss
+
+.contact-page {
+  width: 100%;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+// ============================
+// HERO SECTION
+// ============================
+.hero-section {
+  padding: 100px 0 60px 0;
+  background: linear-gradient(135deg, rgba(3, 27, 48, 0.95) 0%, rgba(26, 77, 122, 0.95) 100%),
+  url('https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=1600&h=900&fit=crop') center/cover;
+  color: white;
+  text-align: center;
+
+  .hero-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: #e67e22;
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    margin: 0 0 15px 0;
+    letter-spacing: -0.5px;
+
+    @media (max-width: 768px) {
+      font-size: 2.2rem;
+    }
+  }
+
+  .subtitle {
+    font-size: 1.15rem;
+    max-width: 700px;
+    margin: 0 auto;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.6;
+
+    @media (max-width: 768px) {
+      font-size: 1.05rem;
+    }
+  }
+}
+
+// ============================
+// CONTACT INFO SECTION
+// ============================
+.contact-info-section {
+  padding: 60px 0;
+  background: white;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px;
+
+  @media (max-width: 992px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 576px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.info-card {
+  text-align: center;
+  padding: 35px 25px;
+  background: #fafafa;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+  transition: all 0.3s ease;
+
+  &.clickable {
+    cursor: pointer;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      border-color: #10345B;
+
+      mat-icon {
+        color: #e67e22;
+        transform: scale(1.1);
+      }
+    }
+  }
+
+  mat-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    color: #10345B;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+  }
+
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #10345B;
+    margin: 0 0 8px 0;
+  }
+
+  p {
+    font-size: 0.95rem;
+    color: #666;
+    margin: 0;
+  }
+}
+
+// ============================
+// FORM SECTION
+// ============================
+.form-section {
+  padding: 80px 0;
+  background: #fafafa;
+}
+
+.form-container {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 60px;
+
+  @media (max-width: 992px) {
+    grid-template-columns: 1fr;
+    gap: 50px;
+  }
+}
+
+// LEFT: Form Content
+.form-content {
+  background: white;
+  padding: 50px;
+  border-radius: 16px;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+
+  @media (max-width: 768px) {
+    padding: 35px 25px;
+  }
+
+  h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #10345B;
+    margin: 0 0 10px 0;
+  }
+
+  .form-description {
+    font-size: 1rem;
+    color: #666;
+    margin: 0 0 35px 0;
+    line-height: 1.6;
+  }
+}
+
+.contact-form {
+  .full-width {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  ::ng-deep .mat-mdc-form-field-icon-prefix {
+    padding-right: 12px;
+    color: #10345B;
+  }
+
+  ::ng-deep .mat-mdc-text-field-wrapper {
+    background: #fafafa;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 16px !important;
+    background: #10345B !important;
+    color: white !important;
+    font-size: 1.05rem !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease;
+
+    mat-icon {
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+
+    &:not(:disabled):hover {
+      background: #0d2847 !important;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(16, 52, 91, 0.25);
+    }
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .loading, .success {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .spinning {
+      animation: spin 1s linear infinite;
+    }
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// RIGHT: Sidebar
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.sidebar-card {
+  padding: 30px;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+  &.highlight {
+    background: linear-gradient(135deg, #10345B 0%, #1a4d7a 100%);
+    color: white;
+    border: none;
+
+    .card-icon {
+      color: #e67e22;
+    }
+
+    h3 {
+      color: white;
+    }
+
+    p {
+      color: rgba(255, 255, 255, 0.9);
+    }
+  }
+
+  .card-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    color: #10345B;
+    margin-bottom: 15px;
+  }
+
+  h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #10345B;
+    margin: 0 0 10px 0;
+  }
+
+  p {
+    font-size: 0.95rem;
+    color: #666;
+    line-height: 1.6;
+    margin: 0 0 20px 0;
+  }
+
+  .card-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px !important;
+    border: 2px solid #10345B !important;
+    color: #10345B !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+
+    mat-icon {
+      margin-left: 8px;
+    }
+
+    &:hover {
+      background: #10345B !important;
+      color: white !important;
+    }
+  }
+}
+
+// ============================
+// MAP SECTION
+// ============================
+.map-section {
+  height: 300px;
+  background: #e9ecef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top: 1px solid #dee2e6;
+}
+
+.map-placeholder {
+  text-align: center;
+  color: #666;
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: #e67e22;
+    margin-bottom: 15px;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #10345B;
+    margin: 0 0 8px 0;
+  }
+
+  p {
+    font-size: 1rem;
+    margin: 0;
+  }
+}
+
+// ============================
+// SNACKBAR STYLES
+// ============================
+::ng-deep .success-snackbar {
+  background: #4caf50 !important;
+  color: white !important;
+}
+
+::ng-deep .error-snackbar {
+  background: #f44336 !important;
+  color: white !important;
+}
+
+// ============================
+// RESPONSIVE
+// ============================
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 80px 0 50px 0;
+
+    .hero-icon {
+      font-size: 56px;
+      width: 56px;
+      height: 56px;
+    }
+  }
+
+  .contact-info-section {
+    padding: 50px 0;
+  }
+
+  .form-section {
+    padding: 60px 0;
+  }
+
+  .map-section {
+    height: 250px;
+  }
+
+  .map-placeholder {
+    mat-icon {
+      font-size: 56px;
+      width: 56px;
+      height: 56px;
+    }
+
+    h3 {
+      font-size: 1.3rem;
+    }
+  }
+}

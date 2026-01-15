@@ -1,0 +1,262 @@
+<!-- src/app/features/host/host-booking-detail/host-booking-detail.component.html -->
+<div class="booking-detail">
+
+  <!-- Header -->
+  <header class="page-header">
+    <button mat-icon-button (click)="goBack()" class="back-btn">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div class="header-info">
+      <h1>Reservation #{{ bookingId }}</h1>
+      @if (booking) {
+        <div class="status-chip" [style.background-color]="getStatusColor(booking.status)">
+          {{ getStatusLabel(booking.status) }}
+        </div>
+      }
+    </div>
+  </header>
+
+  <!-- Loading -->
+  @if (loading) {
+    <div class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Loading reservation details...</p>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (error && !loading) {
+    <div class="error-container">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ error }}</p>
+      <button mat-stroked-button (click)="loadBookingDetails()">
+        <mat-icon>refresh</mat-icon>
+        Retry
+      </button>
+    </div>
+  }
+
+  <!-- Content -->
+  @if (!loading && !error && booking) {
+    <div class="content-grid">
+
+      <!-- Left Column -->
+      <div class="left-column">
+
+        <!-- Property Card -->
+        <mat-card class="property-card">
+          <div class="property-image" (click)="viewProperty()">
+            @if (getPropertyCover()) {
+              <img [src]="getPropertyCover()" [alt]="property?.title">
+            } @else {
+              <div class="no-image">
+                <mat-icon>home</mat-icon>
+              </div>
+            }
+          </div>
+          <mat-card-content>
+            <h3>{{ property?.title || 'Property' }}</h3>
+            <p class="location">
+              <mat-icon>location_on</mat-icon>
+              {{ property?.city }}, {{ property?.country }}
+            </p>
+            <button mat-stroked-button (click)="viewProperty()" class="view-property-btn">
+              View Property
+            </button>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Guest Card -->
+        <mat-card class="guest-card">
+          <mat-card-header>
+            <div class="guest-avatar" mat-card-avatar>
+              @if (guest?.photoUrl) {
+                <img [src]="getPhotoUrl(guest?.photoUrl)" [alt]="guest?.prenom">
+              } @else {
+                <mat-icon>person</mat-icon>
+              }
+            </div>
+            <mat-card-title>{{ guest?.prenom }} {{ guest?.nom }}</mat-card-title>
+            <mat-card-subtitle>Guest</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="guest-info-row">
+              <mat-icon>email</mat-icon>
+              <span>{{ guest?.email || 'No email' }}</span>
+            </div>
+            @if (guest?.tel) {
+              <div class="guest-info-row">
+                <mat-icon>phone</mat-icon>
+                <span>{{ guest?.tel }}</span>
+              </div>
+            }
+            <div class="guest-info-row">
+              <mat-icon>group</mat-icon>
+              <span>{{ booking.numGuests }} guest(s)</span>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+      </div>
+
+      <!-- Right Column -->
+      <div class="right-column">
+
+        <!-- Booking Details Card -->
+        <mat-card class="details-card">
+          <mat-card-header>
+            <mat-card-title>Reservation Details</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+
+            <!-- Dates -->
+            <div class="dates-section">
+              <div class="date-item">
+                <div class="date-label">Check-in</div>
+                <div class="date-value">{{ formatDate(booking.checkInDate) }}</div>
+                <div class="date-time">{{ property?.checkInTimeStart || '14:00' }}</div>
+              </div>
+              <div class="date-separator">
+                <mat-icon>arrow_forward</mat-icon>
+                <span class="nights">{{ calculateNights() }} nights</span>
+              </div>
+              <div class="date-item">
+                <div class="date-label">Check-out</div>
+                <div class="date-value">{{ formatDate(booking.checkOutDate) }}</div>
+                <div class="date-time">{{ property?.checkOutTime || '11:00' }}</div>
+              </div>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <!-- Price Breakdown -->
+            <div class="price-section">
+              <h4>Price Breakdown</h4>
+              <div class="price-row">
+                <span>{{ booking.priceBreakdown.lockedPricePerNight | currency:'USD' }} × {{ calculateNights() }} nights</span>
+                <span>{{ booking.priceBreakdown.baseAmount | currency:'USD' }}</span>
+              </div>
+              @if (booking.priceBreakdown.discountAmount > 0) {
+                <div class="price-row discount">
+                  <span>Discount</span>
+                  <span>-{{ booking.priceBreakdown.discountAmount | currency:'USD' }}</span>
+                </div>
+              }
+              @if (booking.priceBreakdown.cleaningFee > 0) {
+                <div class="price-row">
+                  <span>Cleaning fee</span>
+                  <span>{{ booking.priceBreakdown.cleaningFee | currency:'USD' }}</span>
+                </div>
+              }
+              @if (booking.priceBreakdown.petFee > 0) {
+                <div class="price-row">
+                  <span>Pet fee</span>
+                  <span>{{ booking.priceBreakdown.petFee | currency:'USD' }}</span>
+                </div>
+              }
+              <div class="price-row">
+                <span>Service fee</span>
+                <span>{{ booking.priceBreakdown.serviceFee | currency:'USD' }}</span>
+              </div>
+              <mat-divider></mat-divider>
+              <div class="price-row total">
+                <span>Total</span>
+                <span>{{ booking.priceBreakdown.totalAmount | currency:'USD' }}</span>
+              </div>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <!-- Blockchain Info -->
+            @if (booking.blockchainTxHash) {
+              <div class="blockchain-section">
+                <h4>Payment Info</h4>
+                <div class="info-row">
+                  <span class="label">Transaction</span>
+                  <span class="value hash">{{ booking.blockchainTxHash | slice:0:20 }}...</span>
+                </div>
+                @if (booking.escrowReleased) {
+                  <div class="info-row">
+                    <span class="label">Escrow Status</span>
+                    <span class="value released">
+                      <mat-icon>check_circle</mat-icon>
+                      Released
+                    </span>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Timestamps -->
+            <div class="timestamps">
+              <span>Created: {{ booking.createdAt | date:'medium' }}</span>
+              @if (booking.cancelledAt) {
+                <span class="cancelled">Cancelled: {{ booking.cancelledAt | date:'medium' }}</span>
+              }
+            </div>
+
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Actions Card -->
+        <mat-card class="actions-card">
+          <mat-card-header>
+            <mat-card-title>Actions</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="actions-grid">
+              @if (canCheckIn()) {
+                <button
+                  mat-raised-button
+                  color="primary"
+                  (click)="checkInGuest()"
+                  [disabled]="actionLoading"
+                >
+                  <mat-icon>login</mat-icon>
+                  Check-in Guest
+                </button>
+              }
+
+              @if (canCheckOut()) {
+                <button
+                  mat-raised-button
+                  color="accent"
+                  (click)="checkOutGuest()"
+                  [disabled]="actionLoading"
+                >
+                  <mat-icon>logout</mat-icon>
+                  Check-out Guest
+                </button>
+              }
+
+              @if (canCancel()) {
+                <button
+                  mat-stroked-button
+                  color="warn"
+                  (click)="cancelReservation()"
+                  [disabled]="actionLoading"
+                >
+                  <mat-icon>cancel</mat-icon>
+                  Cancel Reservation
+                </button>
+              }
+
+              @if (!canCheckIn() && !canCheckOut() && !canCancel()) {
+                <p class="no-actions">No actions available for this reservation.</p>
+              }
+            </div>
+
+            @if (actionLoading) {
+              <div class="action-loading">
+                <mat-spinner diameter="24"></mat-spinner>
+                <span>Processing...</span>
+              </div>
+            }
+          </mat-card-content>
+        </mat-card>
+
+      </div>
+    </div>
+  }
+
+</div>

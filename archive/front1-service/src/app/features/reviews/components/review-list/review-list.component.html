@@ -1,0 +1,73 @@
+<!-- src/app/features/reviews/components/review-list/review-list.component.html -->
+<div class="review-list-container">
+
+  <!-- ========== LOADING STATE ========== -->
+  <div *ngIf="loading" class="loading-state">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading reviews...</p>
+  </div>
+
+  <!-- ========== EMPTY STATE ========== -->
+  <div *ngIf="!loading && reviews.length === 0" class="empty-state">
+    <mat-icon>rate_review</mat-icon>
+    <h3>No reviews yet</h3>
+    <p>Be the first to leave a review!</p>
+  </div>
+
+  <!-- ========== REVIEWS ========== -->
+  <div *ngIf="!loading && reviews.length > 0" class="reviews-content">
+
+    <!-- Stats globales -->
+    <div class="reviews-stats" *ngIf="stats && stats.totalReviews > 0">
+      <div class="overall-rating">
+        <div class="rating-number">{{ stats.averageRating.toFixed(1) }}</div>
+        <div class="rating-details">
+          <app-rating-stars
+            [rating]="stats.averageRating"
+            [showValue]="false"
+            size="medium">
+          </app-rating-stars>
+          <span class="total-reviews">{{ stats.totalReviews }} {{ stats.totalReviews === 1 ? 'review' : 'reviews' }}</span>
+        </div>
+      </div>
+
+      <!-- Distribution des étoiles -->
+      <div class="rating-distribution">
+        <div *ngFor="let star of [5, 4, 3, 2, 1]" class="distribution-row">
+          <span class="star-label">{{ star }}</span>
+          <mat-icon class="star-icon">star</mat-icon>
+          <div class="distribution-bar">
+            <div class="distribution-fill" [style.width.%]="getRatingDistribution(star)"></div>
+          </div>
+          <span class="distribution-percentage">{{ getRatingDistribution(star).toFixed(0) }}%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Liste des reviews -->
+    <div class="reviews-list">
+      <app-review-card
+        *ngFor="let review of displayedReviews; trackBy: trackByReviewId"
+        [review]="review">
+      </app-review-card>
+    </div>
+
+    <!-- Bouton "Show more" -->
+    <div class="show-more-container" *ngIf="hasMore">
+      <button mat-stroked-button class="show-more-btn" (click)="toggleShowAll()">
+        <mat-icon>expand_more</mat-icon>
+        Show all {{ reviews.length }} reviews
+      </button>
+    </div>
+
+    <!-- Bouton "Show less" -->
+    <div class="show-more-container" *ngIf="showAll && reviews.length > displayLimit">
+      <button mat-stroked-button class="show-more-btn" (click)="toggleShowAll()">
+        <mat-icon>expand_less</mat-icon>
+        Show less
+      </button>
+    </div>
+
+  </div>
+
+</div>

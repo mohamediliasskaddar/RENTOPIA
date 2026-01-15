@@ -1,0 +1,96 @@
+<!-- src/app/features/host/property-wizard/steps/step-photos/step-photos.component.html -->
+<div class="step-photos">
+  <div class="step-intro">
+    <h2>Add photos of your property</h2>
+    <p>High quality photos help attract more guests. Add at least 5 photos.</p>
+  </div>
+
+  <!-- Upload Area -->
+  <div
+    class="upload-area"
+    (drop)="onDrop($event)"
+    (dragover)="onDragOver($event)"
+    [class.has-photos]="photos.length > 0"
+  >
+    <input
+      type="file"
+      id="photo-input"
+      accept="image/*"
+      multiple
+      (change)="onFilesSelected($event)"
+      hidden
+    >
+
+    <label for="photo-input" class="upload-label">
+      <mat-icon>cloud_upload</mat-icon>
+      <span class="upload-text">Drag and drop photos here</span>
+      <span class="upload-hint">or click to browse</span>
+      <span class="upload-formats">JPEG, PNG, WebP • Max 10MB per file</span>
+    </label>
+  </div>
+
+  <!-- Photos Grid -->
+  @if (photos.length > 0) {
+    <div class="photos-info">
+      <span>{{ photos.length }} photo(s) added</span>
+      <span class="hint">Drag to reorder • First photo will be the cover</span>
+    </div>
+
+    <div
+      class="photos-grid"
+      cdkDropList
+      cdkDropListOrientation="horizontal"
+      (cdkDropListDropped)="drop($event)"
+    >
+      @for (photo of photos; track photo.preview; let i = $index) {
+        <div class="photo-card" cdkDrag>
+          <div class="photo-preview">
+            <img [src]="photo.preview" [alt]="'Photo ' + (i + 1)">
+
+            @if (photo.isCover) {
+              <div class="cover-badge">
+                <mat-icon>star</mat-icon>
+                Cover
+              </div>
+            }
+
+            <div class="photo-order">{{ photo.displayOrder }}</div>
+
+            <div class="photo-actions">
+              @if (!photo.isCover) {
+                <button mat-icon-button (click)="setCover(i)" matTooltip="Set as cover">
+                  <mat-icon>star_border</mat-icon>
+                </button>
+              }
+              <button mat-icon-button color="warn" (click)="removePhoto(i)" matTooltip="Remove">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+          <div class="photo-name">{{ photo.file.name }}</div>
+        </div>
+      }
+
+      <!-- Add More Button -->
+      <label for="photo-input" class="add-more-card">
+        <mat-icon>add_photo_alternate</mat-icon>
+        <span>Add more</span>
+      </label>
+    </div>
+  }
+
+  <!-- Tips -->
+  <div class="photo-tips">
+    <h4>
+      <mat-icon>lightbulb</mat-icon>
+      Tips for great photos
+    </h4>
+    <ul>
+      <li>Use natural lighting when possible</li>
+      <li>Show the entire room in each photo</li>
+      <li>Include photos of all spaces guests can use</li>
+      <li>Make sure photos are clear and not blurry</li>
+      <li>Add at least one exterior photo</li>
+    </ul>
+  </div>
+</div>

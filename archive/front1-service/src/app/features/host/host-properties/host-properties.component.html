@@ -1,0 +1,175 @@
+<!-- src/app/features/host/host-properties/host-properties.component.html -->
+<br><br><br>
+<div class="host-properties-page">
+  <!-- Header -->
+  <header class="page-header">
+    <div class="header-content">
+      <h1>My Properties</h1>
+      <p class="subtitle">Manage your listings</p>
+    </div>
+    <button mat-raised-button color="primary" routerLink="/host/properties/new">
+      <mat-icon>add</mat-icon>
+      Add New Property
+    </button>
+  </header>
+
+  <!-- Loading -->
+  @if (loading$ | async) {
+    <div class="loading-container">
+      <mat-spinner diameter="48"></mat-spinner>
+      <p>Loading your properties...</p>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (error$ | async; as error) {
+    <div class="error-container">
+      <mat-icon>error_outline</mat-icon>
+      <p>{{ error }}</p>
+      <button mat-button color="primary" (click)="ngOnInit()">
+        Try Again
+      </button>
+    </div>
+  }
+
+  <!-- Content -->
+  @if (myPropertiesLoaded$ | async) {
+    @if (myProperties$ | async; as properties) {
+      <!-- Filters -->
+      @if (properties.length > 0) {
+        <div class="status-filters">
+          <button
+            mat-stroked-button
+            [class.active]="selectedStatus === null"
+            (click)="filterByStatus(null)"
+          >
+            All ({{ properties.length }})
+          </button>
+          <button
+            mat-stroked-button
+            [class.active]="selectedStatus === 'ACTIVE'"
+            (click)="filterByStatus('ACTIVE')"
+          >
+            <mat-icon>check_circle</mat-icon>
+            Active
+          </button>
+          <button
+            mat-stroked-button
+            [class.active]="selectedStatus === 'DRAFT'"
+            (click)="filterByStatus('DRAFT')"
+          >
+            <mat-icon>edit</mat-icon>
+            Draft
+          </button>
+          <button
+            mat-stroked-button
+            [class.active]="selectedStatus === 'ARCHIVED'"
+            (click)="filterByStatus('ARCHIVED')"
+          >
+            <mat-icon>archive</mat-icon>
+            Archived
+          </button>
+        </div>
+      }
+
+      <!-- Properties Grid -->
+      @if (getFilteredProperties(properties).length > 0) {
+        <div class="properties-grid">
+          @for (property of getFilteredProperties(properties); track trackByPropertyId($index, property)) {
+            <mat-card class="property-card" [routerLink]="['/host/properties', property.propertyId]">
+              <!-- Image -->
+              <div class="property-image">
+                <img [src]="getMainPhoto(property)" [alt]="property.title">
+                <mat-chip-set class="status-chip">
+                  <mat-chip [color]="getStatusColor(property.status)" selected>
+                    {{ getStatusLabel(property.status) }}
+                  </mat-chip>
+                </mat-chip-set>
+              </div>
+
+              <!-- Content -->
+              <mat-card-content>
+                <h3 class="property-title">{{ property.title }}</h3>
+                <p class="property-location">
+                  <mat-icon>location_on</mat-icon>
+                  {{ property.city }}, {{ property.country }}
+                </p>
+                <div class="property-details">
+                  <span><mat-icon>bed</mat-icon> {{ property.bedrooms }} beds</span>
+                  <span><mat-icon>bathtub</mat-icon> {{ property.bathrooms }} baths</span>
+                  <span><mat-icon>people</mat-icon> {{ property.maxGuests }} guests</span>
+                </div>
+                <div class="property-price">
+                  <div class="price-main">
+                    <strong>{{ property.pricePerNight | ethPrice:false:true }}</strong>
+                    <span>/night</span>
+                  </div>
+
+                  <div class="price-conversion">
+                    ≈ €{{ (property.pricePerNight * 3200).toFixed(2) }}
+                  </div>
+                </div>
+              </mat-card-content>
+
+              <!-- Actions -->
+              <mat-card-actions>
+                @if (property.status === 'DRAFT') {
+                  <button
+                    mat-button
+                    color="primary"
+                    (click)="publishProperty(property.propertyId, $event)"
+                  >
+                    <mat-icon>publish</mat-icon>
+                    Publish
+                  </button>
+                }
+                <button mat-button [routerLink]="['/host/properties', property.propertyId]">
+                  <mat-icon>visibility</mat-icon>
+                  View
+                </button>
+                <button mat-icon-button [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()">
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+                <mat-menu #menu="matMenu">
+                  <button mat-menu-item [routerLink]="['/host/properties', property.propertyId]">
+                    <mat-icon>edit</mat-icon>
+                    <span>Edit</span>
+                  </button>
+                  <button mat-menu-item [routerLink]="['/host/properties', property.propertyId, 'calendar']">
+                    <mat-icon>calendar_today</mat-icon>
+                    <span>Manage Calendar</span>
+                  </button>
+                  <button mat-menu-item (click)="deleteProperty(property.propertyId, $event)">
+                    <mat-icon color="warn">delete</mat-icon>
+                    <span>Delete</span>
+                  </button>
+                </mat-menu>
+              </mat-card-actions>
+            </mat-card>
+          }
+        </div>
+      } @else if (selectedStatus) {
+        <!-- No properties for selected filter -->
+        <div class="empty-state">
+          <mat-icon>filter_list_off</mat-icon>
+          <h2>No {{ getStatusLabel(selectedStatus) }} Properties</h2>
+          <p>You don't have any {{ getStatusLabel(selectedStatus).toLowerCase() }} properties.</p>
+          <button mat-button color="primary" (click)="filterByStatus(null)">
+            Show All Properties
+          </button>
+        </div>
+      } @else {
+        <!-- No properties at all -->
+        <div class="empty-state">
+          <mat-icon>home_work</mat-icon>
+          <h2>No Properties Yet</h2>
+          <p>Start hosting by adding your first property.</p>
+          <button mat-raised-button color="primary" routerLink="/host/properties/new">
+            <mat-icon>add</mat-icon>
+            Add Your First Property
+          </button>
+        </div>
+      }
+    }
+  }
+</div>

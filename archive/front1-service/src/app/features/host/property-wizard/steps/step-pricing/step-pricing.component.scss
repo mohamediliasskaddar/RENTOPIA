@@ -1,0 +1,524 @@
+// src/app/features/host/property-wizard/steps/step-pricing/step-pricing.component.scss
+
+.step-pricing {
+  .step-intro {
+    text-align: center;
+    margin-bottom: 32px;
+
+    h2 {
+      margin: 0 0 8px;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0;
+      color: #666;
+    }
+  }
+
+  .section {
+    margin-bottom: 32px;
+
+    h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .section-hint {
+      margin: 0 0 16px;
+      color: #666;
+      font-size: 14px;
+    }
+  }
+
+  // ========================================
+  // ✅ AI SUGGESTION CARD
+  // ========================================
+  .ai-suggestion-card {
+    background: linear-gradient(135deg, #16243e 0%, #1a2d4d 100%);
+    color: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 32px;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+
+      mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+
+      h3 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+      }
+    }
+
+    // Loading
+    .loading-state {
+      text-align: center;
+      padding: 24px;
+
+      ::ng-deep .mat-mdc-progress-spinner {
+        --mdc-circular-progress-active-indicator-color: white;
+      }
+
+      p {
+        margin-top: 12px;
+        font-size: 14px;
+        opacity: 0.9;
+      }
+    }
+
+    // Error
+    .error-state {
+      text-align: center;
+      padding: 20px;
+
+      mat-icon {
+        font-size: 40px;
+        width: 40px;
+        height: 40px;
+        margin-bottom: 12px;
+        opacity: 0.9;
+      }
+
+      p {
+        margin-bottom: 16px;
+        font-size: 14px;
+      }
+
+      button {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        padding: 8px 20px;
+        font-size: 14px;
+
+        mat-icon {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+          margin: 0;
+        }
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.3);
+        }
+      }
+    }
+
+    // Success
+    .prediction-result {
+      .suggested-price {
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        flex-wrap: wrap;
+
+        .label {
+          font-size: 12px;
+          opacity: 0.85;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .price {
+          font-size: 36px;
+          font-weight: 700;
+        }
+
+        .per-night {
+          font-size: 14px;
+          opacity: 0.85;
+        }
+      }
+
+      // Conversion EUR (sous le prix ETH)
+      .price-conversion {
+        text-align: center;
+        font-size: 16px;
+        opacity: 0.9;
+        margin-bottom: 16px;
+        font-weight: 500;
+      }
+
+      // Fourchette ETH
+      .confidence-range {
+        text-align: center;
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 8px;
+        margin-bottom: 8px;
+
+        .label {
+          display: block;
+          font-size: 11px;
+          text-transform: uppercase;
+          opacity: 0.8;
+          margin-bottom: 4px;
+          letter-spacing: 0.5px;
+        }
+
+        .range {
+          font-size: 16px;
+          font-weight: 600;
+        }
+      }
+
+      // Fourchette EUR (optionnelle, plus petite)
+      .confidence-range-eur {
+        text-align: center;
+        font-size: 12px;
+        opacity: 0.8;
+        margin-bottom: 16px;
+
+        .range-eur {
+          font-weight: 500;
+        }
+      }
+
+      .recommendation {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        margin-bottom: 16px;
+
+        mat-icon {
+          color: #ffd700;
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+        }
+
+        span {
+          font-size: 14px;
+        }
+      }
+
+      button {
+        width: 100%;
+        background: white;
+        color: #667eea;
+        font-weight: 600;
+        font-size: 14px;
+        padding: 12px;
+        border-radius: 8px;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.95);
+        }
+      }
+    }
+  }
+
+  // ========================================
+  // MAIN PRICING SECTION
+  // ========================================
+  .pricing-main {
+    text-align: center;
+    padding: 32px;
+    background: #f5f5f5;
+    border-radius: 16px;
+    margin-bottom: 32px;
+
+    h3 {
+      margin: 0 0 20px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .price-input-large {
+      display: flex;
+      align-items: baseline;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 12px;
+
+      .price-field {
+        font-size: 48px;
+        font-weight: 700;
+        width: 200px;
+        text-align: center;
+        border: none;
+        background: transparent;
+        outline: none;
+        border-bottom: 3px solid var(--color-bg-dark, #16243e);
+        padding: 4px 0;
+
+        &:focus {
+          border-bottom-color: #1976d2;
+        }
+
+        &::placeholder {
+          color: #ccc;
+        }
+      }
+
+      .currency {
+        font-size: 24px;
+        font-weight: 600;
+        color: #666;
+      }
+
+      .per-night {
+        font-size: 16px;
+        color: #666;
+      }
+    }
+
+    // Conversion EUR en temps réel
+    .price-eur-conversion {
+      text-align: center;
+      font-size: 15px;
+      color: #888;
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+
+    // Price validation
+    .price-validation {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      margin: 16px auto;
+      font-size: 13px;
+      max-width: 500px;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+
+      &.valid {
+        background: #e8f5e9;
+        color: #2e7d32;
+
+        mat-icon {
+          color: #4caf50;
+        }
+      }
+
+      &.invalid {
+        background: #fff3e0;
+        color: #e65100;
+
+        mat-icon {
+          color: #ff9800;
+        }
+      }
+    }
+
+    // Earnings estimate
+    .earnings-estimate {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+      padding: 16px;
+      background: rgba(46, 125, 50, 0.08);
+      border-radius: 10px;
+      display: inline-flex;
+      max-width: 100%;
+
+      mat-icon {
+        font-size: 22px;
+        width: 22px;
+        height: 22px;
+        margin-top: 2px;
+        color: #4caf50;
+      }
+
+      .earnings-content {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        text-align: left;
+
+        > span:first-child {
+          font-size: 13px;
+          color: #2e7d32;
+        }
+
+        strong {
+          font-size: 18px;
+          font-weight: 700;
+          color: #2e7d32;
+        }
+
+        .earnings-eur {
+          font-size: 13px;
+          color: #666;
+        }
+      }
+    }
+  }
+
+  // ========================================
+  // WEEKEND PRICE SECTION
+  // ========================================
+  .price-field-small {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .weekend-eur-hint {
+    font-size: 13px;
+    color: #888;
+    margin-top: 8px;
+    font-weight: 500;
+  }
+
+  // ========================================
+  // FEES GRID
+  // ========================================
+  .fees-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+
+    ::ng-deep .mat-mdc-form-field {
+      width: 100%;
+    }
+  }
+
+  // ========================================
+  // FORM FIELDS STYLING
+  // ========================================
+  ::ng-deep {
+    .mat-mdc-form-field {
+      width: 100%;
+
+      .mat-mdc-text-field-wrapper {
+        background: white;
+      }
+
+      // ETH suffix styling
+      .mat-mdc-form-field-text-suffix {
+        color: #666;
+        font-weight: 600;
+        font-size: 14px;
+      }
+
+      .mat-mdc-form-field-hint {
+        color: #999;
+        font-size: 12px;
+      }
+    }
+  }
+}
+
+// ========================================
+// RESPONSIVE
+// ========================================
+@media (max-width: 768px) {
+  .step-pricing {
+    .ai-suggestion-card {
+      padding: 20px 16px;
+
+      .card-header {
+        h3 {
+          font-size: 15px;
+        }
+      }
+
+      .prediction-result {
+        .suggested-price {
+          flex-direction: column;
+          gap: 4px;
+
+          .price {
+            font-size: 32px;
+          }
+        }
+
+        .confidence-range {
+          .range {
+            font-size: 14px;
+          }
+        }
+      }
+    }
+
+    .pricing-main {
+      padding: 24px 16px;
+
+      .price-input-large {
+        flex-wrap: wrap;
+        gap: 6px;
+
+        .price-field {
+          font-size: 36px;
+          width: 160px;
+        }
+
+        .currency {
+          font-size: 20px;
+        }
+
+        .per-night {
+          font-size: 14px;
+        }
+      }
+
+      .price-eur-conversion {
+        font-size: 14px;
+      }
+
+      .price-validation {
+        font-size: 12px;
+        padding: 8px 12px;
+      }
+
+      .earnings-estimate {
+        .earnings-content {
+          strong {
+            font-size: 16px;
+          }
+        }
+      }
+    }
+
+    .price-field-small {
+      max-width: 100%;
+    }
+
+    .fees-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .step-pricing {
+    .pricing-main {
+      .price-input-large {
+        .price-field {
+          font-size: 32px;
+          width: 140px;
+        }
+      }
+    }
+  }
+}

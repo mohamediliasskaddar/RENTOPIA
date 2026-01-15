@@ -1,0 +1,250 @@
+<!-- src/app/shared/components/navbar/navbar.component.html -->
+
+<mat-toolbar
+  class="navbar"
+  [class.scrolled]="isScrolled"
+  [class.other-page]="!isHomePage">
+  <div class="navbar-container">
+
+    <!-- LOGO -->
+    <div class="navbar-left">
+      <a routerLink="/" class="logo-link">
+        <mat-icon class="logo-icon">home</mat-icon>
+        <span class="logo-text">Rentopia</span>
+      </a>
+    </div>
+
+    <!-- NAVIGATION WITH MEGA MENU -->
+    <div class="navbar-center">
+      <nav class="nav-links">
+
+        <!-- ✨ MEGA MENU WRAPPER -->
+        <div class="mega-menu-wrapper">
+
+          <!-- Lien 1: Discover -->
+          <a routerLink="/listings" class="nav-link">
+            Discover
+          </a>
+
+          <!-- Lien 2: FAQ -->
+          <a routerLink="/faq" class="nav-link">
+            FAQ
+          </a>
+
+          <!-- Lien 3: About us -->
+          <a routerLink="/about" class="nav-link">
+            About us
+          </a>
+
+          <!-- 🔥 BACKDROP BLUR -->
+          <div class="mega-backdrop"></div>
+
+          <!-- 🔥 MEGA MENU PANEL -->
+          <div class="mega-menu-panel">
+            <div class="mega-menu-container">
+
+              <!-- ✅ LEFT IMAGE -->
+              <div class="mega-visual">
+                <div class="image-container">
+                  <img src="/assets/images/mega.jpg" alt="Modern House">
+                </div>
+              </div>
+
+              <!-- Link Columns -->
+              <div class="mega-content">
+
+                <!-- Column 1: PRODUCT -->
+                <div class="mega-column">
+                  <h4>PRODUCT</h4>
+
+                  <a routerLink="/listings" class="mega-link with-image">
+                    <img src="/assets/images/home.jpg" alt="Explore">
+                    <div>
+                      <strong>Explore Properties</strong>
+                      <span>Complete catalog verified on blockchain</span>
+                    </div>
+                  </a>
+
+                  <a routerLink="/How-it-works" class="mega-link with-image">
+                    <img src="/assets/images/logo.png" alt="How it works">
+                    <div>
+                      <strong>How It Works</strong>
+                      <span>Step-by-step process</span>
+                    </div>
+                  </a>
+
+                  <a routerLink="/become-host" class="mega-link with-image">
+                    <img src="/assets/images/key2.jpg" alt="Become host">
+                    <div>
+                      <strong>Become a Host</strong>
+                      <span>List your property for free</span>
+                    </div>
+                  </a>
+                </div>
+
+                <!-- Column 2: LEARN MORE -->
+                <div class="mega-column">
+                  <h4>LEARN MORE</h4>
+
+                  <a routerLink="/trust-safety" class="mega-link text-only">
+                    <div>
+                      <strong>Trust & Safety</strong>
+                      <span>Blockchain security guaranteed</span>
+                    </div>
+                  </a>
+
+                  <a routerLink="/faq" class="mega-link text-only">
+                    <div>
+                      <strong>FAQ</strong>
+                      <span>Quick and clear answers</span>
+                    </div>
+                  </a>
+
+                  <a routerLink="/about" class="mega-link text-only">
+                    <div>
+                      <strong>About Us</strong>
+                      <span>Our mission and team</span>
+                    </div>
+                  </a>
+                </div>
+
+                <!-- Column 3: OTHER -->
+                <div class="mega-column">
+                  <h4>OTHER</h4>
+
+                  <a routerLink="/contact" class="mega-link text-only">
+                    <div>
+                      <strong>Contact Us</strong>
+                      <span>24/7 support available</span>
+                    </div>
+                  </a>
+
+                  <a routerLink="/privacy-policy" class="mega-link text-only">
+                    <div>
+                      <strong>Reviews</strong>
+                      <span>What people say</span>
+                    </div>
+                  </a>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </nav>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="navbar-right">
+
+      <!-- Not logged in -->
+      <div class="auth-buttons" *ngIf="!(isAuthenticated$ | async)">
+        <button mat-button class="login-btn" (click)="navigateToLogin()">
+          Log In
+        </button>
+        <button mat-raised-button color="primary" class="signup-btn" (click)="navigateToRegister()">
+          Sign Up
+        </button>
+      </div>
+
+      <!-- Logged in -->
+      <div class="user-actions" *ngIf="isAuthenticated$ | async">
+
+        <!-- 🔥 SWITCH MODE BUTTON (Host/Guest) -->
+        <button
+          mat-stroked-button
+          class="mode-switch-btn"
+          (click)="toggleMode()"
+          [class.host-mode]="isHostMode">
+          <mat-icon>{{ isHostMode ? 'person' : 'home_work' }}</mat-icon>
+          <span>{{ isHostMode ? 'Switch to Guest' : 'Switch to Hosting' }}</span>
+        </button>
+        <!-- User Menu -->
+
+        <button
+          mat-icon-button
+          class="menu-btn"
+          [matMenuTriggerFor]="userActionsMenu">
+          <mat-icon>menu</mat-icon>
+        </button>
+
+        <!-- User Dropdown Menu -->
+        <mat-menu
+          #userActionsMenu="matMenu"
+          class="user-dropdown"
+          [overlapTrigger]="false">
+
+          <div class="menu-header">
+            <div class="user-info">
+              <p class="user-name">
+                <mat-icon>person</mat-icon>
+                {{ (currentUser$ | async)?.prenom }} {{ (currentUser$ | async)?.nom }}
+              </p>
+              <p class="user-email">{{ (currentUser$ | async)?.email }}</p>
+            </div>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <button mat-menu-item (click)="navigateToProfile()">
+            <mat-icon>account_circle</mat-icon>
+            <span>My Profile</span>
+          </button>
+
+          <button mat-menu-item (click)="navigateToBookings()">
+            <mat-icon>event</mat-icon>
+            <span>My Bookings</span>
+          </button>
+
+          <button mat-menu-item (click)="navigateToMessages()">
+            <mat-icon
+              [matBadge]="unreadMessagesCount$ | async"
+              [matBadgeHidden]="(unreadMessagesCount$ | async) === 0"
+              matBadgeColor="warn"
+              matBadgeSize="small">
+              message
+            </mat-icon>
+            <span>Messages</span>
+          </button>
+
+          <mat-divider></mat-divider>
+
+          <button
+            mat-menu-item
+            (click)="navigateToBecomeHost()"
+            *ngIf="!(isHost$ | async)"
+            class="become-host-item">
+            <mat-icon>home_work</mat-icon>
+            <span>Become Host</span>
+          </button>
+
+
+          <button mat-menu-item (click)="logout()" class="logout-item">
+            <mat-icon>logout</mat-icon>
+            <span>Log Out</span>
+          </button>
+        </mat-menu>
+
+        <!-- Notifications -->
+        <app-notification-bell></app-notification-bell>
+        <!-- Messages -->
+        <button
+          mat-icon-button
+          class="icon-btn"
+          (click)="navigateToMessages()"
+          matTooltip="Messages">
+          <mat-icon
+            [matBadge]="unreadMessagesCount$ | async"
+            [matBadgeHidden]="(unreadMessagesCount$ | async) === 0"
+            matBadgeColor="warn"
+            matBadgeSize="small">
+            message
+          </mat-icon>
+        </button>
+
+
+      </div>
+    </div>
+  </div>
+</mat-toolbar>

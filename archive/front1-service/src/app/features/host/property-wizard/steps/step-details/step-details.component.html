@@ -1,0 +1,120 @@
+<!-- src/app/features/host/property-wizard/steps/step-details/step-details.component.html -->
+<div class="step-details">
+  <div class="step-intro">
+    <h2>Tell us about your property</h2>
+    <p>Share details that will help guests know what to expect</p>
+  </div>
+
+  <form [formGroup]="form">
+    <!-- Description -->
+    <div class="section">
+      <h3>Description</h3>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Describe your property</mat-label>
+        <textarea
+          matInput
+          formControlName="description"
+          rows="5"
+          placeholder="Tell guests what makes your place special. Mention the best features, nearby attractions, and anything unique..."
+        ></textarea>
+        <mat-hint align="end">{{ form.get('description')?.value?.length || 0 }} characters (min 50)</mat-hint>
+        @if (form.get('description')?.hasError('required')) {
+          <mat-error>Description is required</mat-error>
+        }
+        @if (form.get('description')?.hasError('minlength')) {
+          <mat-error>Description must be at least 50 characters</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <!-- Capacity -->
+    <div class="section">
+      <h3>Capacity</h3>
+      <div class="counter-grid">
+        <!-- Max Guests -->
+        <div class="counter-item">
+          <div class="counter-label">
+            <mat-icon>people</mat-icon>
+            <span>Guests</span>
+          </div>
+          <div class="counter-controls">
+            <button mat-icon-button (click)="decrement('maxGuests', 1)" type="button">
+              <mat-icon>remove</mat-icon>
+            </button>
+            <span class="counter-value">{{ form.get('maxGuests')?.value }}</span>
+            <button mat-icon-button (click)="increment('maxGuests')" type="button">
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Bedrooms -->
+        <div class="counter-item">
+          <div class="counter-label">
+            <mat-icon>bed</mat-icon>
+            <span>Bedrooms</span>
+          </div>
+          <div class="counter-controls">
+            <button mat-icon-button (click)="decrement('bedrooms', 0)" type="button">
+              <mat-icon>remove</mat-icon>
+            </button>
+            <span class="counter-value">{{ form.get('bedrooms')?.value }}</span>
+            <button mat-icon-button (click)="increment('bedrooms')" type="button">
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Beds -->
+        <div class="counter-item">
+          <div class="counter-label">
+            <mat-icon>single_bed</mat-icon>
+            <span>Beds</span>
+          </div>
+          <div class="counter-controls">
+            <button mat-icon-button (click)="decrement('beds', 1)" type="button">
+              <mat-icon>remove</mat-icon>
+            </button>
+            <span class="counter-value">{{ form.get('beds')?.value }}</span>
+            <button mat-icon-button (click)="increment('beds')" type="button">
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Bathrooms -->
+        <div class="counter-item">
+          <div class="counter-label">
+            <mat-icon>bathtub</mat-icon>
+            <span>Bathrooms</span>
+          </div>
+          <div class="counter-controls">
+            <button mat-icon-button (click)="decrement('bathrooms', 1)" type="button">
+              <mat-icon>remove</mat-icon>
+            </button>
+            <span class="counter-value">{{ form.get('bathrooms')?.value }}</span>
+            <button mat-icon-button (click)="increment('bathrooms')" type="button">
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Additional Info -->
+    <div class="section">
+      <h3>Additional information (optional)</h3>
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Surface area (m²)</mat-label>
+          <input matInput type="number" formControlName="surfaceArea" min="0">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Floor number</mat-label>
+          <input matInput type="number" formControlName="floorNumber" min="0">
+        </mat-form-field>
+      </div>
+    </div>
+  </form>
+</div>

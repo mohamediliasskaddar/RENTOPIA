@@ -1,0 +1,89 @@
+<!-- src/app/features/contact/contact.component.html -->
+
+<div class="contact-page">
+
+  <!-- HERO SECTION -->
+  <section class="hero-section">
+    <div class="container">
+      <mat-icon class="hero-icon">support_agent</mat-icon>
+      <h1>Get in Touch</h1>
+      <p class="subtitle">
+        Have questions? We're here to help 24/7. Send us a message and we'll respond as soon as possible.
+      </p>
+    </div>
+  </section>
+
+  <!-- CONTACT INFO -->
+  <section class="contact-info-section">
+    <div class="container">
+      <div class="info-grid">
+        <div
+          class="info-card"
+          *ngFor="let method of contactMethods"
+          [class.clickable]="method.link"
+          (click)="openLink(method.link)">
+          <mat-icon>{{ method.icon }}</mat-icon>
+          <h3>{{ method.title }}</h3>
+          <p>{{ method.value }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT FORM -->
+  <section class="form-section">
+    <div class="container">
+
+      <div class="form-container">
+
+
+
+        <!-- RIGHT: Additional Info -->
+        <div class="sidebar-content">
+
+          <!-- FAQ Link -->
+          <div class="sidebar-card">
+            <mat-icon class="card-icon">quiz</mat-icon>
+            <h3>Looking for Quick Answers?</h3>
+            <p>Check out our FAQ page for instant answers to common questions.</p>
+            <a mat-stroked-button routerLink="/faq" class="card-btn">
+              Visit FAQ
+              <mat-icon>arrow_forward</mat-icon>
+            </a>
+          </div>
+
+          <!-- Trust & Safety -->
+          <div class="sidebar-card">
+            <mat-icon class="card-icon">shield</mat-icon>
+            <h3>Safety Concerns?</h3>
+            <p>Learn about our security measures and dispute resolution process.</p>
+            <a mat-stroked-button routerLink="/trust-safety" class="card-btn">
+              Trust & Safety
+              <mat-icon>arrow_forward</mat-icon>
+            </a>
+          </div>
+
+          <!-- Support Hours -->
+          <div class="sidebar-card highlight">
+            <mat-icon class="card-icon">schedule</mat-icon>
+            <h3>24/7 Support</h3>
+            <p>Our team is available around the clock to assist you with any questions or issues.</p>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- MAP SECTION (Optional - can add real map) -->
+  <section class="map-section">
+    <div class="map-placeholder">
+      <mat-icon>location_on</mat-icon>
+      <h3>Tangier, Morocco</h3>
+      <p>Global team, local support</p>
+    </div>
+  </section>
+
+</div>

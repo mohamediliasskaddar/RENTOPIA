@@ -1,0 +1,117 @@
+<!-- src/app/features/profile/components/profile-info/profile-info.component.html -->
+<!-- ✅ CLEAN ENGLISH VERSION -->
+
+<div class="profile-info-container">
+
+  <!-- VIEW MODE -->
+  <div *ngIf="!(isEditMode$ | async)" class="view-mode">
+    <div class="header">
+      <h2>Personal Information</h2>
+      <button mat-raised-button color="primary" (click)="onToggleEdit()" [disabled]="!(canEdit$ | async)">
+        <mat-icon>edit</mat-icon>
+        Edit
+      </button>
+    </div>
+
+    <div class="info-grid" *ngIf="(user$ | async) as user">
+      <div class="info-item">
+        <label>First Name</label>
+        <p>{{ user.prenom }}</p>
+      </div>
+
+      <div class="info-item">
+        <label>Last Name</label>
+        <p>{{ user.nom }}</p>
+      </div>
+
+      <div class="info-item">
+        <label>Email</label>
+        <p>
+          {{ user.email }}
+          <mat-icon *ngIf="user.emailVerified" class="verified">verified</mat-icon>
+        </p>
+        <span class="hint">Cannot be changed</span>
+      </div>
+
+      <div class="info-item">
+        <label>Phone</label>
+        <p>{{ user.tel || 'Not provided' }}</p>
+        <span class="hint">Cannot be changed</span>
+      </div>
+
+      <div class="info-item full-width">
+        <label>Wallet Address</label>
+        <p class="wallet">{{ user.walletAdresse }}</p>
+        <span class="hint">Cannot be changed - Used for blockchain transactions</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT MODE -->
+  <div *ngIf="isEditMode$ | async" class="edit-mode">
+    <div class="header">
+      <h2>Edit Information</h2>
+    </div>
+
+    <form [formGroup]="profileForm" class="edit-form">
+      <!-- Photo Upload -->
+      <div class="photo-section">
+        <div class="photo">
+          <img *ngIf="previewUrl" [src]="previewUrl" alt="Preview">
+          <img *ngIf="!previewUrl && (user$ | async)?.photoUrl" [src]="(user$ | async)?.photoUrl" alt="Photo">
+          <div *ngIf="!previewUrl && !(user$ | async)?.photoUrl" class="no-photo">
+            <mat-icon>person</mat-icon>
+          </div>
+        </div>
+        <div class="photo-actions">
+          <input type="file" id="photoInput" accept="image/*" (change)="onFileSelected($event)" hidden>
+          <button mat-raised-button type="button" (click)="triggerFileInput()" [disabled]="uploadingPhoto$ | async">
+            <mat-icon>upload</mat-icon>
+            Change Photo
+          </button>
+          <span class="hint">Max 5MB - JPG, PNG</span>
+        </div>
+      </div>
+
+      <!-- First Name -->
+      <mat-form-field appearance="outline">
+        <mat-label>First Name</mat-label>
+        <input matInput formControlName="prenom">
+        <mat-error *ngIf="profileForm.get('prenom')?.errors">Required (min 2 characters)</mat-error>
+      </mat-form-field>
+
+      <!-- Last Name -->
+      <mat-form-field appearance="outline">
+        <mat-label>Last Name</mat-label>
+        <input matInput formControlName="nom">
+        <mat-error *ngIf="profileForm.get('nom')?.errors">Required (min 2 characters)</mat-error>
+      </mat-form-field>
+
+      <!-- Non-editable fields -->
+      <div class="non-editable">
+        <label>Email (Cannot be changed)</label>
+        <p>{{ (user$ | async)?.email }}</p>
+      </div>
+
+      <div class="non-editable">
+        <label>Phone (Cannot be changed)</label>
+        <p>{{ (user$ | async)?.tel || 'Not provided' }}</p>
+      </div>
+
+      <div class="non-editable">
+        <label>Wallet (Cannot be changed)</label>
+        <p class="wallet">{{ (user$ | async)?.walletAdresse }}</p>
+      </div>
+
+      <!-- Actions -->
+      <div class="actions">
+        <button mat-button type="button" (click)="onCancel()">Cancel</button>
+        <button mat-raised-button color="primary" type="button" (click)="onSave()" [disabled]="profileForm.invalid || (loading$ | async)">
+          <span *ngIf="!(loading$ | async)">Save</span>
+          <mat-spinner *ngIf="loading$ | async" diameter="20"></mat-spinner>
+        </button>
+      </div>
+    </form>
+  </div>
+
+</div>

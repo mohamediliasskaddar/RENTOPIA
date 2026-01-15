@@ -1,0 +1,302 @@
+.host-layout {
+  min-height: 100vh;
+  background-color: #f7f7f7;
+  display: flex;
+  flex-direction: column;
+}
+
+// ===========================
+// HEADER / TOP NAVIGATION
+// ===========================
+:host ::ng-deep .host-header,
+.host-header {
+
+  border-bottom: 1px solid #e8e9ec !important;
+
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+
+  .header-container {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 72px;
+    gap: 32px;
+  }
+
+  // Brand/Logo
+  .header-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+
+    mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+      color: #e67e22;
+    }
+
+    .brand-text {
+      font-size: 20px;
+      font-weight: 600;
+      color: #16243e;
+      letter-spacing: -0.3px;
+    }
+  }
+
+  // Navigation Links
+  .header-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #687284;
+      font-size: 15px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        color: #888a8d;
+        transition: color 0.2s ease;
+      }
+
+      &:hover {
+        background: #f5f5f7;
+        color: #16243e;
+
+        mat-icon {
+          color: #16243e;
+        }
+      }
+
+      &.active {
+        background: #fff5ed;
+        color: #e67e22;
+
+        mat-icon {
+          color: #e67e22;
+        }
+      }
+    }
+  }
+
+  // Right Actions
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+
+    button {
+      color: #687284;
+
+      mat-icon {
+        color: #687284;
+      }
+
+      &:hover {
+        background: #f5f5f7;
+        color: #16243e;
+
+        mat-icon {
+          color: #16243e;
+        }
+      }
+    }
+  }
+}
+
+// ===========================
+// MAIN CONTENT AREA
+// ===========================
+.host-content {
+  flex: 1;
+  padding: 32px 0;
+
+  .content-wrapper {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+}
+
+// ===========================
+// RESPONSIVE
+// ===========================
+@media (max-width: 1024px) {
+  .host-header {
+    .header-container {
+      gap: 16px;
+    }
+
+    .header-nav {
+      gap: 4px;
+
+      .nav-link {
+        padding: 8px 12px;
+        font-size: 14px;
+
+        mat-icon {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+        }
+
+        span {
+          display: none;
+        }
+      }
+    }
+
+    .header-brand .brand-text {
+      font-size: 18px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .host-header {
+    .header-container {
+      height: 64px;
+      padding: 0 16px;
+    }
+
+    .header-brand {
+      gap: 8px;
+
+      mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+
+      .brand-text {
+        font-size: 16px;
+      }
+    }
+
+    .header-nav {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+
+      .nav-link {
+        padding: 6px 10px;
+
+        mat-icon {
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+        }
+      }
+    }
+  }
+
+  .host-content {
+    padding: 24px 0;
+
+    .content-wrapper {
+      padding: 0 16px;
+    }
+  }
+}
+
+// ===========================
+// MOBILE NAVIGATION (Bottom)
+// ===========================
+@media (max-width: 640px) {
+  .host-layout {
+    padding-bottom: 72px;
+  }
+
+  .host-header {
+    position: fixed;
+    bottom: 0;
+    top: auto;
+    width: 100%;
+    border-bottom: none;
+    border-top: 1px solid #e8e9ec;
+    box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.06);
+
+    .header-container {
+      height: 72px;
+      padding: 8px 8px 12px;
+      justify-content: center;
+    }
+
+    .header-brand,
+    .header-actions {
+      display: none;
+    }
+
+    .header-nav {
+      width: 100%;
+      justify-content: space-around;
+      gap: 0;
+
+      .nav-link {
+        flex-direction: column;
+        padding: 8px 12px;
+        gap: 4px;
+        flex: 1;
+        justify-content: center;
+        align-items: center;
+
+        mat-icon {
+          font-size: 24px;
+          width: 24px;
+          height: 24px;
+        }
+
+        span {
+          display: block;
+          font-size: 11px;
+          font-weight: 500;
+        }
+
+        &.active {
+          background: transparent;
+
+          &::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 32px;
+            height: 3px;
+            background: #e67e22;
+            border-radius: 0 0 3px 3px;
+          }
+        }
+      }
+    }
+  }
+
+  .host-content {
+    padding: 16px 0 0;
+  }
+}
