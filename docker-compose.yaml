@@ -1,0 +1,262 @@
+networks:
+  rental-net:
+    driver: bridge
+
+volumes:
+  mysql_data:
+
+services:
+  # ================= MySQL =================
+  mysql-db:
+    build: ./mysql-db
+    container_name: mysql-db
+    env_file:
+      - .env
+    ports:
+      - "${MYSQL_PORT}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - rental-net
+
+  # ================= Eureka =================
+  eureka-server:
+    build: ./eureka-server
+    container_name: eureka-server
+    env_file:
+      - .env
+    ports:
+      - "${EUREKA_PORT}:8761"
+    networks:
+      - rental-net
+    depends_on:
+      - mysql-db
+
+  # ================= Redis =================
+  redis:
+    image: redis:7.0-alpine
+    container_name: redis
+    ports:
+      - "${REDIS_PORT}:6379"
+    networks:
+      - rental-net
+
+  # ================= RabbitMQ =================
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: "${RABBITMQ_USER}"
+      RABBITMQ_DEFAULT_PASS: "${RABBITMQ_PASS}"
+    ports:
+      - "${RABBITMQ_PORT}:5672"
+      - "15672:15672" # Management UI
+    networks:
+      - rental-net
+
+  # ================= Services Spring Boot =================
+  user-service:
+    build: ./user-service
+    container_name: user-service
+    env_file:
+      - .env
+    ports:
+      - "${USER_SERVICE_PORT}:8081"
+    networks:
+      - rental-net
+    depends_on:
+      - mysql-db
+      - eureka-server
+      - rabbitmq
+
+
+  listing-service:
+    build: ./listing-service
+    container_name: listing-service
+    env_file:
+      - .env
+    ports:
+      - "${LISTING_SERVICE_PORT}:8082"
+    networks:
+      - rental-net
+    depends_on:
+      - mysql-db
+      - eureka-server
+      - rabbitmq
+
+
+  booking-service:
+    build: ./booking-service
+    container_name: booking-service
+    env_file:
+      - .env
+    ports:
+      - "${BOOKING_SERVICE_PORT}:8083"
+    networks:
+      - rental-net
+    depends_on:
+      - mysql-db
+      - eureka-server
+      - rabbitmq
+
+
+  payment-service:
+    build: ./payment-service
+    container_name: payment-service
+    env_file:
+      - .env
+    ports:
+      - "${PAYMENT_SERVICE_PORT}:8084"
+    networks:
+      - rental-net
+    depends_on:
+      - mysql-db
+      - eureka-server
+      - rabbitmq
+
+
+  messaging-service:
+    build: ./messaging-service
+    container_name: messaging-service
+    env_file:
+      - .env
+    ports:
+      - "${MESSAGING_SERVICE_PORT}:8085"
+    networks:
+      - rental-net
+    depends_on:
+      - mysql-db
+      - eureka-server
+      - rabbitmq
+
+  notification-service:
+    build: ./notification-service
+    container_name: notification-service
+    env_file:
+      - .env
+    ports:
+      - "${NOTIFICATION_SERVICE_PORT}:8086"
+    networks:
+      - rental-net
+    depends_on:
+      - mysql-db
+      - eureka-server
+      - rabbitmq
+      - payment-service
+
+
+  review-service:
+    build: ./review-service
+    container_name: review-service
+    env_file:
+      - .env
+    ports:
+      - "${REVIEW_SERVICE_PORT}:8087"
+    networks:
+      - rental-net
+    depends_on:
+      - mysql-db
+      - eureka-server
+      - rabbitmq
+
+
+  media-service:
+      build: ./media-service
+      container_name: media-service
+      env_file:
+        - .env
+      ports:
+        - "${MEDIA_SERVICE_PORT}:8088"
+      networks:
+        - rental-net
+      depends_on:
+        - mysql-db
+        - eureka-server
+        - redis
+
+  blockchain-service:
+    build: ./blockchain-service
+    container_name: blockchain-service
+    env_file:
+      - .env
+    ports:
+      - "${BLOCKCHAIN_SERVICE_PORT}:8089"
+    networks:
+      - rental-net
+    depends_on:
+      - mysql-db
+      - eureka-server
+      - rabbitmq
+
+
+  ai-service:
+    build: ./ai-service
+    container_name: ai-service
+    env_file:
+      - .env
+    ports:
+      - "${AI_SERVICE_PORT}:8090"
+    networks:
+      - rental-net
+    depends_on:
+      - eureka-server
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    env_file:
+      - .env
+    ports:
+      - "${API_GATEWAY_PORT}:8080"
+    networks:
+      - rental-net
+    depends_on:
+      - redis
+      - user-service
+      - listing-service
+      - booking-service
+      - payment-service
+      - messaging-service
+      - notification-service
+      - review-service
+      - media-service
+      - blockchain-service
+      - ai-service
+      - eureka-server
+  front-service:
+    build: ./front-service
+    container_name: front-service
+    env_file:
+      - .env
+    ports:
+      - "${FRONT_PORT}:4200"
+    networks:
+      - rental-net
+    depends_on:
+      - api-gateway #pas l'appel de mettre tou parce qu'il sont inclus dans api-gatwya dependecies
+
+  # ================= Monitoring =================
+  prometheus:
+    image: prom/prometheus:v2.49.1
+    container_name: prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    ports:
+      - "9090:9090"
+    networks:
+      - rental-net
+    depends_on:
+      - api-gateway
+
+  grafana:
+    image: grafana/grafana:10.2.3
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - rental-net
+    depends_on:
+      - prometheus
+

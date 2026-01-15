@@ -1,5 +1,5 @@
 server:
-  port: 8083
+  port: ${BOOKING_SERVICE_PORT:8083}
 
 spring:
   application:
@@ -9,9 +9,9 @@ spring:
 
   # ==================== DATASOURCE ====================
   datasource:
-    url: jdbc:mysql://localhost:4306/rental_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: root
-    password: ""
+    url: ${MYSQL_URL:jdbc:mysql://localhost:3306/rental_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:44010904mysql}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 10
@@ -39,16 +39,16 @@ spring:
 
   # ==================== RABBITMQ ====================
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER:guest}
+    password: ${RABBITMQ_PASS:guest}
 
 # ==================== EUREKA ====================
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
     register-with-eureka: true
     fetch-registry: true
   instance:
@@ -70,32 +70,31 @@ feign:
     enabled: true
 
 # ==================== SECURITY ====================
-  security:
-  # Désactiver la sécurité par défaut pour les tests (optionnel)
-  # filter:
-  #   order: -100  # Place le filtre JWT en premier
+# (optionnel : filtre JWT désactivé pour tests)
+# security:
+#   filter:
+#     order: -100
 
-  # Configuration JWT
+# ==================== JWT ====================
 jwt:
-  secret: "votreSuperSecretTresLongPourJWT256bitsMinimum1234567890!"  # Au moins 32 caractères
-  expiration: 86400000  # 24 heures en millisecondes
-# ==================== URLs DES SERVICES ====================
-# ✅ CORRECTION : Chaque service a maintenant sa propre URL
+  secret: ${JWT_SECRET:votreSuperSecretTresLongPourJWT256bitsMinimum1234567890!}
+  expiration: ${JWT_EXPIRATION:86400000}
+
+# ==================== URL DES SERVICES ====================
 services:
   user-service:
-    url: http://localhost:8081/api/v1
+    url: http://localhost:${USER_SERVICE_PORT:8081}
   listing-service:
-    url: http://localhost:8082/api/v1
+    url: http://localhost:${LISTING_SERVICE_PORT:8082}
   payment-service:
-    url: http://localhost:8084/api/v1
-  # ✅ NOTIFICATION-SERVICE N'EST PLUS NÉCESSAIRE EN FEIGN (utilise RabbitMQ)
+    url: http://localhost:${PAYMENT_SERVICE_PORT:8084}
 
 # ==================== ACTUATOR ====================
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,prometheus
+        include: health, info, metrics, prometheus
   endpoint:
     health:
       show-details: always

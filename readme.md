@@ -1,3 +1,25 @@
+## Ports
+
+| Service              | Port | Responsabilité |
+|---------------------|------|----------------|
+| User Service         | 8081 | Inscription, connexion, profil, vérification email/SMS, wallets |
+| Listing Service      | 8082 | Gestion annonces, disponibilités, prix, recherche |
+| Booking Service      | 8083 | Réservations, calcul prix, gestion statuts |
+| Payment Service      | 8084 | Paiements blockchain, escrow, vérification solde ETH |
+| Messaging Service    | 8085 | Chat temps réel entre locataire et propriétaire |
+| Notification Service | 8086 | Emails et SMS (confirmation, rappels) |
+| Review Service       | 8087 | Avis et notes des locataires |
+| Media Service        | 8088 | Upload/compression photos, stockage S3 |
+| Blockchain Service   | 8089 | Interface avec smart contracts Ethereum |
+| AI Service           | 8090 | Recommandations, scoring, détection fraude, assistance intelligente |
+| API Gateway          | 8080 | Point d’entrée unique, routage, sécurité, rate limiting |
+| Eureka Server        | 8761 | Service discovery des microservices |
+| Front Service        | 4200 | Application frontend (Angular / React) |
+
+
+
+
+
 🧭 Roadmap – Communication entre Microservices
 
 Objectif : documenter l’état d’avancement des communications entre microservices

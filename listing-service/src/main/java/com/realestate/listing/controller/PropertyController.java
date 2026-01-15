@@ -1,6 +1,7 @@
 // src/main/java/com/realestate/listing/controller/PropertyController.java
 package com.realestate.listing.controller;
 
+import com.realestate.listing.dto.PricePredictionRequestDTO;
 import com.realestate.listing.dto.PropertyCardDTO;
 import com.realestate.listing.dto.PropertyDetailDTO;
 import com.realestate.listing.dto.PropertySearchResultDTO;
@@ -16,6 +17,8 @@ import com.realestate.listing.service.AmenityService;
 import com.realestate.listing.service.PriceHistoryService;
 import com.realestate.listing.service.PropertyAvailabilityService;
 import com.realestate.listing.service.PropertyService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,10 +32,15 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 
+import com.realestate.listing.dto.PricePredictionRequestDTO;
+import com.realestate.listing.service.PricePredictionService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @RestController
 @RequestMapping("/properties")
 public class PropertyController {
+
+    private static final Logger logger = LoggerFactory.getLogger(PropertyController.class);
 
     @Autowired
     private PropertyService propertyService;
@@ -55,6 +63,8 @@ public class PropertyController {
 
     @Autowired
     private DiscountRepository discountRepository;
+    @Autowired
+    private PricePredictionService pricePredictionService; // ✅ AJOUTÉ
 
 
     /**
@@ -389,5 +399,62 @@ public class PropertyController {
         List<Integer> photoIds = request.get("photoIds");
         propertyService.reorderPhotos(propertyId, photoIds);
         return ResponseEntity.ok().build();
+    }
+
+
+
+
+
+
+
+
+
+
+    /**
+     * ✅ NOUVEAU: Suggérer le prix optimal pour une propriété EXISTANTE
+     * GET /properties/{id}/suggest-price
+     *
+     * Utilisé quand un propriétaire veut ajuster le prix
+     */
+    @GetMapping("/{id}/suggest-price")
+    public ResponseEntity<Map<String, Object>> suggestPrice(@PathVariable Integer id) {
+        logger.info("💰 Price suggestion requested for property {}", id);
+        try {
+            Map<String, Object> suggestion = pricePredictionService.suggestOptimalPrice(id);
+            return ResponseEntity.ok(suggestion);
+        } catch (Exception e) {
+            logger.error("❌ Failed to suggest price", e);
+            return ResponseEntity.status(500).body(
+                    Map.of("error", "Impossible de calculer le prix suggéré", "message", e.getMessage())
+            );
+        }
+    }
+
+    /**
+     * ✅ NOUVEAU: Suggérer le prix pour une NOUVELLE propriété (avant création)
+     * POST /properties/suggest-price
+     *
+     * Utilisé dans le formulaire de création
+     */
+    @PostMapping("/suggest-price")
+    public ResponseEntity<Map<String, Object>> suggestPriceForNew(
+            @RequestBody PricePredictionRequestDTO request) {
+
+        logger.info("💰 Price prediction for new property: surface={}, bedrooms={}",
+                request.getSurfaceArea(), request.getBedrooms());
+
+        try {
+            Map<String, Object> prediction = pricePredictionService.suggestPriceForNewProperty(
+                    request.getSurfaceArea(),
+                    request.getBedrooms(),
+                    request.getAmenitiesCount()
+            );
+            return ResponseEntity.ok(prediction);
+        } catch (Exception e) {
+            logger.error("❌ Failed to predict price", e);
+            return ResponseEntity.status(500).body(
+                    Map.of("error", "Impossible de prédire le prix", "message", e.getMessage())
+            );
+        }
     }
 }

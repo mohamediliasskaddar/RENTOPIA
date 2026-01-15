@@ -21,7 +21,10 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/eureka/**").permitAll()
+                        .requestMatchers( "/eureka/**",
+                                "/actuator/health",
+                                "/actuator/info",
+                                "/actuator/prometheus").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic(basic -> {});

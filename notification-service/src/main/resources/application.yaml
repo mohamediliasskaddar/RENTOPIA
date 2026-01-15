@@ -1,5 +1,5 @@
 server:
-  port: 8086
+  port: ${NOTIFICATION_SERVICE_PORT:8086}
 
 spring:
   application:
@@ -7,15 +7,15 @@ spring:
 
   # Configuration MySQL
   datasource:
-    url: jdbc:mysql://localhost:4306/rental_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: root
-    password: ""
+    url: ${MYSQL_URL:jdbc:mysql://localhost:3306/rental_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:44010904mysql}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   # Configuration JPA
   jpa:
     hibernate:
-      ddl-auto: update  # La base existe déjà
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
@@ -24,10 +24,10 @@ spring:
 
   # Configuration Email (Gmail)
   mail:
-    host: smtp.gmail.com
-    port: 587
-    username: fatimaezzahraallai4@gmail.com
-    password: gtee htfd lpwl lswd
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -41,6 +41,10 @@ spring:
 
   # Configuration RabbitMQ
   rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER:guest}
+    password: ${RABBITMQ_PASS:guest}
     listener:
       type: simple
       simple:
@@ -50,36 +54,35 @@ spring:
         prefetch: 1
         default-requeue-rejected: false
 
-# OU pour désactiver un consumer spécifique
+  # Désactiver health RabbitMQ si besoin
   management:
-  health:
-    rabbits:
-      enabled: false
+    health:
+      rabbits:
+        enabled: false
 
   # Config Server
   config:
-    import: optional:configserver:http://localhost:8888
+    import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}
   cloud:
     config:
-      enabled: false  # Désactivé pour ce guide, vous pouvez activer plus tard
+      enabled: false
 
 # Eureka Client
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
     fetch-registry: true
     register-with-eureka: true
   instance:
     prefer-ip-address: true
     instance-id: ${spring.application.name}:${random.value}
 
-# Twilio Configuration (pour SMS)
+# Twilio Configuration (SMS)
 twilio:
-  account-sid: ACb40aaed57bd1f5f08d89b1b912559b78
-  auth-token: 09d28f38519895c26ad9e1d5610f9230
-  phone-number: +1 267 314 8246
-
+  account-sid: ${TWILIO_ACCOUNT_SID}
+  auth-token: ${TWILIO_AUTH_TOKEN}
+  phone-number: ${TWILIO_PHONE_NUMBER}
 
 # Actuator
 management:

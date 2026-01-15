@@ -1,12 +1,10 @@
 spring:
   application:
     name: media-service
-
-  # Configuration Base de Données
   datasource:
-    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?useSSL=false&serverTimezone=Europe/Paris&allowPublicKeyRetrieval=true
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
+    url: ${MYSQL_URL:jdbc:mysql://localhost:3306/rental_db?useSSL=false&serverTimezone=Europe/Paris&allowPublicKeyRetrieval=true}
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:44010904mysql}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 10
@@ -32,10 +30,10 @@ spring:
       file-size-threshold: 2MB
 
   # Profil actif
-  profiles:
-    active: local
+#  profiles:
+#    active: ${APP_MODE:local}
 
-# Configuration AWS (SANS credentials - IAM Roles en production)
+# Configuration AWS (variables EXISTANTES dans .env)
 aws:
   region: ${AWS_REGION}
   s3:
@@ -43,25 +41,33 @@ aws:
     users-bucket: ${S3_USERS_BUCKET}
     cdn-url: ${CLOUDFRONT_URL}
 
-# Mode de l'application (local ou production)
+# Mode de l'application
 app:
-  mode: ${APP_MODE}
+  mode: ${APP_MODE:local}
 
-# Configuration Eureka
+# Configuration Eureka (corrigée)
 eureka:
   client:
     service-url:
-      defaultZone: ${EUREKA_SERVER_URL}
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
     register-with-eureka: true
     fetch-registry: true
   instance:
     prefer-ip-address: true
     lease-renewal-interval-in-seconds: 30
 
-# Port du service
+# Port du service (corrigé)
 server:
-  port: ${SERVER_PORT}
-
+  port: ${MEDIA_SERVICE_PORT:8087}
+# Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
 # Logging
 logging:
   level:

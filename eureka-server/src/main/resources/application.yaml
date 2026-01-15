@@ -1,6 +1,6 @@
 # Configuration du serveur
 server:
-  port: 8761  # Port par défaut d'Eureka
+  port: ${EUREKA_PORT:8761}
 
 # Configuration Spring
 spring:
@@ -12,36 +12,30 @@ eureka:
   instance:
     hostname: localhost
     prefer-ip-address: false
-  
+
   client:
-    # Ne pas s'enregistrer soi-même comme client
     register-with-eureka: false
-    # Ne pas récupérer le registre (car c'est le serveur)
     fetch-registry: false
     service-url:
-      defaultZone:  http://admin:admin123@localhost:8761/eureka/
-  
+      defaultZone: ${EUREKA_URL:http://admin:admin123@eureka-server:8761/eureka/}
+
   server:
-    # Délai avant de supprimer un service inactif
     eviction-interval-timer-in-ms: 10000
-    # Désactiver l'auto-préservation en développement
     enable-self-preservation: false
-    # Seuil de renouvellement
     renewal-percent-threshold: 0.85
-    # Intervalle de vérification des services expirés
     response-cache-update-interval-ms: 5000
 
-# Configuration Actuator
+# Actuator
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics,env
+        include: health, info, metrics, env, prometheus
   endpoint:
     health:
       show-details: always
 
-# Configuration des logs
+# Logging
 logging:
   level:
     root: INFO
@@ -49,9 +43,8 @@ logging:
     com.netflix.discovery: INFO
     com.rental.eurekaserver: DEBUG
 
-# Configuration de sécurité
-
-  security:
-    user:
-      name: admin
-      password: admin123
+# Security Admin (via variables d'environnement)
+security:
+  user:
+    name: ${EUREKA_ADMIN_USER:admin}
+    password: ${EUREKA_ADMIN_PASS:admin123}

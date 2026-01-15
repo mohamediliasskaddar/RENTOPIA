@@ -1,0 +1,71 @@
+server:
+  port: 8089
+
+spring:
+  application:
+    name: blockchain-service
+  config:
+    import: optional:configserver:http://localhost:8888
+
+  # RabbitMQ Configuration
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${random.value}
+
+# Configuration Ethereum
+ethereum:
+  network: sepolia
+  rpc-url: https://sepolia.infura.io/v3/50e3d616c7ae4bb4bb5d48d97ab6d5a8
+  chain-id: 11155111
+  contract:
+    address: "0x23470CA6C42Fe32E3E48b85999123cC28a57Ca94"
+    abi-path: classpath:contract/RentalPlatform.json
+  wallet:
+    admin-private-key: ${ADMIN_PRIVATE_KEY:95f943fbd16b6288242988cc02a48e9519fe37a71f989bde1687e7c471ea214f}
+  gas:
+    price: 20000000000  # 20 Gwei
+    limit: 500000
+
+# Wallet encryption
+wallet:
+  encryption-key: ${WALLET_ENCRYPTION_KEY:7e4d9c12cfb1a7e08e583d0a9fc4b8d298c44cc7d3ef0fa1c29f35d59a046be3}
+
+# RabbitMQ Queues
+rabbitmq:
+  exchange: rental-exchange
+  queues:
+    booking-created: booking.created.queue
+    booking-confirmed: booking.confirmed.queue
+    checkin-completed: checkin.completed.queue
+    checkout-completed: checkout.completed.queue
+
+# Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+# Logging
+logging:
+  level:
+    com.rental.blockchain: DEBUG
+    org.web3j: INFO
+    org.springframework.amqp: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"

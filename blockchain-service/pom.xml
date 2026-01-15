@@ -79,6 +79,18 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!--adeded to test  promotehus-->
+        <!-- Spring Boot Actuator pour exposer les métriques -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- Micrometer Prometheus registry pour exposer les métriques au format Prometheus -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>
@@ -89,6 +101,7 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -127,33 +140,26 @@
                 <groupId>org.web3j</groupId>
                 <artifactId>web3j-maven-plugin</artifactId>
                 <version>${web3j.version}</version>
-                <configuration>
-                    <packageName>com.rental.blockchain.contract</packageName>
-                    <sourceDestination>src/main/java</sourceDestination>
-                    <nativeJavaType>true</nativeJavaType>
-                    <outputFormat>java</outputFormat>
-                    <!-- Configuration pour ABI et BIN files -->
-                    <abiSourceFiles>
-                        <directory>${project.basedir}/src/main/resources/contract</directory>
-                        <includes>
-                            <include>*.json</include>
-                            <include>*.abi</include>
-                        </includes>
-                    </abiSourceFiles>
-                    <binarySourceFiles>
-                        <directory>${project.basedir}/src/main/resources/contract</directory>
-                        <includes>
-                            <include>*.bin</include>
-                        </includes>
-                    </binarySourceFiles>
-                </configuration>
                 <executions>
                     <execution>
-                        <id>generate-sources-web3j</id>
-                        <phase>generate-sources</phase>
                         <goals>
                             <goal>generate-sources</goal>
                         </goals>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <packageName>com.rental.blockchain.contract</packageName>
+                            <sourceDestination>src/main/java</sourceDestination>
+                            <nativeJavaType>true</nativeJavaType>
+                            <outputFormat>java</outputFormat>
+                            <sourceFiles>
+                                <directory>${project.basedir}/src/main/resources/contract</directory>
+                                <includes>
+                                    <include>*.json</include>
+                                    <include>*.abi</include>
+                                    <include>*.bin</include>
+                                </includes>
+                            </sourceFiles>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

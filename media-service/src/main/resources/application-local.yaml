@@ -1,0 +1,85 @@
+#spring:
+#  application:
+#    name: media-service
+#
+#  # Configuration Base de Données
+#  datasource:
+#    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?useSSL=false&serverTimezone=Europe/Paris&allowPublicKeyRetrieval=true
+#    username: ${DB_USER}
+#    password: ${DB_PASSWORD}
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    hikari:
+#      maximum-pool-size: 10
+#      minimum-idle: 5
+#      connection-timeout: 30000
+#
+#  # Configuration JPA
+#  jpa:
+#    hibernate:
+#      ddl-auto: validate
+#    show-sql: true
+#    properties:
+#      hibernate:
+#        dialect: org.hibernate.dialect.MySQL8Dialect
+#        format_sql: true
+#
+#  # Configuration Upload Multipart
+#  servlet:
+#    multipart:
+#      enabled: true
+#      max-file-size: 10MB
+#      max-request-size: 50MB
+#      file-size-threshold: 2MB
+#
+#  # Profil actif
+#  profiles:
+#    active: local
+#
+## Configuration AWS (SANS credentials - IAM Roles en production)
+#aws:
+#  region: ${AWS_REGION}
+#  s3:
+#    properties-bucket: ${S3_PROPERTIES_BUCKET}
+#    users-bucket: ${S3_USERS_BUCKET}
+#    cdn-url: ${CLOUDFRONT_URL}
+#
+## Mode de l'application (local ou production)
+#app:
+#  mode: ${APP_MODE}
+#
+## Configuration Eureka
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: ${EUREKA_SERVER_URL}
+#    register-with-eureka: true
+#    fetch-registry: true
+#  instance:
+#    prefer-ip-address: true
+#    lease-renewal-interval-in-seconds: 30
+#
+## Port du service
+#server:
+#  port: ${SERVER_PORT}
+#
+## Logging
+#logging:
+#  level:
+#    root: INFO
+#    com.rental.media: DEBUG
+#    org.springframework.web: INFO
+#    software.amazon.awssdk: INFO
+#  pattern:
+#    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+#
+## Configuration Images
+#image:
+#  allowed-formats: jpg,jpeg,png
+#  max-size-mb: 10
+#  compression:
+#    quality: 0.85
+#    max-width: 1920
+#    max-height: 1080
+#  thumbnail:
+#    width: 400
+#    height: 300
