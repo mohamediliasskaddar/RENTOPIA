@@ -6,6 +6,11 @@
 # OS
 .DS_Store
 Thumbs.db
+./archive
+./app-local.sh
+.env
+docker-prep.sh
+d
 .env
 app-local.sh
 docker-prep.sh
