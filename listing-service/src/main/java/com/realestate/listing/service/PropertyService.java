@@ -45,15 +45,15 @@ public class PropertyService {
     // === CRUD DE BASE ===
     // ======================
 
-        /**
-         * ✅ NOUVEAU : Vérifier si un utilisateur est propriétaire d'une propriété
-         */
-        public boolean isOwner(Integer propertyId, Integer userId) {
-            Property property = propertyRepository.findById(propertyId)
-                    .orElseThrow(() -> new RuntimeException("Propriété non trouvée"));
+    /**
+     * ✅ NOUVEAU : Vérifier si un utilisateur est propriétaire d'une propriété
+     */
+    public boolean isOwner(Integer propertyId, Integer userId) {
+        Property property = propertyRepository.findById(propertyId)
+                .orElseThrow(() -> new RuntimeException("Propriété non trouvée"));
 
-            return property.getUserId().equals(userId);
-        }
+        return property.getUserId().equals(userId);
+    }
     public Page<Property> getAllProperties(Pageable pageable) {
         return propertyRepository.findByStatus(Property.PropertyStatus.ACTIVE, pageable);
     }
@@ -354,6 +354,41 @@ public class PropertyService {
                 case "cleaningFee" -> property.setCleaningFee(value != null ? ((Number) value).doubleValue() : null);
                 case "petFee" -> property.setPetFee(value != null ? ((Number) value).doubleValue() : null);
                 case "platformFeePercentage" -> property.setPlatformFeePercentage(value != null ? ((Number) value).doubleValue() : null);
+
+                // ✅ AJOUT: Property Rules
+                case "childrenAllowed", "babiesAllowed", "petsAllowed", "smokingAllowed", "eventsAllowed", "additionalRules" -> {
+                    PropertyRule rules = property.getRules();
+                    if (rules == null) {
+                        rules = new PropertyRule();
+                        rules.setProperty(property);
+                        property.setRules(rules);
+                    }
+
+                    switch (key) {
+                        case "childrenAllowed" -> rules.setChildrenAllowed((Boolean) value);
+                        case "babiesAllowed" -> rules.setBabiesAllowed((Boolean) value);
+                        case "petsAllowed" -> rules.setPetsAllowed((Boolean) value);
+                        case "smokingAllowed" -> rules.setSmokingAllowed((Boolean) value);
+                        case "eventsAllowed" -> rules.setEventsAllowed((Boolean) value);
+                        case "additionalRules" -> rules.setCustomRules((String) value);
+                    }
+                }
+
+                // ✅ AJOUT: Host Preferences
+                case "communicationStyle", "responseTime", "checkInProcess" -> {
+                    HostInteractionPreference prefs = property.getHostPreferences();
+                    if (prefs == null) {
+                        prefs = new HostInteractionPreference();
+                        prefs.setProperty(property);
+                        property.setHostPreferences(prefs);
+                    }
+
+                    switch (key) {
+                        case "communicationStyle" -> prefs.setInteractionLevel((String) value);
+                        case "responseTime" -> prefs.setCheckInMethod((String) value);
+                        case "checkInProcess" -> prefs.setCheckInInstructions((String) value);
+                    }
+                }
             }
         });
 

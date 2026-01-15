@@ -48,7 +48,8 @@ public class SecurityConfig {
                         .requestMatchers("/health").permitAll()
                         .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers("/error").permitAll()
-
+                        //just added
+                        .requestMatchers("/actuator/health", "/actuator/info", "/actuator/prometheus").permitAll()
                         // Ensuite les routes plus génériques
                         .requestMatchers("/api/users/auth/**").permitAll()  // IMPORTANT: ajoutez cette ligne
 

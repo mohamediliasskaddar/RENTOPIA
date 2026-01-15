@@ -1,0 +1,57 @@
+server:
+  port: 8085
+  servlet:
+    context-path:/
+
+spring:
+  application:
+    name: messaging-service
+
+  # Configuration MySQL
+  datasource:
+    url: jdbc:mysql://localhost:3306/rental_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: "44010904mysql"
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+  # Configuration JPA
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+    open-in-view: false
+
+# Configuration JWT
+jwt:
+  secret: "votreSuperSecretTresLongPourJWT256bitsMinimum1234567890!"  # Au moins 32 caractères
+  expiration: 86400000  # 24 heures en millisecondes
+
+# Configuration WebSocket
+websocket:
+  allowed-origins: "*"
+  endpoint: /ws
+
+# Logging
+logging:
+  level:
+    root: INFO
+    com.rentaldapp.messagingservice: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.web.socket: DEBUG
+    org.hibernate.SQL: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"

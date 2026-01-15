@@ -1,0 +1,65 @@
+server:
+  port: 8081
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: user-service
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    connection-timeout: 5000
+
+  # Configuration MySQL
+  datasource:
+    url: jdbc:mysql://localhost:4306/rental_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: "44010904mysql"
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+
+  # Configuration JPA
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+    open-in-view: false
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+# Configuration JWT
+jwt:
+  secret: "votreSuperSecretTresLongPourJWT256bitsMinimum1234567890!"  # Au moins 32 caractères
+  expiration: 86400000  # 24 heures en millisecondes
+# Logging
+logging:
+  level:
+    root: INFO
+    com.rentaldapp.userservice: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+  logging:
+    level:
+      org.springframework.security: TRACE  # ⬅️ TRACE au lieu de DEBUG
+      org.springframework.web: DEBUG
+      com.rentaldapp.userservice: DEBUG
+      org.hibernate.SQL: DEBUG
+      org.hibernate.type.descriptor.sql.BasicBinder: TRACE

@@ -1,5 +1,5 @@
 server:
-  port: 8087
+  port: ${REVIEW_SERVICE_PORT:8088}
 
 spring:
   application:
@@ -7,15 +7,15 @@ spring:
 
   # Configuration MySQL
   datasource:
-    url: jdbc:mysql://localhost:4306/rental_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: root
-    password: # Mettez votre mot de passe MySQL ici
+    url: ${MYSQL_URL:jdbc:mysql://localhost:3306/rental_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:44010904mysql}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   # Configuration JPA
   jpa:
     hibernate:
-      ddl-auto: update  # La base existe déjà
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
@@ -24,45 +24,35 @@ spring:
 
   # Configuration RabbitMQ
   rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER:guest}
+    password: ${RABBITMQ_PASS:guest}
 
   # Config Server
   config:
-    import: optional:configserver:http://localhost:8888
+    import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}
   cloud:
     config:
-      enabled: false  # Désactivé pour ce guide
+      enabled: false
 
 # Eureka Client
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka/}
     fetch-registry: true
     register-with-eureka: true
   instance:
     prefer-ip-address: true
     instance-id: ${spring.application.name}:${random.value}
 
-# Actuator
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics
-  endpoint:
-    health:
-      show-details: always
-
 # Configuration métier
 review:
-  min-rating: 1.0
-  max-rating: 5.0
-  max-review-length: 2000
-  edit-window-hours: 24  # Durée pendant laquelle un avis peut être modifié
+  min-rating: ${REVIEW_MIN_RATING:1.0}
+  max-rating: ${REVIEW_MAX_RATING:5.0}
+  max-review-length: ${REVIEW_MAX_LENGTH:2000}
+  edit-window-hours: ${REVIEW_EDIT_WINDOW_HOURS:24}
 
 # Logging
 logging:
@@ -70,3 +60,18 @@ logging:
     com.rental.review: DEBUG
     org.springframework.amqp: DEBUG
     org.hibernate.SQL: DEBUG
+
+# ACTUATOR + PROMETHEUS
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true

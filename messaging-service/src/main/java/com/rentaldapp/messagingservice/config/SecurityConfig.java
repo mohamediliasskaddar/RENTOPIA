@@ -38,7 +38,8 @@ public class SecurityConfig {
                         .requestMatchers("/ws/**").permitAll()  // WebSocket
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/error").permitAll()
-
+                        //just added
+                        .requestMatchers("/actuator/health", "/actuator/info", "/actuator/prometheus").permitAll()
                         // Toutes les autres routes nécessitent une authentification
                         .anyRequest().authenticated()
                 )

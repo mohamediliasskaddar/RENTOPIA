@@ -17,13 +17,13 @@ public interface PropertyServiceClient {
     /**
      * Récupérer les détails d'une propriété
      */
-    @GetMapping("/api/properties/{id}")
+    @GetMapping("/properties/{id}")
     PropertyDTO getPropertyById(@PathVariable("id") Integer id);
 
     /**
      * Vérifier la disponibilité d'une propriété pour des dates données
      */
-    @GetMapping("/api/properties/{id}/availability/check")
+    @GetMapping("/properties/{id}/availability/check")
     Boolean checkAvailability(
             @PathVariable("id") Integer propertyId,
             @RequestParam("checkIn") LocalDateTime checkIn,
@@ -33,13 +33,13 @@ public interface PropertyServiceClient {
     /**
      * Récupérer le prix d'une propriété
      */
-    @GetMapping("/api/properties/{id}/pricing")
+    @GetMapping("/properties/{id}/pricing")
     PropertyDTO getPropertyPricing(@PathVariable("id") Integer propertyId);
 
     /**
      * ✅ CORRECTION : POST au lieu de GET pour bloquer les dates
      */
-    @PostMapping("/api/properties/{id}/availability/block")
+    @PostMapping("/properties/{id}/availability/block")
     void blockDates(
             @PathVariable("id") Integer propertyId,
             @RequestParam("checkIn") LocalDateTime checkIn,
@@ -50,7 +50,7 @@ public interface PropertyServiceClient {
     /**
      * ✅ CORRECTION : POST au lieu de GET pour débloquer les dates
      */
-    @PostMapping("/api/properties/{id}/availability/unblock")
+    @PostMapping("/properties/{id}/availability/unblock")
     void unblockDates(
             @PathVariable("id") Integer propertyId,
             @RequestParam("reservationId") Integer reservationId
@@ -59,7 +59,7 @@ public interface PropertyServiceClient {
     /**
      * Vérifier que l'utilisateur est le propriétaire
      */
-    @GetMapping("/api/properties/{id}/owner/{userId}")
+    @GetMapping("/properties/{id}/owner/{userId}")
     Boolean isOwner(
             @PathVariable("id") Integer propertyId,
             @PathVariable("userId") Integer userId

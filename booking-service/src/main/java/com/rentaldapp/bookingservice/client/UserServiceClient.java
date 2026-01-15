@@ -11,29 +11,30 @@ import java.util.Map;
  * ✅ CORRECTION : URL corrigée + méthodes manquantes ajoutées
  */
 @FeignClient(name = "user-service", url = "${services.user-service.url:http://localhost:8081}")
+
 public interface UserServiceClient {
 
     /**
      * Récupérer les informations complètes d'un utilisateur
      */
-    @GetMapping("/api/v1/users/{id}")
+    @GetMapping("/users/{id}")
     Map<String, Object> getUserById(@PathVariable("id") Integer id);
 
     /**
      * ✅ NOUVEAU : Récupérer uniquement l'email (pour notifications)
      */
-    @GetMapping("/api/v1/users/{id}/email")
+    @GetMapping("/users/{id}/email")
     String getUserEmail(@PathVariable("id") Integer id);
 
     /**
      * ✅ NOUVEAU : Récupérer l'adresse wallet (pour paiements blockchain)
      */
-    @GetMapping("/api/v1/users/{id}/wallet")
+    @GetMapping("/users/{id}/wallet")
     String getUserWallet(@PathVariable("id") Integer id);
 
     /**
      * ✅ NOUVEAU : Vérifier si un utilisateur existe
      */
-    @GetMapping("/api/v1/users/{id}/exists")
+    @GetMapping("/users/{id}/exists")
     Boolean userExists(@PathVariable("id") Integer id);
 }

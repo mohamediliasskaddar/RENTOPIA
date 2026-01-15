@@ -1,4 +1,4 @@
-"""
+""
 Génération de datasets IA réalistes
 Basés sur la logique métier + smart contract
 VERSION BLOCKCHAIN-NATIVE (ETH)

@@ -36,6 +36,8 @@ public class SecurityConfig {
                         .requestMatchers("/bookings/health").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/error").permitAll()
+//                        just added
+                        .requestMatchers("/actuator/health", "/actuator/info", "/actuator/prometheus").permitAll()
 
                         // Toutes les routes /bookings/** nécessitent une authentification
                         .requestMatchers("/bookings/**").authenticated()

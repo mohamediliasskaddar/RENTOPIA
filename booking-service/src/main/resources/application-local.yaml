@@ -1,0 +1,115 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: booking-service
+  main:
+    allow-bean-definition-overriding: true
+
+  # ==================== DATASOURCE ====================
+  datasource:
+    url: jdbc:mysql://localhost:3306/rental_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: "44010904mysql"
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+
+  # ==================== JPA ====================
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        jdbc:
+          time_zone: UTC
+        format_sql: true
+
+  # ==================== EUREKA CLIENT ====================
+  cloud:
+    discovery:
+      enabled: true
+    compatibility-verifier:
+      enabled: false
+
+  # ==================== RABBITMQ ====================
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+# ==================== EUREKA ====================
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+    hostname: localhost
+    lease-renewal-interval-in-seconds: 30
+    lease-expiration-duration-in-seconds: 90
+
+# ==================== FEIGN ====================
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 10000
+        loggerLevel: full
+  circuitbreaker:
+    enabled: true
+
+  # ==================== SECURITY ====================
+  security:
+  # Désactiver la sécurité par défaut pour les tests (optionnel)
+  # filter:
+  #   order: -100  # Place le filtre JWT en premier
+
+  # Configuration JWT
+jwt:
+  secret: "votreSuperSecretTresLongPourJWT256bitsMinimum1234567890!"  # Au moins 32 caractères
+  expiration: 86400000  # 24 heures en millisecondes
+# ==================== URLs DES SERVICES ====================
+# ✅ CORRECTION : Chaque service a maintenant sa propre URL
+services:
+  user-service:
+    url: http://localhost:8081
+  listing-service:
+    url: http://localhost:8082
+  payment-service:
+    url: http://localhost:8084
+  # ✅ NOTIFICATION-SERVICE N'EST PLUS NÉCESSAIRE EN FEIGN (utilise RabbitMQ)
+
+# ==================== ACTUATOR ====================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  health:
+    circuitbreakers:
+      enabled: true
+
+# ==================== LOGGING ====================
+logging:
+  level:
+    root: INFO
+    com.rentaldapp.bookingservice: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.cloud.openfeign: DEBUG
+    org.springframework.amqp: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

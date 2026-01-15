@@ -1,0 +1,7 @@
+CREATE DATABASE IF NOT EXISTS rental_db;
+
+CREATE USER IF NOT EXISTS 'rental_user'@'%' IDENTIFIED BY '44010904mysql';
+
+GRANT ALL PRIVILEGES ON rental_db.* TO 'rental_user'@'%';
+
+FLUSH PRIVILEGES;

@@ -1,0 +1,253 @@
+# Configuration de l'API Gateway
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  # DÉSACTIVEZ Spring Cloud Config
+  config:
+    import: "optional:configserver:"  # ⬅️ IMPORTANT
+  cloud:
+    config:
+      enabled: false  # Désactive la vérification
+
+    # Configuration Cloud Gateway
+
+    gateway:
+      # Configuration CORS globale
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowed-origins: "http://localhost:4200"
+            allowed-methods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - PATCH
+              - OPTIONS
+            allowed-headers: "*"
+            allow-credentials: true
+            max-age: 3600
+
+      # Découverte automatique des routes via Eureka
+      discovery:
+        locator:
+          enabled: false
+          lower-case-service-id: true
+
+      # Configuration des routes
+      routes:
+        # SEULEMENT cette route - supprimez auth-service
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - StripPrefix=2  # /api/users/auth/register -> /auth/register
+            - name: CircuitBreaker
+              args:
+                name: userServiceCircuitBreaker
+                fallbackUri: forward:/fallback/user-service
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 5
+                redis-rate-limiter.burstCapacity: 10
+                redis-rate-limiter.requestedTokens: 1
+
+        # Route pour User Service
+        - id: user-service
+          uri: lb://user-service  # En majuscules comme dans Eureka
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - StripPrefix=2  # Supprime /api/users -> reste /...
+            - name: CircuitBreaker
+              args:
+                name: userServiceCircuitBreaker
+                fallbackUri: forward:/fallback/user-service
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+                redis-rate-limiter.requestedTokens: 1
+
+        # Route pour Listing Service
+        - id: listing-service
+          uri: lb://LISTING-SERVICE
+          predicates:
+            - Path=/api/listings/**
+          filters:
+            - StripPrefix=2
+            - name: CircuitBreaker
+              args:
+                name: listingServiceCircuitBreaker
+                fallbackUri: forward:/fallback/listing-service
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+        # UNE SEULE route pour booking-service
+        - id: booking-service
+          uri: lb://booking-service  # ← minuscules
+          predicates:
+            - Path=/bookings/**
+
+        # Route pour Payment Service
+        - id: payment-service
+          uri: lb://PAYMENT-SERVICE
+          predicates:
+            - Path=/api/payments/**
+          filters:
+            - StripPrefix=2
+            - name: CircuitBreaker
+              args:
+                name: paymentServiceCircuitBreaker
+                fallbackUri: forward:/fallback/payment-service
+
+        # Route pour Messaging Service
+        - id: messaging-service
+          uri: lb://MESSAGING-SERVICE
+          predicates:
+            - Path=/api/messages/**
+          filters:
+            - StripPrefix=2
+            - name: CircuitBreaker
+              args:
+                name: messagingServiceCircuitBreaker
+                fallbackUri: forward:/fallback/messaging-service
+
+                # ✅ NOUVELLE ROUTE pour WebSocket
+        - id: messaging-websocket
+          uri: lb:ws://MESSAGING-SERVICE  # ← Noter le "lb:ws://"
+          predicates:
+            - Path=/api/ws/**
+          filters:
+            - StripPrefix=1
+        # Route pour Notification Service
+        - id: notification-service
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/api/notifications/**
+          filters:
+            - StripPrefix=2
+            - name: CircuitBreaker
+              args:
+                name: notificationServiceCircuitBreaker
+                fallbackUri: forward:/fallback/notification-service
+
+        # Route pour Review Service
+        - id: review-service-property
+          uri: lb://review-service
+          predicates:
+            - Path=/api/reviews/property/**
+          filters:
+            - StripPrefix=2
+        - id: review-service
+          uri: lb://review-service
+          predicates:
+            - Path=/api/reviews/**
+          filters:
+            - StripPrefix=1
+            - name: CircuitBreaker
+              args:
+                name: reviewServiceCircuitBreaker
+                fallbackUri: forward:/fallback/review-service
+
+        # Route pour Media Service
+        - id: media-service
+          uri: lb://MEDIA-SERVICE
+          predicates:
+            - Path=/api/media/**
+          filters:
+            - StripPrefix=2
+            - name: CircuitBreaker
+              args:
+                name: mediaServiceCircuitBreaker
+                fallbackUri: forward:/fallback/media-service
+
+        # Route pour Blockchain Service
+        - id: blockchain-service
+          uri: lb://BLOCKCHAIN-SERVICE
+          predicates:
+            - Path=/api/blockchain/**
+          filters:
+            - StripPrefix=2
+            - name: CircuitBreaker
+              args:
+                name: blockchainServiceCircuitBreaker
+                fallbackUri: forward:/fallback/blockchain-service
+
+# Configuration Eureka Client
+eureka:
+  client:
+    enabled: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+    # Configuration pour un refresh rapide
+    registry-fetch-interval-seconds: 5
+    instance-info-replication-interval-seconds: 10
+
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 10
+
+# Configuration Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway,routes,metrics,env
+      cors:
+        allowed-origins: "http://localhost:4200"
+        allowed-methods: GET,POST
+
+  endpoint:
+    gateway:
+      enabled: true
+    health:
+      show-details: always
+    routes:
+      enabled: true
+
+# Configuration Resilience4J (Circuit Breaker)
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 10s
+        failureRateThreshold: 50
+        slowCallRateThreshold: 50
+        slowCallDurationThreshold: 2s
+  timelimiter:
+    configs:
+      default:
+        timeoutDuration: 5s
+
+# Configuration des logs (TRACE pour débogage)
+logging:
+  level:
+    root: INFO
+    com.rental.apigateway: DEBUG
+    org.springframework.cloud.gateway: TRACE  # TRACE pour voir les routes
+    org.springframework.cloud.netflix.eureka: DEBUG
+    org.springframework.cloud.loadbalancer: DEBUG
+    com.netflix.discovery: DEBUG
+    reactor.netty.http.client: DEBUG
+    org.springframework.web: DEBUG
+
+# Configuration JWT (si utilisé)
+jwt:
+  secret: password321
+  expiration: 86400000
+  header: Authorization
+  prefix: "Bearer "
