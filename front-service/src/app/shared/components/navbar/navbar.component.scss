@@ -1,0 +1,616 @@
+// src/app/shared/components/navbar/navbar.component.scss
+// VERSION FINALE - BOUTONS UNIFORMES ET MODERNES
+
+.navbar {
+  position: absolute !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: 76px;
+  padding: 0 !important;
+  border-bottom: none !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background: transparent !important;
+  backdrop-filter: none;
+  box-shadow: none;
+
+  &.other-page {
+    background: #ffffff !important;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(16, 52, 91, 0.1) !important;
+
+    .navbar-left .logo-link {
+      color: #10345B;
+
+      .logo-icon, .logo-text {
+        color: #10345B;
+      }
+    }
+
+    .navbar-center .nav-links .nav-link {
+      color: #10345B;
+
+      mat-icon {
+        color: #10345B;
+      }
+    }
+
+    .navbar-right {
+      .auth-buttons .login-btn {
+        color: #10345B;
+      }
+
+      .user-actions {
+        .mode-switch-btn {
+          border-color: rgba(16, 52, 91, 0.3);
+          color: #10345B;
+
+          mat-icon {
+            color: #10345B;
+          }
+
+          &.host-mode {
+            background: #10345B;
+            border-color: #10345B;
+            color: white;
+
+            mat-icon {
+              color: white;
+            }
+          }
+
+          &:hover {
+            border-color: #10345B;
+            background: rgba(16, 52, 91, 0.05);
+          }
+        }
+
+        .icon-btn, .menu-btn {
+          color: #10345B;
+
+          &:hover {
+            background: rgba(16, 52, 91, 0.1);
+          }
+        }
+      }
+    }
+  }
+}
+
+.navbar-container {
+  width: 92%;
+  max-width: 1800px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+}
+
+// ============================
+// NAVBAR LEFT - LOGO
+// ============================
+.navbar-left {
+  .logo-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: white;
+
+    .logo-icon {
+      font-size: 32px;
+      width: 32px;
+      height: 32px;
+    }
+
+    .logo-text {
+      font-size: 1.85rem;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+  }
+}
+
+// ============================
+// NAVBAR CENTER - NAVIGATION
+// ============================
+.navbar-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+
+  .nav-link {
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    font-size: 1.05rem;
+    padding: 8px 0;
+    position: relative;
+
+    &::after {
+      content: '';
+      width: 0;
+      height: 2px;
+      background: white;
+      transition: width 0.3s ease;
+    }
+
+    &:hover::after {
+      width: 100%;
+    }
+  }
+}
+
+// ============================
+// MEGA MENU
+// ============================
+.mega-menu-wrapper {
+  position: static;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+
+  &:hover {
+    .mega-backdrop {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .mega-menu-panel {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+  }
+}
+
+.mega-backdrop {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  z-index: 998;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  pointer-events: none;
+
+  .mega-menu-wrapper:hover & {
+    pointer-events: auto;
+  }
+}
+
+.mega-menu-panel {
+  position: fixed;
+  top: 76px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  margin-top: 20px;
+  width: 1300px;
+  max-width: 95vw;
+  height: 400px;
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  border: 1px solid #e9ecef;
+  overflow: hidden;
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+
+  .mega-menu-wrapper:hover & {
+    pointer-events: auto;
+  }
+}
+
+.mega-menu-container {
+  display: grid;
+  grid-template-columns: 350px repeat(3, 1fr);
+  gap: 0;
+  min-height: 500px;
+}
+
+.mega-visual {
+  padding: 20px;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+
+  .image-container {
+    position: relative;
+    width: 100%;
+    max-width: 300px;
+    aspect-ratio: 1;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    margin-bottom: 80px;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+  }
+
+  &:hover img {
+    transform: scale(1.08);
+  }
+}
+
+.mega-content {
+  display: contents;
+}
+
+.mega-column {
+  padding: 35px 25px;
+  background: white;
+
+  &:not(:last-child) {
+    border-right: 1px solid #f0f0f0;
+  }
+
+  h4 {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin: 0 0 20px 0;
+  }
+}
+
+.mega-link {
+  display: flex;
+  align-items: flex-start;
+  padding: 12px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #333;
+  transition: all 0.2s ease;
+  margin-bottom: 6px;
+
+  &.with-image {
+    gap: 14px;
+
+    img {
+      width: 65px;
+      height: 65px;
+      border-radius: 8px;
+      object-fit: cover;
+      flex-shrink: 0;
+      border: 1px solid #e9ecef;
+      transition: all 0.2s ease;
+    }
+
+    &:hover img {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  &.text-only {
+    padding: 14px 12px;
+  }
+
+  div {
+    flex: 1;
+
+    strong {
+      display: block;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #111;
+      margin-bottom: 4px;
+      transition: color 0.2s ease;
+    }
+
+    span {
+      display: block;
+      font-size: 0.85rem;
+      color: #666;
+      line-height: 1.4;
+    }
+  }
+
+  &:hover {
+    background: #fafafa;
+
+    div strong {
+      color: #e67e22;
+    }
+  }
+}
+
+// ============================
+// 🔥 NAVBAR RIGHT - BOUTONS UNIFORMES
+// ============================
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  .auth-buttons {
+    display: flex;
+    gap: 12px;
+
+    .login-btn {
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 600;
+    }
+
+    .signup-btn {
+      background: white !important;
+      color: #0f1a2e !important;
+      font-weight: 700;
+      border-radius: 50px;
+      padding: 8px 24px;
+    }
+  }
+
+  .user-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    // 🔥 BOUTON SWITCH MODE (Host/Guest)
+    .mode-switch-btn {
+      height: 40px;
+      padding: 0 16px;
+      border-radius: 20px;
+      border: 1.5px solid rgba(255, 255, 255, 0.3);
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+
+      &.host-mode {
+        background: white;
+        border-color: white;
+        color: #10345B;
+
+        mat-icon {
+          color: #10345B;
+        }
+      }
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        border-color: rgba(255, 255, 255, 0.6);
+      }
+    }
+
+    // 🔥 BOUTONS ICÔNES (Messages, Menu) - Style Original
+    .icon-btn,
+    .menu-btn {
+      color: white;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+    }
+  }
+}
+
+// ============================
+// 🔥 USER DROPDOWN - DESIGN MODERNE
+// ============================
+::ng-deep {
+  .user-dropdown.mat-mdc-menu-panel {
+    margin-top: 12px !important;
+    margin-left: -100px !important;
+    background: white !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12),
+    0 2px 6px rgba(0, 0, 0, 0.08) !important;
+    min-width: 280px !important;
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    overflow: hidden;
+
+    .mat-mdc-menu-content {
+      padding: 0 !important;
+    }
+
+    .menu-header {
+      padding: 16px 20px;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+
+      .user-info {
+        .user-name {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 0.95rem;
+          font-weight: 600;
+          color: #1a1a1a;
+          margin: 0 0 6px 0;
+
+          mat-icon {
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
+            color: #10345B;
+          }
+        }
+
+        .user-email {
+          font-size: 0.85rem;
+          color: #6b7280;
+          margin: 0;
+        }
+      }
+    }
+
+    .mat-mdc-menu-item {
+      height: 48px !important;
+      padding: 0 20px !important;
+      font-size: 0.9rem;
+      transition: background-color 0.2s ease;
+
+      mat-icon {
+        margin-right: 12px;
+        color: #4b5563;
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+
+      &:hover {
+        background: #f8f9fa !important;
+      }
+    }
+
+    .become-host-item {
+      color: #10345B !important;
+      font-weight: 600;
+
+      mat-icon {
+        color: #10345B !important;
+      }
+    }
+
+    .logout-item {
+      color: #ef4444 !important;
+
+      mat-icon {
+        color: #ef4444 !important;
+      }
+    }
+
+    mat-divider {
+      margin: 8px 0;
+      border-top-color: rgba(0, 0, 0, 0.06);
+    }
+  }
+}
+
+// ============================
+// NOTIFICATION MENU STYLING
+// ============================
+::ng-deep {
+  // Style du bouton notification pour qu'il soit identique aux autres
+  .notification-btn {
+    color: white;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+  }
+
+  // Quand on est sur other-page
+  .navbar.other-page {
+    .notification-btn {
+      color: #10345B;
+
+      &:hover {
+        background: rgba(16, 52, 91, 0.1);
+      }
+    }
+  }
+
+  .notification-menu.mat-mdc-menu-panel {
+    margin-top: 12px !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12),
+    0 2px 6px rgba(0, 0, 0, 0.08) !important;
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  }
+}
+
+// ============================
+// RESPONSIVE
+// ============================
+@media (max-width: 1400px) {
+  .mega-menu-panel {
+    width: 1200px;
+  }
+
+  .mega-menu-container {
+    grid-template-columns: 320px repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 1200px) {
+  .mega-menu-panel {
+    width: 1000px;
+  }
+
+  .mega-menu-container {
+    grid-template-columns: 280px repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 1100px) {
+  .navbar-center {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar-right {
+    .user-actions {
+      gap: 6px;
+
+      .mode-switch-btn {
+        height: 36px;
+        font-size: 0.85rem;
+        padding: 0 12px;
+
+        span {
+          display: none; // Masquer le texte sur mobile
+        }
+
+        mat-icon {
+          margin: 0;
+        }
+      }
+    }
+  }
+
+  ::ng-deep {
+    .user-dropdown.mat-mdc-menu-panel {
+      margin-left: -120px !important;
+      min-width: 260px !important;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  ::ng-deep {
+    .user-dropdown.mat-mdc-menu-panel {
+      margin-left: -80px !important;
+      min-width: 240px !important;
+    }
+  }
+}
+::ng-deep {
+  .notification-menu.mat-mdc-menu-panel {
+    margin-top: 12px !important;
+    margin-left: -220px !important; // 👈 décale vers la gauche
+    border-radius: 16px !important;
+  }
+}

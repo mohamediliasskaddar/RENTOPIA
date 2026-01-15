@@ -1,0 +1,299 @@
+// src/app/features/property-detail/components/payment-modal/payment-modal.component.scss
+
+.payment-modal {
+  max-width: 600px;
+
+  // ========================================
+  // HEADER
+  // ========================================
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+
+    h2 {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+      color: #222222;
+
+      mat-icon {
+        font-size: 28px;
+        width: 28px;
+        height: 28px;
+        color: #00A699;
+      }
+    }
+
+    .close-btn {
+      mat-icon {
+        color: #717171;
+      }
+
+      &:hover:not(:disabled) mat-icon {
+        color: #222222;
+      }
+    }
+  }
+
+  // ========================================
+  // CONTENT
+  // ========================================
+  .modal-content {
+    padding: 24px;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+
+  // ========================================
+  // RÉCAPITULATIF RÉSERVATION
+  // ========================================
+  .booking-summary {
+    background: #F7F7F7;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+
+    h3 {
+      margin: 0 0 16px 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: #222222;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      font-size: 15px;
+
+      span {
+        color: #717171;
+      }
+
+      strong {
+        color: #222222;
+      }
+
+      &.total-row {
+        padding-top: 12px;
+        font-size: 18px;
+
+        .total-amount {
+          color: #00A699;
+        }
+      }
+
+      &.eth-row {
+        padding-top: 4px;
+        font-size: 14px;
+
+        strong {
+          color: #717171;
+        }
+      }
+    }
+  }
+
+  // ========================================
+  // ÉTAPES DE PAIEMENT
+  // ========================================
+  .payment-steps {
+    .step {
+      padding: 20px 0;
+      transition: all 0.3s ease;
+
+      &.active {
+        .step-header .step-icon mat-icon {
+          color: #00A699;
+        }
+      }
+
+      &.completed {
+        .step-header .step-icon mat-icon {
+          color: #4CAF50;
+        }
+      }
+
+      &.error {
+        .step-header .step-icon .error-icon {
+          color: #F44336;
+        }
+      }
+
+      .step-header {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 12px;
+
+        .step-icon {
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: #F7F7F7;
+          border-radius: 50%;
+          flex-shrink: 0;
+
+          mat-icon {
+            font-size: 24px;
+            width: 24px;
+            height: 24px;
+            color: #717171;
+          }
+
+          mat-spinner {
+            ::ng-deep circle {
+              stroke: #00A699;
+            }
+          }
+        }
+
+        .step-content {
+          flex: 1;
+
+          h4 {
+            margin: 0 0 4px 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #222222;
+          }
+
+          p {
+            margin: 0;
+            font-size: 14px;
+            color: #717171;
+
+            &.success-text {
+              color: #4CAF50;
+              font-weight: 500;
+            }
+
+            &.error-text {
+              color: #F44336;
+              font-weight: 500;
+            }
+          }
+
+          .tx-hash {
+            margin-top: 8px;
+
+            a {
+              color: #00A699;
+              text-decoration: none;
+              display: inline-flex;
+              align-items: center;
+              gap: 4px;
+              font-size: 13px;
+
+              &:hover {
+                text-decoration: underline;
+              }
+
+              mat-icon {
+                font-size: 16px;
+                width: 16px;
+                height: 16px;
+              }
+            }
+          }
+        }
+      }
+
+      button {
+        margin-left: 56px;
+        border-radius: 8px;
+        height: 40px;
+
+        mat-icon {
+          margin-right: 8px;
+        }
+      }
+
+      &.success-step {
+        background: #E8F5E9;
+        border-radius: 12px;
+        padding: 20px;
+        margin-top: 12px;
+
+        .step-icon {
+          background: #4CAF50;
+
+          .success-icon {
+            color: white;
+          }
+        }
+
+        .step-content h4 {
+          color: #2E7D32;
+        }
+
+        .success-text {
+          color: #2E7D32;
+        }
+      }
+    }
+  }
+
+  // ========================================
+  // MESSAGE D'ERREUR
+  // ========================================
+  .error-message {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: #FFEBEE;
+    border-radius: 8px;
+    margin-top: 16px;
+    color: #C62828;
+
+    mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+
+    span {
+      font-size: 14px;
+      font-weight: 500;
+    }
+  }
+
+  // ========================================
+  // FOOTER
+  // ========================================
+  .modal-footer {
+    padding: 16px 24px;
+    justify-content: flex-end;
+
+    button {
+      min-width: 100px;
+      border-radius: 8px;
+    }
+  }
+
+  // ========================================
+  // RESPONSIVE
+  // ========================================
+  @media (max-width: 600px) {
+    .modal-content {
+      padding: 16px;
+    }
+
+    .booking-summary {
+      padding: 16px;
+    }
+
+    .payment-steps .step button {
+      margin-left: 0;
+      margin-top: 12px;
+      width: 100%;
+    }
+  }
+}

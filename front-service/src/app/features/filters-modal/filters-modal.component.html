@@ -1,0 +1,209 @@
+<!-- src/app/features/listings/components/filters-modal/filters-modal.component.html -->
+
+<div class="filters-modal">
+
+  <!-- ========================================
+       HEADER
+  ========================================= -->
+  <div class="modal-header">
+    <button mat-icon-button class="close-btn" (click)="close()">
+      <mat-icon>close</mat-icon>
+    </button>
+    <h2>Filters</h2>
+    <button mat-button class="clear-all-btn" (click)="clearAll()">
+      Clear all
+    </button>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <!-- ========================================
+       CONTENU SCROLLABLE
+  ========================================= -->
+  <div class="modal-content" [formGroup]="filtersForm">
+
+    <!-- SECTION: Type de propriété -->
+    <div class="filter-section">
+      <h3 class="section-title">Property type</h3>
+      <div class="property-types-grid">
+        <button
+          *ngFor="let type of displayedPropertyTypes"
+          type="button"
+          class="property-type-btn"
+          [class.selected]="filtersForm.value.propertyType === type.value"
+          (click)="selectPropertyType(type.value)">
+          <mat-icon>{{ type.icon }}</mat-icon>
+          <span>{{ type.label }}</span>
+        </button>
+      </div>
+
+      <!-- Bouton Show more / Show less -->
+      <button
+        type="button"
+        class="show-more-btn"
+        (click)="togglePropertyTypes()">
+        <span>{{ showAllPropertyTypes ? 'Show less' : 'Show more' }}</span>
+        <mat-icon class="expand-icon" [class.expanded]="showAllPropertyTypes">
+          expand_more
+        </mat-icon>
+      </button>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- SECTION: Prix -->
+    <div class="filter-section">
+      <h3 class="section-title">Price range</h3>
+      <div class="price-range-container">
+        <div class="price-inputs">
+          <div class="price-input-group">
+            <label>Min</label>
+            <input
+              type="number"
+              formControlName="minPrice"
+              placeholder="0"
+              class="price-input" />
+          </div>
+          <span class="separator">-</span>
+          <div class="price-input-group">
+            <label>Max</label>
+            <input
+              type="number"
+              formControlName="maxPrice"
+              placeholder="1000"
+              class="price-input" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- SECTION: Chambres et lits -->
+    <div class="filter-section">
+      <h3 class="section-title">Rooms and beds</h3>
+
+      <!-- Bedrooms -->
+      <div class="counter-row">
+        <span class="counter-label">Bedrooms</span>
+        <div class="counter-controls">
+          <button
+            mat-icon-button
+            type="button"
+            (click)="decrement('bedrooms')"
+            [disabled]="!filtersForm.value.bedrooms || filtersForm.value.bedrooms <= 0">
+            <mat-icon>remove_circle_outline</mat-icon>
+          </button>
+          <span class="counter-value">{{ filtersForm.value.bedrooms || 0 }}</span>
+          <button mat-icon-button type="button" (click)="increment('bedrooms')">
+            <mat-icon>add_circle_outline</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- Beds -->
+      <div class="counter-row">
+        <span class="counter-label">Beds</span>
+        <div class="counter-controls">
+          <button
+            mat-icon-button
+            type="button"
+            (click)="decrement('beds')"
+            [disabled]="!filtersForm.value.beds || filtersForm.value.beds <= 0">
+            <mat-icon>remove_circle_outline</mat-icon>
+          </button>
+          <span class="counter-value">{{ filtersForm.value.beds || 0 }}</span>
+          <button mat-icon-button type="button" (click)="increment('beds')">
+            <mat-icon>add_circle_outline</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- Bathrooms -->
+      <div class="counter-row">
+        <span class="counter-label">Bathrooms</span>
+        <div class="counter-controls">
+          <button
+            mat-icon-button
+            type="button"
+            (click)="decrement('bathrooms')"
+            [disabled]="!filtersForm.value.bathrooms || filtersForm.value.bathrooms <= 0">
+            <mat-icon>remove_circle_outline</mat-icon>
+          </button>
+          <span class="counter-value">{{ filtersForm.value.bathrooms || 0 }}</span>
+          <button mat-icon-button type="button" (click)="increment('bathrooms')">
+            <mat-icon>add_circle_outline</mat-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- SECTION: Amenities -->
+    <div class="filter-section">
+      <h3 class="section-title">Amenities</h3>
+      <div class="amenities-grid">
+        <button
+          *ngFor="let amenity of displayedAmenities"
+          type="button"
+          class="amenity-btn"
+          [class.selected]="isAmenitySelected(amenity.amenityId)"
+          (click)="toggleAmenity(amenity.amenityId)">
+          <mat-icon>{{ amenity.icon }}</mat-icon>
+          <span>{{ amenity.name }}</span>
+        </button>
+      </div>
+
+      <!-- Bouton Show more / Show less (affiché seulement s'il y a plus de 8 amenities) -->
+      <button
+        *ngIf="hasMoreAmenities"
+        type="button"
+        class="show-more-btn"
+        (click)="toggleAmenities()">
+        <span>{{ showAllAmenities ? 'Show less' : 'Show more' }}</span>
+        <mat-icon class="expand-icon" [class.expanded]="showAllAmenities">
+          expand_more
+        </mat-icon>
+      </button>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- SECTION: Options -->
+    <div class="filter-section">
+      <h3 class="section-title">Booking options</h3>
+
+      <div class="checkbox-row">
+        <mat-checkbox formControlName="instantBooking">
+          Instant booking
+        </mat-checkbox>
+      </div>
+
+      <div class="checkbox-row">
+        <mat-checkbox formControlName="smokingAllowed">
+          Smoking allowed
+        </mat-checkbox>
+      </div>
+
+      <div class="checkbox-row">
+        <mat-checkbox formControlName="eventsAllowed">
+          Events allowed
+        </mat-checkbox>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================
+       FOOTER
+  ========================================= -->
+  <div class="modal-footer">
+    <button mat-button class="cancel-btn" (click)="close()">
+      Cancel
+    </button>
+    <button mat-raised-button color="primary" class="apply-btn" (click)="applyFilters()">
+      Show results
+    </button>
+  </div>
+
+</div>

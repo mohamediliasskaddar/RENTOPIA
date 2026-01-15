@@ -1,0 +1,120 @@
+<!-- src/app/features/profile/profile.component.html -->
+<!-- ✅ CLEAN & PROFESSIONAL DESIGN - ENGLISH VERSION -->
+<br><br><br><br><br><br>
+<div class="profile-container">
+
+  <!-- LOADING -->
+  <div *ngIf="loading$ | async" class="loading-overlay">
+    <mat-spinner diameter="50" color="primary"></mat-spinner>
+    <p>Loading profile...</p>
+  </div>
+
+  <!-- ERROR -->
+  <div *ngIf="error$ | async as error" class="error-banner">
+    <mat-icon>error_outline</mat-icon>
+    <span>{{ error }}</span>
+    <button mat-icon-button (click)="onRefresh()">
+      <mat-icon>refresh</mat-icon>
+    </button>
+  </div>
+
+  <!-- PROFILE CONTENT -->
+  <div *ngIf="(user$ | async) as user" class="profile-wrapper">
+
+    <!-- HEADER SECTION -->
+    <div class="profile-header">
+      <!-- Cover -->
+      <div class="cover-image"></div>
+
+      <!-- Content -->
+      <div class="header-content">
+        <!-- Avatar -->
+        <div class="avatar-section">
+          <div class="avatar" *ngIf="user.photoUrl">
+            <img [src]="user.photoUrl" [alt]="fullName$ | async">
+          </div>
+          <div class="avatar avatar-placeholder" *ngIf="!user.photoUrl">
+            <span>{{ userInitial }}</span>
+          </div>
+          <div class="verified-badge" *ngIf="user.emailVerified">
+            <mat-icon>verified</mat-icon>
+          </div>
+        </div>
+
+        <!-- Info -->
+        <div class="user-info">
+          <h1>{{ fullName$ | async }}</h1><br><br>
+          <p class="email">
+            <mat-icon>email</mat-icon>
+            {{ user.email }}
+          </p>
+          <div class="badges">
+            <span class="badge">
+              <mat-icon>calendar_today</mat-icon>
+              Member since {{ memberSince$ | async }}
+            </span>
+            <span class="badge" *ngIf="user.isHost">
+              <mat-icon>home</mat-icon>
+              Host
+            </span>
+            <span class="badge" *ngIf="user.isGuest">
+              <mat-icon>luggage</mat-icon>
+              Guest
+            </span>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats">
+          <div class="stat">
+            <mat-icon>language</mat-icon>
+            <span class="number">{{ languagesCount$ | async }}</span>
+            <span class="label">Languages</span>
+          </div>
+          <div class="stat">
+            <mat-icon>rate_review</mat-icon>
+            <span class="number">{{ reviewsCount$ | async }}</span>
+            <span class="label">Reviews</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs-section">
+      <mat-tab-group class="profile-tabs">
+
+        <!-- TAB: Information -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon>person</mat-icon>
+            <span>Information</span>
+          </ng-template>
+          <app-profile-info></app-profile-info>
+        </mat-tab>
+
+        <!-- TAB: Languages -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon>language</mat-icon>
+            <span>Languages</span>
+          </ng-template>
+          <app-profile-languages></app-profile-languages>
+        </mat-tab>
+
+        <!-- TAB: Reviews -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <mat-icon>rate_review</mat-icon>
+            <span>My Reviews</span>
+          </ng-template>
+          <app-profile-reviews></app-profile-reviews>
+        </mat-tab>
+
+
+
+      </mat-tab-group>
+    </div>
+
+  </div>
+</div>

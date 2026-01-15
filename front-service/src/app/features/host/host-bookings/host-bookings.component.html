@@ -1,0 +1,315 @@
+<div class="host-bookings">
+
+  <!-- Header -->
+  <header class="page-header">
+    <h1>Reservations</h1>
+    <p class="subtitle">{{ filteredBookings.length }} total booking(s)</p>
+  </header>
+
+  <!-- Stats Cards - Design Moderne -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-content">
+        <div class="stat-header">
+          <span class="stat-label">Pending</span>
+          <div class="stat-icon pending">
+            <mat-icon>schedule</mat-icon>
+          </div>
+        </div>
+        <span class="stat-value">{{ stats.pending }}</span>
+        <span class="stat-trend">Awaiting confirmation</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-content">
+        <div class="stat-header">
+          <span class="stat-label">Confirmed</span>
+          <div class="stat-icon confirmed">
+            <mat-icon>check_circle</mat-icon>
+          </div>
+        </div>
+        <span class="stat-value">{{ stats.confirmed }}</span>
+        <span class="stat-trend">Ready to check in</span>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-content">
+        <div class="stat-header">
+          <span class="stat-label">In Progress</span>
+          <div class="stat-icon active">
+            <mat-icon>hotel</mat-icon>
+          </div>
+        </div>
+        <span class="stat-value">{{ stats.checkedIn }}</span>
+        <span class="stat-trend">Currently staying</span>
+      </div>
+    </div>
+
+    <div class="stat-card revenue">
+      <div class="stat-content">
+        <div class="stat-header">
+          <span class="stat-label">Total Revenue</span>
+          <div class="stat-icon">
+            <mat-icon>payments</mat-icon>
+          </div>
+        </div>
+        <!-- ✅ AVANT: {{ stats.totalRevenue | currency:'USD':'symbol':'1.0-0' }} -->
+        <!-- ✅ APRÈS: -->
+        <span class="stat-value">{{ stats.totalRevenue | ethPrice:false:true }}</span>
+        <span class="stat-trend">≈ €{{ (stats.totalRevenue * 3200).toFixed(0) }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (loading) {
+    <div class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Loading reservations...</p>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (error && !loading) {
+    <div class="error-container">
+      <div class="error-icon">
+        <mat-icon>error_outline</mat-icon>
+      </div>
+      <h3>Something went wrong</h3>
+      <p>{{ error }}</p>
+      <button mat-flat-button (click)="loadBookings()">
+        <mat-icon>refresh</mat-icon>
+        Retry
+      </button>
+    </div>
+  }
+
+  <!-- Content -->
+  @if (!loading && !error) {
+    <!-- Filters -->
+    <div class="filters-bar">
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Property</mat-label>
+        <mat-select [(ngModel)]="selectedPropertyId" (selectionChange)="applyFilters()">
+          <mat-option [value]="null">All Properties</mat-option>
+          @for (prop of properties; track prop.propertyId) {
+            <mat-option [value]="prop.propertyId">{{ prop.title }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Status</mat-label>
+        <mat-select [(ngModel)]="selectedStatus" (selectionChange)="applyFilters()">
+          <mat-option value="all">All Status</mat-option>
+          <mat-option value="PENDING">Pending</mat-option>
+          <mat-option value="CONFIRMED">Confirmed</mat-option>
+          <mat-option value="CHECKED_IN">Checked In</mat-option>
+          <mat-option value="COMPLETED">Completed</mat-option>
+          <mat-option value="CANCELLED">Cancelled</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <div class="results-info">
+        <mat-icon>filter_list</mat-icon>
+        <span>{{ filteredBookings.length }} result(s)</span>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <mat-tab-group (selectedIndexChange)="onTabChange($event)" class="bookings-tabs">
+
+      <!-- Tab: Upcoming -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>event</mat-icon>
+          <span>Upcoming</span>
+          @if (getUpcomingBookings().length > 0) {
+            <span class="badge">{{ getUpcomingBookings().length }}</span>
+          }
+        </ng-template>
+
+        <div class="tab-content">
+          @if (getUpcomingBookings().length === 0) {
+            <div class="empty-state">
+              <div class="empty-icon">
+                <mat-icon>event_busy</mat-icon>
+              </div>
+              <h3>No upcoming reservations</h3>
+              <p>New bookings will appear here</p>
+            </div>
+          } @else {
+            <div class="bookings-list">
+              @for (booking of getUpcomingBookings(); track booking.id) {
+                <ng-container *ngTemplateOutlet="bookingCard; context: { booking: booking }"></ng-container>
+              }
+            </div>
+          }
+        </div>
+      </mat-tab>
+
+      <!-- Tab: Current -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>hotel</mat-icon>
+          <span>Current</span>
+          @if (getCurrentBookings().length > 0) {
+            <span class="badge active">{{ getCurrentBookings().length }}</span>
+          }
+        </ng-template>
+
+        <div class="tab-content">
+          @if (getCurrentBookings().length === 0) {
+            <div class="empty-state">
+              <div class="empty-icon">
+                <mat-icon>home</mat-icon>
+              </div>
+              <h3>No guests currently staying</h3>
+              <p>Active check-ins will appear here</p>
+            </div>
+          } @else {
+            <div class="bookings-list">
+              @for (booking of getCurrentBookings(); track booking.id) {
+                <ng-container *ngTemplateOutlet="bookingCard; context: { booking: booking }"></ng-container>
+              }
+            </div>
+          }
+        </div>
+      </mat-tab>
+
+      <!-- Tab: All -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>list</mat-icon>
+          <span>All</span>
+        </ng-template>
+
+        <div class="tab-content">
+          @if (filteredBookings.length === 0) {
+            <div class="empty-state">
+              <div class="empty-icon">
+                <mat-icon>inbox</mat-icon>
+              </div>
+              <h3>No reservations found</h3>
+              <p>Reservations on your properties will appear here</p>
+            </div>
+          } @else {
+            <div class="bookings-list">
+              @for (booking of filteredBookings; track booking.id) {
+                <ng-container *ngTemplateOutlet="bookingCard; context: { booking: booking }"></ng-container>
+              }
+            </div>
+          }
+        </div>
+      </mat-tab>
+
+      <!-- Tab: Past -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>history</mat-icon>
+          <span>Past</span>
+        </ng-template>
+
+        <div class="tab-content">
+          @if (getPastBookings().length === 0) {
+            <div class="empty-state">
+              <div class="empty-icon">
+                <mat-icon>history</mat-icon>
+              </div>
+              <h3>No past reservations</h3>
+              <p>Completed stays will appear here</p>
+            </div>
+          } @else {
+            <div class="bookings-list">
+              @for (booking of getPastBookings(); track booking.id) {
+                <ng-container *ngTemplateOutlet="bookingCard; context: { booking: booking }"></ng-container>
+              }
+            </div>
+          }
+        </div>
+      </mat-tab>
+
+    </mat-tab-group>
+  }
+
+  <!-- Booking Card Template -->
+  <ng-template #bookingCard let-booking="booking">
+    <mat-card class="booking-card" [routerLink]="['/host/bookings', booking.id]">
+      <!-- Property Image -->
+      <div class="booking-image">
+        @if (booking.property?.coverPhoto) {
+          <img [src]="getPhotoUrl(booking.property.coverPhoto)" [alt]="booking.property?.title">
+        } @else {
+          <div class="no-image">
+            <mat-icon>home</mat-icon>
+          </div>
+        }
+        <div class="status-badge" [class]="'status-' + booking.status?.toLowerCase()">
+          {{ getStatusLabel(booking.status) }}
+        </div>
+      </div>
+
+      <!-- Booking Info -->
+      <div class="booking-content">
+        <!-- Property & Guest -->
+        <div class="booking-header">
+          <div class="property-info">
+            <h3>{{ booking.property?.title || 'Property #' + booking.propertyId }}</h3>
+            <span class="location">
+              <mat-icon>location_on</mat-icon>
+              {{ booking.property?.city }}, {{ booking.property?.country }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Guest Info -->
+        <div class="guest-info">
+          <div class="guest-avatar">
+            @if (booking.guest?.photoUrl) {
+              <img [src]="getPhotoUrl(booking.guest.photoUrl)" [alt]="booking.guest?.fullName">
+            } @else {
+              <mat-icon>person</mat-icon>
+            }
+          </div>
+          <div class="guest-details">
+            <span class="guest-name">{{ booking.guest?.fullName || 'Guest' }}</span>
+            <span class="guest-count">{{ booking.numGuests }} guest(s)</span>
+          </div>
+        </div>
+
+        <!-- Dates -->
+        <div class="booking-dates">
+          <div class="date-block">
+            <span class="date-label">Check-in</span>
+            <span class="date-value">{{ formatDate(booking.checkInDate) }}</span>
+          </div>
+          <mat-icon class="arrow-icon">arrow_forward</mat-icon>
+          <div class="date-block">
+            <span class="date-label">Check-out</span>
+            <span class="date-value">{{ formatDate(booking.checkOutDate) }}</span>
+          </div>
+          <div class="nights-badge">
+            {{ calculateNights(booking.checkInDate, booking.checkOutDate) }} nights
+          </div>
+        </div>
+
+        <!-- Price -->
+        <div class="booking-footer">
+          <div class="booking-price">
+            <span class="price-label">Total</span>
+            <div class="price-column">
+              <span class="price-value">{{ booking.priceBreakdown.totalAmount | ethPrice:false:true }}</span>
+              <span class="price-conversion">≈ €{{ (booking.priceBreakdown.totalAmount * 3200).toFixed(2) }}</span>
+            </div>
+          </div>
+          <button mat-icon-button class="view-btn" matTooltip="View details">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+      </div>
+    </mat-card>
+  </ng-template>
+
+</div>

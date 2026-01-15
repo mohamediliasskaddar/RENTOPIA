@@ -1,0 +1,69 @@
+<!-- src/app/shared/components/footer/footer.component.html -->
+
+<footer class="footer">
+  <div class="footer-container">
+
+    <!-- TOP SECTION: Logo + Links -->
+    <div class="footer-top">
+
+      <!-- BRAND COLUMN -->
+      <div class="footer-brand">
+        <div class="logo">
+          <mat-icon>home</mat-icon>
+          <span>Rentopia</span>
+        </div>
+        <p class="tagline">
+          Decentralized real estate rentals powered by Ethereum blockchain
+        </p>
+
+        <!-- Social Links -->
+        <div class="social-links">
+          <button
+            *ngFor="let social of socialLinks"
+            class="social-btn"
+            (click)="openSocialLink(social.url)"
+            [attr.aria-label]="social.label">
+            <mat-icon>{{ getSocialIcon(social.icon) }}</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- LINKS COLUMNS -->
+      <div class="footer-links">
+        <div class="link-column" *ngFor="let section of footerSections">
+          <h3>{{ section.title }}</h3>
+          <ul>
+            <li *ngFor="let link of section.links">
+              <a [routerLink]="link.route">{{ link.label }}</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <mat-divider class="footer-divider"></mat-divider>
+
+    <!-- BOTTOM SECTION: Copyright + Language -->
+    <div class="footer-bottom">
+
+      <div class="copyright">
+        <mat-icon class="shield-icon">shield</mat-icon>
+        <span>© {{ currentYear }} RentalChain. All rights reserved. Secured by Ethereum.</span>
+      </div>
+
+      <div class="footer-meta">
+        <button class="meta-btn">
+          <mat-icon>language</mat-icon>
+          <span>English</span>
+        </button>
+        <button class="meta-btn">
+          <mat-icon>attach_money</mat-icon>
+          <span>ETH</span>
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+</footer>

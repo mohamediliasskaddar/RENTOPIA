@@ -1,0 +1,183 @@
+<!-- src/app/features/host/property-wizard/steps/step-rules/step-rules.component.html -->
+<div class="step-rules">
+  <div class="step-intro">
+    <h2>Set your house rules & preferences</h2>
+    <p>Let guests know what to expect</p>
+  </div>
+
+  <form [formGroup]="form">
+
+    <!-- ===== CHECK-IN/OUT SECTION ===== -->
+    <div class="section">
+      <h3>
+        <mat-icon>schedule</mat-icon>
+        Check-in / Check-out
+      </h3>
+
+      <div class="time-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Check-in from</mat-label>
+          <input matInput type="time" formControlName="checkInTimeStart">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Check-in until</mat-label>
+          <input matInput type="time" formControlName="checkInTimeEnd">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Check-out by</mat-label>
+          <input matInput type="time" formControlName="checkOutTime">
+        </mat-form-field>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- ===== INSTANT BOOKING ===== -->
+    <div class="section">
+      <div class="toggle-item highlight">
+        <div class="toggle-info">
+          <mat-icon>bolt</mat-icon>
+          <div class="toggle-text">
+            <span class="toggle-label">Instant booking</span>
+            <span class="toggle-desc">Guests can book without waiting for approval</span>
+          </div>
+        </div>
+        <mat-slide-toggle formControlName="instantBooking" color="primary"></mat-slide-toggle>
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- ===== CANCELLATION POLICY ===== -->
+    <div class="section">
+      <h3>
+        <mat-icon>event_busy</mat-icon>
+        Cancellation policy
+      </h3>
+
+      <div class="policy-options">
+        @for (policy of cancellationPolicies; track policy.value) {
+          <div
+            class="policy-card"
+            [class.selected]="form.get('cancellationPolicy')?.value === policy.value"
+            (click)="form.patchValue({ cancellationPolicy: policy.value })"
+          >
+            <div class="policy-header">
+              <span class="policy-label">{{ policy.label }}</span>
+              @if (form.get('cancellationPolicy')?.value === policy.value) {
+                <mat-icon>check_circle</mat-icon>
+              }
+            </div>
+            <p class="policy-desc">{{ policy.description }}</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- ===== HOUSE RULES ===== -->
+    <div class="section">
+      <h3>
+        <mat-icon>gavel</mat-icon>
+        House rules
+      </h3>
+      <p class="section-hint">What's allowed at your property?</p>
+
+      <div class="rules-grid">
+        <div class="toggle-item">
+          <div class="toggle-info">
+            <mat-icon>child_care</mat-icon>
+            <span>Children allowed</span>
+          </div>
+          <mat-slide-toggle formControlName="childrenAllowed" color="primary"></mat-slide-toggle>
+        </div>
+
+        <div class="toggle-item">
+          <div class="toggle-info">
+            <mat-icon>baby_changing_station</mat-icon>
+            <span>Babies allowed</span>
+          </div>
+          <mat-slide-toggle formControlName="babiesAllowed" color="primary"></mat-slide-toggle>
+        </div>
+
+        <div class="toggle-item">
+          <div class="toggle-info">
+            <mat-icon>pets</mat-icon>
+            <span>Pets allowed</span>
+          </div>
+          <mat-slide-toggle formControlName="petsAllowed" color="primary"></mat-slide-toggle>
+        </div>
+
+        <div class="toggle-item">
+          <div class="toggle-info">
+            <mat-icon>smoking_rooms</mat-icon>
+            <span>Smoking allowed</span>
+          </div>
+          <mat-slide-toggle formControlName="smokingAllowed" color="primary"></mat-slide-toggle>
+        </div>
+
+        <div class="toggle-item">
+          <div class="toggle-info">
+            <mat-icon>celebration</mat-icon>
+            <span>Events allowed</span>
+          </div>
+          <mat-slide-toggle formControlName="eventsAllowed" color="primary"></mat-slide-toggle>
+        </div>
+      </div>
+
+      <mat-form-field appearance="outline" class="full-width additional-rules">
+        <mat-label>Additional rules (optional)</mat-label>
+        <textarea
+          matInput
+          formControlName="additionalRules"
+          rows="3"
+          placeholder="e.g., No loud music after 10pm, Remove shoes indoors..."
+        ></textarea>
+      </mat-form-field>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- ===== HOST PREFERENCES ===== -->
+    <div class="section">
+      <h3>
+        <mat-icon>person</mat-icon>
+        Host preferences
+      </h3>
+      <p class="section-hint">How do you prefer to interact with guests?</p>
+
+      <div class="preferences-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Communication style</mat-label>
+          <mat-select formControlName="communicationStyle">
+            @for (style of communicationStyles; track style) {
+              <mat-option [value]="style">{{ style }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Response time</mat-label>
+          <mat-select formControlName="responseTime">
+            @for (time of responseTimes; track time) {
+              <mat-option [value]="time">{{ time }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Check-in process</mat-label>
+          <mat-select formControlName="checkInProcess">
+            @for (process of checkInProcesses; track process) {
+              <mat-option [value]="process">{{ process }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+  </form>
+</div>

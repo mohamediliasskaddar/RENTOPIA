@@ -1,0 +1,90 @@
+<!-- src/app/features/home/home.component.html -->
+<!-- VERSION MODERNE INSPIRÉE DE SUPERPOWER.COM -->
+
+<app-navbar></app-navbar>
+
+<!-- ========================================
+     HERO SECTION (ON NE TOUCHE PAS)
+========================================= -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="left-text">
+      <h1>Finding Your New Home Is Simple</h1>
+      <p>
+        Explore a curated selection of beautiful modern homes and find the perfect space
+        that fits your lifestyle.
+      </p>
+      <div class="cta-buttons">
+        <button class="btn-secondary" [routerLink]="'/listings'">
+          <span class="btn-text">Explore Properties</span>
+          <span class="btn-arrow">→</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="right-image">
+      <img src="assets/images/hero2.jpg" alt="Modern Luxury House">
+    </div>
+  </div>
+
+  <app-search-bar></app-search-bar>
+</section>
+
+<!-- ========================================
+     WHY CHOOSE US - VERSION SIMPLE SANS IMAGES
+========================================= -->
+<section class="why-section fade-section">
+
+  <h2 class="section-title fade-item">Why Choose Us</h2>
+
+  <p class="section-subtitle fade-item">
+    A modern rental experience powered by transparency, security, and innovative blockchain technology
+  </p>
+
+  <div class="why-container">
+
+    <!-- Card 1: Secure Payments -->
+    <mat-card class="why-card fade-card">
+      <mat-icon>verified</mat-icon>
+      <h3>Secure Payments</h3>
+      <p>Blockchain-powered transactions that are safe and transparent</p>
+    </mat-card>
+
+    <!-- Card 2: Smart Search -->
+    <mat-card class="why-card fade-card">
+      <mat-icon>search</mat-icon>
+      <h3>Smart Search</h3>
+      <p>Find the perfect property using intelligent filters</p>
+    </mat-card>
+
+    <!-- Card 3: Fast Booking -->
+    <mat-card class="why-card fade-card">
+      <mat-icon>bolt</mat-icon>
+      <h3>Fast Booking</h3>
+      <p>Reserve instantly with decentralized verification</p>
+    </mat-card>
+
+    <!-- Card 4: Quality Listings -->
+    <mat-card class="why-card fade-card">
+      <mat-icon>home_work</mat-icon>
+      <h3>Quality Listings</h3>
+      <p>Every listing is verified for authenticity and trust</p>
+    </mat-card>
+
+  </div>
+</section>
+
+<!-- ========================================
+     HOW IT WORKS
+========================================= -->
+<app-how-it-works></app-how-it-works>
+
+<!-- ========================================
+     STATS
+========================================= -->
+<app-stats></app-stats>
+
+<!-- ========================================
+     BECOME HOST
+========================================= -->
+<app-become-host></app-become-host>

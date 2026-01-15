@@ -1,0 +1,141 @@
+// src/app/features/host/property-wizard/steps/step-location/step-location.component.scss
+.step-location {
+  .step-intro {
+    text-align: center;
+    margin-bottom: 32px;
+
+    h2 {
+      margin: 0 0 8px;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0;
+      color: #666;
+    }
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .full-width {
+    width: 100%;
+  }
+
+  .half-width {
+    width: 50%;
+  }
+
+  .coordinates-section {
+    background: #f5f5f5;
+    padding: 20px;
+    border-radius: 12px;
+    margin: 16px 0;
+
+    h3 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 4px;
+      font-size: 16px;
+      font-weight: 600;
+
+      mat-icon {
+        color: #666;
+      }
+    }
+
+    .hint {
+      margin: 0 0 16px;
+      color: #666;
+      font-size: 14px;
+    }
+
+    .current-coordinates {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      background: #e8f5e9;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      color: #2e7d32;
+
+      mat-icon {
+        color: #4CAF50;
+      }
+
+      span {
+        flex: 1;
+        font-family: monospace;
+        font-size: 14px;
+      }
+
+      button {
+        color: #666;
+      }
+    }
+
+    .coordinates-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+
+      button {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+    }
+
+    .manual-input {
+      margin-top: 16px;
+
+      summary {
+        cursor: pointer;
+        color: #1976d2;
+        font-size: 14px;
+        padding: 8px 0;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+
+      .coordinates-row {
+        margin-top: 12px;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .step-location {
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+
+    .half-width {
+      width: 100%;
+    }
+
+    .coordinates-section .coordinates-actions {
+      flex-direction: column;
+
+      button {
+        width: 100%;
+      }
+    }
+  }
+}

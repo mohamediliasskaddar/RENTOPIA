@@ -1,0 +1,49 @@
+<!-- src/app/features/profile/components/profile-languages/profile-languages.component.html -->
+<!-- ✅ CLEAN ENGLISH VERSION -->
+
+<div class="profile-languages-container">
+
+  <div class="header">
+    <h2>Spoken Languages</h2>
+    <button mat-raised-button color="primary" (click)="onAddLanguage()">
+      <mat-icon>add</mat-icon>
+      Add Language
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading$ | async" class="loading">
+    <mat-spinner diameter="40"></mat-spinner>
+  </div>
+
+  <!-- Content -->
+  <div *ngIf="!(loading$ | async)">
+
+    <!-- Empty State -->
+    <div *ngIf="(languages$ | async)?.length === 0" class="empty-state">
+      <mat-icon>language</mat-icon>
+      <p>No languages added</p>
+      <button mat-raised-button color="primary" (click)="onAddLanguage()">
+        Add Your First Language
+      </button>
+    </div>
+
+    <!-- Languages List -->
+    <div *ngIf="(languages$ | async)?.length! > 0" class="languages-grid">
+      <div *ngFor="let language of (languages$ | async)" class="language-card">
+        <div class="language-info">
+          <h3>{{ language.languageName }}</h3>
+          <span class="code">{{ language.languageCode }}</span>
+          <span class="level level-{{ language.proficiencyLevel.toLowerCase() }}">
+            {{ getProficiencyLabel(language.proficiencyLevel) }}
+          </span>
+        </div>
+        <button mat-icon-button (click)="onRemoveLanguage(language)" class="remove-btn">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+</div>

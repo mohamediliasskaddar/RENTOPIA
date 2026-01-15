@@ -1,0 +1,1177 @@
+<!-- src/app/features/host/host-property-detail/host-property-detail.component.html -->
+<div class="property-detail-page">
+  <!-- Loading -->
+  @if (loading$ | async) {
+    <div class="loading-container">
+      <mat-spinner diameter="48"></mat-spinner>
+      <p>Loading property details...</p>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (error$ | async; as error) {
+    <div class="error-container">
+      <mat-icon>error_outline</mat-icon>
+      <h2>Error Loading Property</h2>
+      <p>{{ error }}</p>
+      <button mat-raised-button color="primary" routerLink="/host/properties">
+        Back to My Properties
+      </button>
+    </div>
+  }
+
+  <!-- Content -->
+  @if (property$ | async; as property) {
+    <!-- Header -->
+    <header class="page-header">
+      <div class="header-left">
+        <button mat-icon-button routerLink="/host/properties" class="back-btn">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <div class="header-content">
+          <div class="title-row">
+            <h1>{{ property.title }}</h1>
+            <span
+              class="status-badge"
+              [style.background-color]="getStatusColor(property.status)"
+            >
+              {{ getStatusLabel(property.status) }}
+            </span>
+          </div>
+          <p class="location">
+            <mat-icon>location_on</mat-icon>
+            {{ property.city }}, {{ property.country }}
+          </p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button mat-stroked-button [routerLink]="['/property', property.propertyId]" target="_blank">
+          <mat-icon>visibility</mat-icon>
+          Preview
+        </button>
+      </div>
+    </header>
+
+    <!-- Saving indicator -->
+    @if (saving$ | async) {
+      <div class="saving-indicator">
+        <mat-spinner diameter="20"></mat-spinner>
+        <span>Saving changes...</span>
+      </div>
+    }
+
+    <!-- Tabs -->
+    <mat-tab-group animationDuration="200ms">
+
+      <!-- ========== OVERVIEW TAB ========== -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>info</mat-icon>
+          <span>Overview</span>
+        </ng-template>
+
+        <div class="tab-content">
+          <div class="overview-grid">
+
+            <!-- Basic Info Card -->
+            <mat-card class="info-card">
+              <mat-card-header>
+                <mat-icon mat-card-avatar>home</mat-icon>
+                <mat-card-title>Basic Information</mat-card-title>
+                <button
+                  mat-icon-button
+                  class="edit-btn"
+                  (click)="toggleEditMode('basicInfo')"
+                  [matTooltip]="editMode['basicInfo'] ? 'Cancel' : 'Edit'"
+                >
+                  <mat-icon>{{ editMode['basicInfo'] ? 'close' : 'edit' }}</mat-icon>
+                </button>
+              </mat-card-header>
+              <mat-card-content>
+                @if (!editMode['basicInfo']) {
+                  <!-- View Mode -->
+                  <div class="info-list">
+                    <div class="info-item">
+                      <span class="label">Title</span>
+                      <span class="value">{{ property.title }}</span>
+                    </div>
+                    <div class="info-item">
+                      <span class="label">Property Type</span>
+                      <span class="value">{{ getPropertyTypeLabel(property.propertyType) }}</span>
+                    </div>
+                    <div class="info-item">
+                      <span class="label">Place Type</span>
+                      <span class="value">{{ getPlaceTypeLabel(property.placeType) }}</span>
+                    </div>
+                    <div class="info-item">
+                      <span class="label">Surface Area</span>
+                      <span class="value">{{ property.surfaceArea ? property.surfaceArea + ' m²' : 'Not specified' }}</span>
+                    </div>
+                    <div class="info-item">
+                      <span class="label">Floor Number</span>
+                      <span class="value">{{ property.floorNumber ?? 'Not specified' }}</span>
+                    </div>
+                  </div>
+                } @else {
+                  <!-- Edit Mode -->
+                  <form [formGroup]="basicInfoForm" class="edit-form">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Title</mat-label>
+                      <input matInput formControlName="title" placeholder="Property title">
+                      @if (basicInfoForm.get('title')?.hasError('required')) {
+                        <mat-error>Title is required</mat-error>
+                      }
+                      @if (basicInfoForm.get('title')?.hasError('minlength')) {
+                        <mat-error>Title must be at least 10 characters</mat-error>
+                      }
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                      <mat-label>Property Type</mat-label>
+                      <mat-select formControlName="propertyType">
+                        @for (type of propertyTypes; track type.value) {
+                          <mat-option [value]="type.value">{{ type.label }}</mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                      <mat-label>Place Type</mat-label>
+                      <mat-select formControlName="placeType">
+                        @for (type of placeTypes; track type.value) {
+                          <mat-option [value]="type.value">{{ type.label }}</mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+
+                    <div class="form-row">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Surface Area (m²)</mat-label>
+                        <input matInput type="number" formControlName="surfaceArea">
+                      </mat-form-field>
+
+                      <mat-form-field appearance="outline">
+                        <mat-label>Floor Number</mat-label>
+                        <input matInput type="number" formControlName="floorNumber">
+                      </mat-form-field>
+                    </div>
+
+                    <div class="form-actions">
+                      <button mat-button (click)="cancelEdit('basicInfo')">Cancel</button>
+                      <button
+                        mat-raised-button
+                        color="primary"
+                        (click)="saveSection('basicInfo', basicInfoForm)"
+                        [disabled]="basicInfoForm.invalid"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </form>
+                }
+              </mat-card-content>
+            </mat-card>
+
+            <!-- Capacity Card -->
+            <mat-card class="info-card">
+              <mat-card-header>
+                <mat-icon mat-card-avatar>people</mat-icon>
+                <mat-card-title>Capacity</mat-card-title>
+                <button
+                  mat-icon-button
+                  class="edit-btn"
+                  (click)="toggleEditMode('capacity')"
+                  [matTooltip]="editMode['capacity'] ? 'Cancel' : 'Edit'"
+                >
+                  <mat-icon>{{ editMode['capacity'] ? 'close' : 'edit' }}</mat-icon>
+                </button>
+              </mat-card-header>
+              <mat-card-content>
+                @if (!editMode['capacity']) {
+                  <!-- View Mode -->
+                  <div class="capacity-grid">
+                    <div class="capacity-item">
+                      <mat-icon>people</mat-icon>
+                      <span class="number">{{ property.maxGuests }}</span>
+                      <span class="label">Guests</span>
+                    </div>
+                    <div class="capacity-item">
+                      <mat-icon>bed</mat-icon>
+                      <span class="number">{{ property.bedrooms }}</span>
+                      <span class="label">Bedrooms</span>
+                    </div>
+                    <div class="capacity-item">
+                      <mat-icon>single_bed</mat-icon>
+                      <span class="number">{{ property.beds }}</span>
+                      <span class="label">Beds</span>
+                    </div>
+                    <div class="capacity-item">
+                      <mat-icon>bathtub</mat-icon>
+                      <span class="number">{{ property.bathrooms }}</span>
+                      <span class="label">Bathrooms</span>
+                    </div>
+                  </div>
+                } @else {
+                  <!-- Edit Mode -->
+                  <form [formGroup]="capacityForm" class="edit-form">
+                    <div class="form-row four-cols">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Max Guests</mat-label>
+                        <input matInput type="number" formControlName="maxGuests" min="1">
+                      </mat-form-field>
+
+                      <mat-form-field appearance="outline">
+                        <mat-label>Bedrooms</mat-label>
+                        <input matInput type="number" formControlName="bedrooms" min="0">
+                      </mat-form-field>
+
+                      <mat-form-field appearance="outline">
+                        <mat-label>Beds</mat-label>
+                        <input matInput type="number" formControlName="beds" min="1">
+                      </mat-form-field>
+
+                      <mat-form-field appearance="outline">
+                        <mat-label>Bathrooms</mat-label>
+                        <input matInput type="number" formControlName="bathrooms" min="1">
+                      </mat-form-field>
+                    </div>
+
+                    <div class="form-actions">
+                      <button mat-button (click)="cancelEdit('capacity')">Cancel</button>
+                      <button
+                        mat-raised-button
+                        color="primary"
+                        (click)="saveSection('capacity', capacityForm)"
+                        [disabled]="capacityForm.invalid"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </form>
+                }
+              </mat-card-content>
+            </mat-card>
+
+            <!-- Description Card -->
+            <mat-card class="info-card full-width">
+              <mat-card-header>
+                <mat-icon mat-card-avatar>description</mat-icon>
+                <mat-card-title>Description</mat-card-title>
+                <button
+                  mat-icon-button
+                  class="edit-btn"
+                  (click)="toggleEditMode('description')"
+                  [matTooltip]="editMode['description'] ? 'Cancel' : 'Edit'"
+                >
+                  <mat-icon>{{ editMode['description'] ? 'close' : 'edit' }}</mat-icon>
+                </button>
+              </mat-card-header>
+              <mat-card-content>
+                @if (!editMode['description']) {
+                  <p class="description-text">{{ property.description }}</p>
+                } @else {
+                  <form [formGroup]="descriptionForm" class="edit-form">
+                    <mat-form-field appearance="outline" class="full-width-field">
+                      <mat-label>Description</mat-label>
+                      <textarea
+                        matInput
+                        formControlName="description"
+                        rows="6"
+                        placeholder="Describe your property..."
+                      ></textarea>
+                      @if (descriptionForm.get('description')?.hasError('required')) {
+                        <mat-error>Description is required</mat-error>
+                      }
+                      @if (descriptionForm.get('description')?.hasError('minlength')) {
+                        <mat-error>Description must be at least 50 characters</mat-error>
+                      }
+                      <mat-hint align="end">{{ descriptionForm.get('description')?.value || 0 }} characters</mat-hint>
+                    </mat-form-field>
+
+                    <div class="form-actions">
+                      <button mat-button (click)="cancelEdit('description')">Cancel</button>
+                      <button
+                        mat-raised-button
+                        color="primary"
+                        (click)="saveSection('description', descriptionForm)"
+                        [disabled]="descriptionForm.invalid"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </form>
+                }
+              </mat-card-content>
+            </mat-card>
+
+            <!-- Check-in/out Card -->
+            <mat-card class="info-card">
+              <mat-card-header>
+                <mat-icon mat-card-avatar>schedule</mat-icon>
+                <mat-card-title>Check-in / Check-out</mat-card-title>
+                <button
+                  mat-icon-button
+                  class="edit-btn"
+                  (click)="toggleEditMode('checkInOut')"
+                  [matTooltip]="editMode['checkInOut'] ? 'Cancel' : 'Edit'"
+                >
+                  <mat-icon>{{ editMode['checkInOut'] ? 'close' : 'edit' }}</mat-icon>
+                </button>
+              </mat-card-header>
+              <mat-card-content>
+                @if (!editMode['checkInOut']) {
+                  <div class="info-list">
+                    <div class="info-item">
+                      <span class="label">Check-in Time</span>
+                      <span class="value">{{ property.checkInTimeStart }} - {{ property.checkInTimeEnd }}</span>
+                    </div>
+                    <div class="info-item">
+                      <span class="label">Check-out Time</span>
+                      <span class="value">{{ property.checkOutTime }}</span>
+                    </div>
+                    <div class="info-item">
+                      <span class="label">Instant Booking</span>
+                      <span class="value">
+                        <mat-icon [style.color]="property.instantBooking ? '#4CAF50' : '#f44336'">
+                          {{ property.instantBooking ? 'check_circle' : 'cancel' }}
+                        </mat-icon>
+                        {{ property.instantBooking ? 'Enabled' : 'Disabled' }}
+                      </span>
+                    </div>
+                  </div>
+                } @else {
+                  <form [formGroup]="checkInOutForm" class="edit-form">
+                    <div class="form-row">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Check-in Start</mat-label>
+                        <input matInput type="time" formControlName="checkInTimeStart">
+                      </mat-form-field>
+
+                      <mat-form-field appearance="outline">
+                        <mat-label>Check-in End</mat-label>
+                        <input matInput type="time" formControlName="checkInTimeEnd">
+                      </mat-form-field>
+                    </div>
+
+                    <mat-form-field appearance="outline">
+                      <mat-label>Check-out Time</mat-label>
+                      <input matInput type="time" formControlName="checkOutTime">
+                    </mat-form-field>
+
+                    <mat-slide-toggle formControlName="instantBooking" color="primary">
+                      Instant Booking
+                    </mat-slide-toggle>
+
+                    <div class="form-actions">
+                      <button mat-button (click)="cancelEdit('checkInOut')">Cancel</button>
+                      <button
+                        mat-raised-button
+                        color="primary"
+                        (click)="saveSection('checkInOut', checkInOutForm)"
+                        [disabled]="checkInOutForm.invalid"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </form>
+                }
+              </mat-card-content>
+            </mat-card>
+
+            <!-- Stay Rules Card -->
+            <mat-card class="info-card">
+              <mat-card-header>
+                <mat-icon mat-card-avatar>event</mat-icon>
+                <mat-card-title>Stay Rules</mat-card-title>
+                <button
+                  mat-icon-button
+                  class="edit-btn"
+                  (click)="toggleEditMode('stayRules')"
+                  [matTooltip]="editMode['stayRules'] ? 'Cancel' : 'Edit'"
+                >
+                  <mat-icon>{{ editMode['stayRules'] ? 'close' : 'edit' }}</mat-icon>
+                </button>
+              </mat-card-header>
+              <mat-card-content>
+                @if (!editMode['stayRules']) {
+                  <div class="info-list">
+                    <div class="info-item">
+                      <span class="label">Minimum Stay</span>
+                      <span class="value">{{ property.minStayNights }} nights</span>
+                    </div>
+                    <div class="info-item">
+                      <span class="label">Maximum Stay</span>
+                      <span class="value">{{ property.maxStayNights }} nights</span>
+                    </div>
+                    <div class="info-item">
+                      <span class="label">Booking Advance</span>
+                      <span class="value">{{ property.bookingAdvanceDays }} days</span>
+                    </div>
+                    <div class="info-item">
+                      <span class="label">Cancellation Policy</span>
+                      <span class="value">{{ property.cancellationPolicy }}</span>
+                    </div>
+                  </div>
+                } @else {
+                  <form [formGroup]="stayRulesForm" class="edit-form">
+                    <div class="form-row">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Minimum Stay (nights)</mat-label>
+                        <input matInput type="number" formControlName="minStayNights" min="1">
+                      </mat-form-field>
+
+                      <mat-form-field appearance="outline">
+                        <mat-label>Maximum Stay (nights)</mat-label>
+                        <input matInput type="number" formControlName="maxStayNights" min="1">
+                      </mat-form-field>
+                    </div>
+
+                    <mat-form-field appearance="outline">
+                      <mat-label>Booking Advance (days)</mat-label>
+                      <input matInput type="number" formControlName="bookingAdvanceDays" min="0">
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                      <mat-label>Cancellation Policy</mat-label>
+                      <mat-select formControlName="cancellationPolicy">
+                        @for (policy of cancellationPolicies; track policy.value) {
+                          <mat-option [value]="policy.value">{{ policy.label }}</mat-option>
+                        }
+                      </mat-select>
+                    </mat-form-field>
+
+                    <div class="form-actions">
+                      <button mat-button (click)="cancelEdit('stayRules')">Cancel</button>
+                      <button
+                        mat-raised-button
+                        color="primary"
+                        (click)="saveSection('stayRules', stayRulesForm)"
+                        [disabled]="stayRulesForm.invalid"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </form>
+                }
+              </mat-card-content>
+            </mat-card>
+
+          </div>
+        </div>
+      </mat-tab>
+
+    <!-- ========== PHOTOS TAB ========== -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>photo_library</mat-icon>
+        <span>Photos ({{ property.photos?.length || 0 }})</span>
+      </ng-template>
+
+      <div class="tab-content">
+        <app-photos-manager
+          [propertyId]="propertyId"
+          [photos]="property.photos || []"
+          (photosChanged)="reloadProperty()"
+        ></app-photos-manager>
+      </div>
+    </mat-tab>
+
+      <!-- ========== LOCATION TAB ========== -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>location_on</mat-icon>
+          <span>Location</span>
+        </ng-template>
+
+        <div class="tab-content">
+          <div class="location-grid">
+            <!-- Address Card -->
+            <mat-card class="info-card">
+              <mat-card-header>
+                <mat-icon mat-card-avatar>home</mat-icon>
+                <mat-card-title>Address</mat-card-title>
+                <button
+                  mat-icon-button
+                  class="edit-btn"
+                  (click)="toggleEditMode('location')"
+                  [matTooltip]="editMode['location'] ? 'Cancel' : 'Edit'"
+                >
+                  <mat-icon>{{ editMode['location'] ? 'close' : 'edit' }}</mat-icon>
+                </button>
+              </mat-card-header>
+              <mat-card-content>
+                @if (!editMode['location']) {
+                  <div class="info-list">
+                    <div class="info-item">
+                      <span class="label">Street Address</span>
+                      <span class="value">{{ property.adresseLine }}</span>
+                    </div>
+                    <div class="info-item">
+                      <span class="label">City</span>
+                      <span class="value">{{ property.city }}</span>
+                    </div>
+                    <div class="info-item">
+                      <span class="label">Country</span>
+                      <span class="value">{{ property.country }}</span>
+                    </div>
+                    <div class="info-item">
+                      <span class="label">Postal Code</span>
+                      <span class="value">{{ property.postalCode }}</span>
+                    </div>
+                  </div>
+                } @else {
+                  <form [formGroup]="locationForm" class="edit-form">
+                    <mat-form-field appearance="outline" class="full-width-field">
+                      <mat-label>Street Address</mat-label>
+                      <input matInput formControlName="adresseLine">
+                    </mat-form-field>
+
+                    <div class="form-row">
+                      <mat-form-field appearance="outline">
+                        <mat-label>City</mat-label>
+                        <input matInput formControlName="city">
+                      </mat-form-field>
+
+                      <mat-form-field appearance="outline">
+                        <mat-label>Country</mat-label>
+                        <input matInput formControlName="country">
+                      </mat-form-field>
+                    </div>
+
+                    <mat-form-field appearance="outline">
+                      <mat-label>Postal Code</mat-label>
+                      <input matInput formControlName="postalCode">
+                    </mat-form-field>
+
+                    <div class="form-row">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Latitude</mat-label>
+                        <input matInput type="number" formControlName="latitude" step="0.000001">
+                      </mat-form-field>
+
+                      <mat-form-field appearance="outline">
+                        <mat-label>Longitude</mat-label>
+                        <input matInput type="number" formControlName="longitude" step="0.000001">
+                      </mat-form-field>
+                    </div>
+
+                    <mat-form-field appearance="outline" class="full-width-field">
+                      <mat-label>Neighborhood Description</mat-label>
+                      <textarea matInput formControlName="neighborhoodDescription" rows="3"></textarea>
+                    </mat-form-field>
+
+                    <div class="form-actions">
+                      <button mat-button (click)="cancelEdit('location')">Cancel</button>
+                      <button
+                        mat-raised-button
+                        color="primary"
+                        (click)="saveSection('location', locationForm)"
+                        [disabled]="locationForm.invalid"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </form>
+                }
+              </mat-card-content>
+            </mat-card>
+
+            <!-- Coordinates Card (View only) -->
+            @if (!editMode['location']) {
+              <mat-card class="info-card">
+                <mat-card-header>
+                  <mat-icon mat-card-avatar>gps_fixed</mat-icon>
+                  <mat-card-title>Coordinates</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                  <div class="info-list">
+                    <div class="info-item">
+                      <span class="label">Latitude</span>
+                      <span class="value clickable" (click)="copyToClipboard(property.latitude?.toString() || '', 'Latitude')">
+                        {{ property.latitude }}
+                        <mat-icon>content_copy</mat-icon>
+                      </span>
+                    </div>
+                    <div class="info-item">
+                      <span class="label">Longitude</span>
+                      <span class="value clickable" (click)="copyToClipboard(property.longitude?.toString() || '', 'Longitude')">
+                        {{ property.longitude }}
+                        <mat-icon>content_copy</mat-icon>
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    mat-stroked-button
+                    color="primary"
+                    class="map-btn"
+                    (click)="openGoogleMaps(property.latitude, property.longitude)"
+                  >
+                    <mat-icon>map</mat-icon>
+                    Open in Google Maps
+                  </button>
+                </mat-card-content>
+              </mat-card>
+            }
+
+            <!-- Neighborhood Card -->
+            @if (property.neighborhoodDescription && !editMode['location']) {
+              <mat-card class="info-card full-width">
+                <mat-card-header>
+                  <mat-icon mat-card-avatar>explore</mat-icon>
+                  <mat-card-title>Neighborhood</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+                  <p class="description-text">{{ property.neighborhoodDescription }}</p>
+                </mat-card-content>
+              </mat-card>
+            }
+          </div>
+        </div>
+      </mat-tab>
+
+
+    <!-- ========== PRICING TAB ========== -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>attach_money</mat-icon>
+        <span>Pricing</span>
+      </ng-template>
+
+      <!-- Section à insérer dans le TAB PRICING -->
+      <!-- Remplace la section "Base Pricing Card" existante -->
+
+      <!-- Section à insérer dans le TAB PRICING -->
+      <!-- Remplace la section "Base Pricing Card" existante -->
+
+      <div class="tab-content">
+        <div class="pricing-grid">
+          <!-- AI Price Suggestion Card - NOUVEAU -->
+          @if (!editMode['pricing'] && property) {
+            <mat-card class="info-card ai-suggestion-card full-width">
+              <mat-card-header>
+                <mat-icon mat-card-avatar class="ai-icon">psychology</mat-icon>
+                <mat-card-title>AI Price Optimization</mat-card-title>
+                <mat-card-subtitle>Get smart pricing recommendations powered by machine learning</mat-card-subtitle>
+              </mat-card-header>
+              <mat-card-content>
+                @if (!showPriceSuggestion) {
+                  <!-- Initial State - Get Suggestion -->
+                  <div class="ai-prompt">
+                    <p class="prompt-text">
+                      <mat-icon>lightbulb</mat-icon>
+                      Our AI can analyze your property and market data to suggest an optimal price
+                    </p>
+                    <button
+                      mat-raised-button
+                      color="accent"
+                      (click)="getPricePrediction()"
+                      [disabled]="loadingPrediction$ | async"
+                    >
+                      @if (loadingPrediction$ | async) {
+                        <mat-spinner diameter="20"></mat-spinner>
+                        <span>Analyzing...</span>
+                      } @else {
+                        <mat-icon>auto_awesome</mat-icon>
+                        <span>Get AI Price Suggestion</span>
+                      }
+                    </button>
+                  </div>
+                } @else if (pricePrediction) {
+                  <!-- AI Suggestion Display -->
+                  <div class="ai-suggestion-content">
+                    <!-- Main Price Comparison -->
+                    <div class="price-comparison">
+                      <div class="current-price-section">
+                        <span class="label">Current Price</span>
+                        <span class="current-price">{{ property.pricePerNight }} ETH</span>
+                        <span class="eur-equivalent">≈ {{ pricePrediction.current_price_eur | number:'1.2-2' }} EUR</span>
+                      </div>
+
+                      <mat-icon class="arrow-icon">trending_flat</mat-icon>
+
+                      <div class="suggested-price-section">
+                        <span class="label">AI Suggested Price</span>
+                        <span class="suggested-price">{{ pricePrediction.predicted_price_eth | number:'1.4-4' }} ETH</span>
+                        <span class="eur-equivalent">≈ {{ pricePrediction.predicted_price_eur | number:'1.2-2' }} EUR</span>
+
+                        @if (getPriceDifferencePercentage(); as diff) {
+                          <span
+                            class="price-difference"
+                            [style.color]="getPriceDifferenceColor()"
+                          >
+                      {{ diff > 0 ? '+' : '' }}{{ diff | number:'1.1-1' }}%
+                    </span>
+                        }
+                      </div>
+                    </div>
+
+                    <!-- Confidence Range -->
+                    @if (pricePrediction.confidence_range_eth) {
+                      <div class="confidence-range">
+                        <mat-icon>show_chart</mat-icon>
+                        <div class="range-content">
+                          <span class="range-label">Confidence Range:</span>
+                          <span class="range-values">
+                      {{ pricePrediction.confidence_range_eth.min | number:'1.4-4' }} -
+                            {{ pricePrediction.confidence_range_eth.max | number:'1.4-4' }} ETH
+                    </span>
+                        </div>
+                      </div>
+                    }
+
+                    <!-- AI Recommendation -->
+                    @if (pricePrediction.recommendation) {
+                      <div class="ai-recommendation">
+                        <mat-icon>info</mat-icon>
+                        <p>{{ pricePrediction.recommendation }}</p>
+                      </div>
+                    }
+
+                    <!-- Action Buttons -->
+                    <div class="suggestion-actions">
+                      <button
+                        mat-button
+                        (click)="dismissSuggestion()"
+                      >
+                        <mat-icon>close</mat-icon>
+                        Dismiss
+                      </button>
+                      <button
+                        mat-raised-button
+                        color="primary"
+                        (click)="applySuggestedPrice(); toggleEditMode('pricing')"
+                      >
+                        <mat-icon>check</mat-icon>
+                        Apply Suggested Price
+                      </button>
+                    </div>
+                  </div>
+                }
+              </mat-card-content>
+            </mat-card>
+          }
+
+          <!-- Base Pricing Card -->
+          <mat-card class="info-card pricing-card">
+            <mat-card-header>
+              <mat-icon mat-card-avatar>payments</mat-icon>
+              <mat-card-title>Base Pricing</mat-card-title>
+              <button
+                mat-icon-button
+                class="edit-btn"
+                (click)="toggleEditMode('pricing')"
+                [matTooltip]="editMode['pricing'] ? 'Cancel' : 'Edit'"
+              >
+                <mat-icon>{{ editMode['pricing'] ? 'close' : 'edit' }}</mat-icon>
+              </button>
+            </mat-card-header>
+            <mat-card-content>
+              @if (!editMode['pricing']) {
+                <div class="price-items">
+                  <div class="price-item main">
+                    <span class="label">Price per Night</span>
+                    <span class="price">{{ property.pricePerNight }} ETH</span>
+                  </div>
+                  <div class="price-item">
+                    <span class="label">Weekend Price</span>
+                    <span class="price">{{ property.weekendPricePerNight }} ETH</span>
+                  </div>
+                </div>
+              } @else {
+                <form [formGroup]="pricingForm" class="edit-form">
+                  <!-- Show AI suggestion hint if available -->
+                  @if (pricePrediction && showPriceSuggestion) {
+                    <div class="form-hint ai-hint">
+                      <mat-icon>tips_and_updates</mat-icon>
+                      <span>AI suggests {{ pricePrediction.predicted_price_eth | number:'1.4-4' }} ETH per night</span>
+                    </div>
+                  }
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Price per Night (ETH)</mat-label>
+                    <input
+                      matInput
+                      type="number"
+                      formControlName="pricePerNight"
+                      min="0.0001"
+                      step="any"
+                      lang="en"
+                      [value]="pricingForm.get('pricePerNight')?.value"
+                    >
+                    <span matTextSuffix>ETH</span>
+                    <mat-hint>Enter decimal values (e.g., 0.0125)</mat-hint>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Weekend Price (ETH)</mat-label>
+                    <input
+                      matInput
+                      type="number"
+                      formControlName="weekendPricePerNight"
+                      min="0.0001"
+                      step="any"
+                      lang="en"
+                      [value]="pricingForm.get('weekendPricePerNight')?.value"
+                    >
+                    <span matTextSuffix>ETH</span>
+                    <mat-hint>Enter decimal values (e.g., 0.0150)</mat-hint>
+                  </mat-form-field>
+
+                  <div class="form-actions">
+                    <button mat-button (click)="cancelEdit('pricing')">Cancel</button>
+                    <button
+                      mat-raised-button
+                      color="primary"
+                      (click)="saveSection('pricing', pricingForm)"
+                      [disabled]="pricingForm.invalid"
+                    >
+                      Save
+                    </button>
+                  </div>
+                </form>
+              }
+            </mat-card-content>
+          </mat-card>
+
+          <!-- Additional Fees Card - Reste identique -->
+          <mat-card class="info-card pricing-card">
+            <mat-card-header>
+              <mat-icon mat-card-avatar>receipt</mat-icon>
+              <mat-card-title>Additional Fees</mat-card-title>
+              <button
+                mat-icon-button
+                class="edit-btn"
+                (click)="toggleEditMode('fees')"
+                [matTooltip]="editMode['fees'] ? 'Cancel' : 'Edit'"
+              >
+                <mat-icon>{{ editMode['fees'] ? 'close' : 'edit' }}</mat-icon>
+              </button>
+            </mat-card-header>
+            <mat-card-content>
+              @if (!editMode['fees']) {
+                <div class="price-items">
+                  <div class="price-item">
+                    <span class="label">Cleaning Fee</span>
+                    <span class="price">{{ property.cleaningFee }} ETH</span>
+                  </div>
+                  <div class="price-item">
+                    <span class="label">Pet Fee</span>
+                    <span class="price">{{ property.petFee }} ETH</span>
+                  </div>
+                  <div class="price-item">
+                    <span class="label">Platform Fee</span>
+                    <span class="price">{{ property.platformFeePercentage }}%</span>
+                  </div>
+                </div>
+              } @else {
+                <form [formGroup]="feesForm" class="edit-form">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Cleaning Fee (ETH)</mat-label>
+                    <input
+                      matInput
+                      type="number"
+                      formControlName="cleaningFee"
+                      min="0"
+                      step="any"
+                      lang="en"
+                    >
+                    <span matTextSuffix>ETH</span>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Pet Fee (ETH)</mat-label>
+                    <input
+                      matInput
+                      type="number"
+                      formControlName="petFee"
+                      min="0"
+                      step="any"
+                      lang="en"
+                    >
+                    <span matTextSuffix>ETH</span>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Platform Fee (%)</mat-label>
+                    <input matInput type="number" formControlName="platformFeePercentage" min="0" max="100">
+                    <span matTextSuffix>%</span>
+                  </mat-form-field>
+
+                  <div class="form-actions">
+                    <button mat-button (click)="cancelEdit('fees')">Cancel</button>
+                    <button
+                      mat-raised-button
+                      color="primary"
+                      (click)="saveSection('fees', feesForm)"
+                      [disabled]="feesForm.invalid"
+                    >
+                      Save
+                    </button>
+                  </div>
+                </form>
+              }
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+        <!-- Discounts Manager - Reste identique -->
+        <div class="discounts-section">
+          <app-discounts-manager
+            [propertyId]="propertyId"
+            [currentDiscounts]="property.discounts || []"
+            (discountsChanged)="reloadProperty()"
+          ></app-discounts-manager>
+        </div>
+      </div>
+    </mat-tab>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- ========== AMENITIES TAB ========== -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>wifi</mat-icon>
+        <span>Amenities ({{ property.amenities?.length || 0 }})</span>
+      </ng-template>
+
+      <div class="tab-content">
+        <app-amenities-manager
+          [propertyId]="propertyId"
+          [currentAmenities]="property.amenities || []"
+          (amenitiesChanged)="reloadProperty()"
+        ></app-amenities-manager>
+      </div>
+    </mat-tab>
+
+      <!-- ========== RULES TAB ========== -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>rule</mat-icon>
+          <span>Rules</span>
+        </ng-template>
+
+        <div class="tab-content">
+          <div class="rules-grid">
+            <!-- House Rules Card -->
+            <mat-card class="info-card">
+              <mat-card-header>
+                <mat-icon mat-card-avatar>gavel</mat-icon>
+                <mat-card-title>House Rules</mat-card-title>
+                <button
+                  mat-icon-button
+                  class="edit-btn"
+                  (click)="toggleEditMode('rules')"
+                  [matTooltip]="editMode['rules'] ? 'Cancel' : 'Edit'"
+                >
+                  <mat-icon>{{ editMode['rules'] ? 'close' : 'edit' }}</mat-icon>
+                </button>
+              </mat-card-header>
+              <mat-card-content>
+                @if (!editMode['rules']) {
+                  @if (property.rules) {
+                    <div class="rules-list">
+                      <div class="rule-item">
+                        <mat-icon [style.color]="getRuleColor(property.rules.childrenAllowed)">
+                          {{ getRuleIcon(property.rules.childrenAllowed) }}
+                        </mat-icon>
+                        <span>Children {{ property.rules.childrenAllowed ? 'allowed' : 'not allowed' }}</span>
+                      </div>
+                      <div class="rule-item">
+                        <mat-icon [style.color]="getRuleColor(property.rules.babiesAllowed)">
+                          {{ getRuleIcon(property.rules.babiesAllowed) }}
+                        </mat-icon>
+                        <span>Babies {{ property.rules.babiesAllowed ? 'allowed' : 'not allowed' }}</span>
+                      </div>
+                      <div class="rule-item">
+                        <mat-icon [style.color]="getRuleColor(property.rules.petsAllowed)">
+                          {{ getRuleIcon(property.rules.petsAllowed) }}
+                        </mat-icon>
+                        <span>Pets {{ property.rules.petsAllowed ? 'allowed' : 'not allowed' }}</span>
+                      </div>
+                      <div class="rule-item">
+                        <mat-icon [style.color]="getRuleColor(property.rules.smokingAllowed)">
+                          {{ getRuleIcon(property.rules.smokingAllowed) }}
+                        </mat-icon>
+                        <span>Smoking {{ property.rules.smokingAllowed ? 'allowed' : 'not allowed' }}</span>
+                      </div>
+                      <div class="rule-item">
+                        <mat-icon [style.color]="getRuleColor(property.rules.eventsAllowed)">
+                          {{ getRuleIcon(property.rules.eventsAllowed) }}
+                        </mat-icon>
+                        <span>Events {{ property.rules.eventsAllowed ? 'allowed' : 'not allowed' }}</span>
+                      </div>
+                    </div>
+                  } @else {
+                    <p class="no-data">No rules configured</p>
+                  }
+                } @else {
+                  <form [formGroup]="rulesForm" class="edit-form rules-form">
+                    <div class="toggle-list">
+                      <mat-slide-toggle formControlName="childrenAllowed" color="primary">
+                        Children allowed
+                      </mat-slide-toggle>
+
+                      <mat-slide-toggle formControlName="babiesAllowed" color="primary">
+                        Babies allowed
+                      </mat-slide-toggle>
+
+                      <mat-slide-toggle formControlName="petsAllowed" color="primary">
+                        Pets allowed
+                      </mat-slide-toggle>
+
+                      <mat-slide-toggle formControlName="smokingAllowed" color="primary">
+                        Smoking allowed
+                      </mat-slide-toggle>
+
+                      <mat-slide-toggle formControlName="eventsAllowed" color="primary">
+                        Events allowed
+                      </mat-slide-toggle>
+                    </div>
+
+                    <mat-form-field appearance="outline" class="full-width-field">
+                      <mat-label>Additional Rules</mat-label>
+                      <textarea
+                        matInput
+                        formControlName="additionalRules"
+                        rows="4"
+                        placeholder="Any additional rules..."
+                      ></textarea>
+                    </mat-form-field>
+
+                    <div class="form-actions">
+                      <button mat-button (click)="cancelEdit('rules')">Cancel</button>
+                      <button
+                        mat-raised-button
+                        color="primary"
+                        (click)="saveSection('rules', rulesForm)"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </form>
+                }
+              </mat-card-content>
+            </mat-card>
+
+            <!-- Additional Rules Card -->
+            @if (property.rules?.additionalRules && !editMode['rules']) {
+              <mat-card class="info-card">
+                <mat-card-header>
+                  <mat-icon mat-card-avatar>note</mat-icon>
+                  <mat-card-title>Additional Rules</mat-card-title>
+                </mat-card-header>
+                <mat-card-content>
+
+                  <p class="description-text">{{ property.rules?.additionalRules }}</p>
+                </mat-card-content>
+              </mat-card>
+            }
+
+            <!-- Host Preferences Card -->
+            <mat-card class="info-card">
+              <mat-card-header>
+                <mat-icon mat-card-avatar>person</mat-icon>
+                <mat-card-title>Host Preferences</mat-card-title>
+                <button
+                  mat-icon-button
+                  class="edit-btn"
+                  (click)="toggleEditMode('hostPreferences')"
+                  [matTooltip]="editMode['hostPreferences'] ? 'Cancel' : 'Edit'"
+                >
+                  <mat-icon>{{ editMode['hostPreferences'] ? 'close' : 'edit' }}</mat-icon>
+                </button>
+              </mat-card-header>
+              <mat-card-content>
+                @if (!editMode['hostPreferences']) {
+                  @if (property.hostPreferences) {
+                    <div class="info-list">
+                      @if (property.hostPreferences.communicationStyle) {
+                        <div class="info-item">
+                          <span class="label">Communication Style</span>
+                          <span class="value">{{ property.hostPreferences.communicationStyle }}</span>
+                        </div>
+                      }
+                      @if (property.hostPreferences.responseTime) {
+                        <div class="info-item">
+                          <span class="label">Response Time</span>
+                          <span class="value">{{ property.hostPreferences.responseTime }}</span>
+                        </div>
+                      }
+                      @if (property.hostPreferences.checkInProcess) {
+                        <div class="info-item">
+                          <span class="label">Check-in Process</span>
+                          <span class="value">{{ property.hostPreferences.checkInProcess }}</span>
+                        </div>
+                      }
+                    </div>
+                  } @else {
+                    <p class="no-data">No preferences configured</p>
+                  }
+                } @else {
+                  <form [formGroup]="hostPreferencesForm" class="edit-form">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Communication Style</mat-label>
+                      <input matInput formControlName="communicationStyle" placeholder="e.g., Friendly, Professional">
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                      <mat-label>Response Time</mat-label>
+                      <input matInput formControlName="responseTime" placeholder="e.g., Within 1 hour">
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="full-width-field">
+                      <mat-label>Check-in Process</mat-label>
+                      <textarea
+                        matInput
+                        formControlName="checkInProcess"
+                        rows="3"
+                        placeholder="Describe the check-in process..."
+                      ></textarea>
+                    </mat-form-field>
+
+                    <div class="form-actions">
+                      <button mat-button (click)="cancelEdit('hostPreferences')">Cancel</button>
+                      <button
+                        mat-raised-button
+                        color="primary"
+                        (click)="saveSection('hostPreferences', hostPreferencesForm)"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </form>
+                }
+              </mat-card-content>
+            </mat-card>
+          </div>
+        </div>
+      </mat-tab>
+
+    <!-- ========== CALENDAR TAB ========== -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>calendar_today</mat-icon>
+        <span>Calendar</span>
+      </ng-template>
+
+      <div class="tab-content">
+        <app-availability-calendar [propertyId]="propertyId"></app-availability-calendar>
+      </div>
+    </mat-tab>
+
+    </mat-tab-group>
+  }
+</div>

@@ -1,0 +1,24 @@
+<!-- src/app/shared/components/stats/stats.component.html -->
+
+<section class="stats-section">
+  <div class="container">
+    <br><br><br><br>
+    <div class="stats-header">
+      <h2>Trusted by Thousands</h2>
+      <p>Join our growing decentralized community</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card" *ngFor="let stat of stats; let i = index">
+        <div class="stat-icon">
+          <mat-icon>{{ stat.icon }}</mat-icon>
+        </div>
+        <div class="stat-value" #statValue>
+          {{ stat.prefix }}{{ formatValue(i) }}{{ stat.suffix }}
+        </div>
+        <div class="stat-label">{{ stat.label }}</div>
+      </div>
+    </div>
+
+  </div>
+</section>

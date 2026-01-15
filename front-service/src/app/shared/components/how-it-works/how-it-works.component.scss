@@ -1,0 +1,258 @@
+// src/app/shared/components/how-it-works/how-it-works.component.scss
+// VERSION MODERNE INSPIRÉE DE SUPERPOWER
+
+.how-it-works-section {
+  padding: 120px 0;
+  width: 100%;
+  background: #fafafa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.container {
+  width: 100%;
+  max-width: 1400px;
+  padding: 0 40px;
+}
+
+// ============================
+// HEADER
+// ============================
+.section-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin-bottom: 25px;
+  color: #111;
+  text-align: center;
+  letter-spacing: -1px;
+}
+
+.section-subtitle {
+  text-align: center;
+  font-size: 1.25rem;
+  color: #666;
+  max-width: 700px;
+  margin: 0 auto 80px;
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+// ============================
+// GRILLE AVEC IMAGES
+// ============================
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  margin-bottom: 80px;
+
+  @media (max-width: 992px) {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+}
+
+.step-card {
+  background: white;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: default;
+  border: 1px solid #f0f0f0;
+  position: relative;
+
+  // ✨ Numéro d'étape (moderne)
+  .step-number {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #e67e22;
+    color: white;
+    font-size: 1.3rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
+  }
+
+  // ✨ Image
+  .step-image {
+    width: 100%;
+    height: 280px;
+    overflow: hidden;
+    position: relative;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.4), transparent);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+  }
+
+  // ✨ Contenu
+  .step-content {
+    padding: 35px 30px;
+
+    .step-icon {
+      font-size: 42px;
+      width: 42px;
+      height: 42px;
+      color: #10345B;
+      margin-bottom: 20px;
+      transition: transform 0.3s ease;
+    }
+
+    h3 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #111;
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+
+    p {
+      font-size: 1.05rem;
+      color: #666;
+      line-height: 1.7;
+      margin: 0;
+    }
+  }
+
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+    border-color: rgba(230, 126, 34, 0.3);
+
+    .step-image {
+      img {
+        transform: scale(1.05);
+      }
+
+      &::after {
+        opacity: 1;
+      }
+    }
+
+    .step-content .step-icon {
+      transform: scale(1.1) rotate(-5deg);
+      color: #e67e22;
+    }
+  }
+}
+
+// ============================
+// CTA BUTTON
+// ============================
+.cta-section {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.btn-cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 18px 45px;
+  border: none;
+  background: #10345B;
+  color: white;
+  font-weight: 700;
+  font-size: 1.1rem;
+  border-radius: 60px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 24px rgba(16, 52, 91, 0.25);
+
+  .arrow {
+    font-size: 1.4rem;
+    transition: transform 0.3s ease;
+  }
+
+  &:hover {
+    background: #0d2a47;
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(16, 52, 91, 0.35);
+
+    .arrow {
+      transform: translateX(8px);
+    }
+  }
+
+  &:active {
+    transform: translateY(-2px);
+  }
+}
+
+// ============================
+// RESPONSIVE
+// ============================
+@media (max-width: 992px) {
+  .how-it-works-section {
+    padding: 80px 0;
+  }
+
+  .container {
+    padding: 0 20px;
+  }
+
+  .section-title {
+    font-size: 2.5rem;
+  }
+
+  .section-subtitle {
+    font-size: 1.1rem;
+    margin-bottom: 50px;
+  }
+
+  .step-card {
+    .step-image {
+      height: 260px;
+    }
+
+    .step-content {
+      padding: 30px 25px;
+
+      h3 {
+        font-size: 1.4rem;
+      }
+
+      p {
+        font-size: 1rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .how-it-works-section {
+    padding: 60px 0;
+  }
+
+  .section-title {
+    font-size: 2.2rem;
+  }
+
+  .btn-cta {
+    width: 100%;
+    max-width: 320px;
+  }
+}

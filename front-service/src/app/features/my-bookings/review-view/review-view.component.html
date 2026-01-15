@@ -1,0 +1,43 @@
+<!-- review-card.component.html -->
+<div class="review-card">
+
+  <!-- Rating -->
+  <div class="rating-header">
+    <div class="stars-container">
+      <mat-icon
+        *ngFor="let s of [].constructor(review.ratingValue)"
+        class="star filled"
+      >
+        star
+      </mat-icon>
+
+      <mat-icon
+        *ngFor="let s of [].constructor(5 - review.ratingValue)"
+        class="star empty"
+      >
+        star_border
+      </mat-icon>
+    </div>
+
+    <div class="rating-number">
+      {{ review.ratingValue }}<span>/5</span>
+    </div>
+    <mat-icon (click)="onEditReview(review)">edit</mat-icon>
+  </div>
+  <mat-divider></mat-divider>
+
+  <!-- Comment -->
+  <div class="comment">
+    <p>{{ review.reviewText }}</p>
+  </div>
+
+  <!-- Date -->
+  <div class="date">
+    <mat-icon>schedule</mat-icon>
+    <span>{{ review.createdAt | date:'mediumDate' }}</span>
+
+  </div>
+
+
+</div>
+

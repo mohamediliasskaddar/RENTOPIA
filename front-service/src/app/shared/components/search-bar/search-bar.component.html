@@ -1,0 +1,173 @@
+<!-- src/app/shared/components/search-bar/search-bar.component.html -->
+
+<div class="search-bar-container" [class.compact]="compact" [class.light-theme]="theme === 'light'">
+  <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="search-bar">
+
+    <!-- WHERE -->
+    <div class="search-field location-field">
+      <div class="field-label">Where</div>
+      <mat-form-field appearance="outline" class="custom-field">
+        <input
+          matInput
+          formControlName="location"
+          placeholder="Search destinations"
+          class="field-input"
+          [matAutocomplete]="locationAuto" />
+        <mat-icon matPrefix class="field-icon">location_on</mat-icon>
+
+        <!-- Autocomplete Panel -->
+        <mat-autocomplete
+          #locationAuto="matAutocomplete"
+          [displayWith]="displayLocation.bind(this)"
+          (optionSelected)="onLocationSelected($event.option.value)"
+          class="location-autocomplete">
+          <mat-option *ngFor="let location of filteredLocations$ | async" [value]="location">
+            <div class="location-option">
+              <mat-icon>location_city</mat-icon>
+              <div class="location-text">
+                <span class="city">{{ location.city }}</span>
+                <span class="country">{{ location.country }}</span>
+              </div>
+            </div>
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </div>
+
+    <div class="divider-vertical"></div>
+
+    <!-- WHEN - Date Range -->
+    <div class="search-field date-field">
+      <div class="field-label">When</div>
+      <mat-form-field appearance="outline" class="custom-field">
+        <mat-date-range-input [rangePicker]="dateRangePicker">
+          <input
+            matStartDate
+            formControlName="checkIn"
+            placeholder="Check-in"
+            class="field-input"
+            readonly
+            (click)="openDatePicker()" />
+          <input
+            matEndDate
+            formControlName="checkOut"
+            placeholder="Check-out"
+            class="field-input"
+            readonly
+            (click)="openDatePicker()" />
+        </mat-date-range-input>
+
+        <mat-icon matPrefix class="field-icon">event</mat-icon>
+
+        <mat-date-range-picker
+          #dateRangePicker
+          (closed)="onDatePickerClosed()">
+        </mat-date-range-picker>
+      </mat-form-field>
+    </div>
+
+    <div class="divider-vertical"></div>
+
+    <!-- WHO - Guests -->
+    <div class="search-field guests-field">
+      <div class="field-label">Who</div>
+      <button
+        type="button"
+        mat-button
+        class="guests-trigger"
+        [matMenuTriggerFor]="guestsMenu"
+        #guestsTrigger="matMenuTrigger">
+        <mat-icon class="field-icon">people</mat-icon>
+        <span class="guests-text">{{ getGuestsText() }}</span>
+        <mat-icon class="arrow-icon">expand_more</mat-icon>
+      </button>
+    </div>
+
+    <!-- SEARCH BUTTON -->
+    <button type="submit" mat-fab class="search-button" [disabled]="searchForm.invalid">
+      <mat-icon>search</mat-icon>
+    </button>
+  </form>
+</div>
+
+<!-- 🔥 GUESTS MENU - CORRECTEMENT CONFIGURÉ -->
+<mat-menu
+  #guestsMenu="matMenu"
+  class="guests-menu-panel"
+  [hasBackdrop]="true"
+  (closed)="onGuestsMenuClosed()">
+
+  <div class="guests-menu-content" (click)="$event.stopPropagation()">
+
+    <!-- Adults -->
+    <div class="guest-row">
+      <div class="guest-info">
+        <div class="guest-label">Adults</div>
+        <div class="guest-desc">Ages 13 or above</div>
+      </div>
+      <div class="counter">
+        <button mat-icon-button (click)="decrementAdults()" [disabled]="adults <= 1">
+          <mat-icon>remove_circle_outline</mat-icon>
+        </button>
+        <span class="counter-value">{{ adults }}</span>
+        <button mat-icon-button (click)="incrementAdults()" [disabled]="adults >= 16">
+          <mat-icon>add_circle_outline</mat-icon>
+        </button>
+      </div>
+    </div>
+    <mat-divider></mat-divider>
+
+    <!-- Children -->
+    <div class="guest-row">
+      <div class="guest-info">
+        <div class="guest-label">Children</div>
+        <div class="guest-desc">Ages 2–12</div>
+      </div>
+      <div class="counter">
+        <button mat-icon-button (click)="decrementChildren()" [disabled]="children <= 0">
+          <mat-icon>remove_circle_outline</mat-icon>
+        </button>
+        <span class="counter-value">{{ children }}</span>
+        <button mat-icon-button (click)="incrementChildren()">
+          <mat-icon>add_circle_outline</mat-icon>
+        </button>
+      </div>
+    </div>
+    <mat-divider></mat-divider>
+
+    <!-- Infants -->
+    <div class="guest-row">
+      <div class="guest-info">
+        <div class="guest-label">Infants</div>
+        <div class="guest-desc">Under 2</div>
+      </div>
+      <div class="counter">
+        <button mat-icon-button (click)="decrementBabies()" [disabled]="babies <= 0">
+          <mat-icon>remove_circle_outline</mat-icon>
+        </button>
+        <span class="counter-value">{{ babies }}</span>
+        <button mat-icon-button (click)="incrementBabies()">
+          <mat-icon>add_circle_outline</mat-icon>
+        </button>
+      </div>
+    </div>
+    <mat-divider></mat-divider>
+
+    <!-- Pets -->
+    <div class="guest-row">
+      <div class="guest-info">
+        <div class="guest-label">Pets</div>
+        <div class="guest-desc">Service animals allowed</div>
+      </div>
+      <div class="counter">
+        <button mat-icon-button (click)="decrementPets()" [disabled]="pets <= 0">
+          <mat-icon>remove_circle_outline</mat-icon>
+        </button>
+        <span class="counter-value">{{ pets }}</span>
+        <button mat-icon-button (click)="incrementPets()">
+          <mat-icon>add_circle_outline</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+</mat-menu>

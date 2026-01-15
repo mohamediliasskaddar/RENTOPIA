@@ -1,0 +1,141 @@
+<!-- src/app/features/listings/listings.component.html -->
+
+<div class="listings-page">
+  <br><br>
+
+  <!-- ========================================
+       STICKY SEARCH HEADER
+  ========================================= -->
+  <div class="search-header">
+    <div class="search-header-inner">
+
+      <!-- Search Bar Professional -->
+      <div class="search-bar-section">
+        <app-search-bar
+          [compact]="true"
+          [theme]="'light'"
+           >
+        </app-search-bar>
+      </div>
+
+      <!-- Filters Button -->
+      <button
+        mat-mini-fab
+        class="filters-fab"
+        [class.has-filters]="activeFiltersCount > 0"
+        (click)="openFiltersModal()"
+        matTooltip="Filters"
+        matTooltipPosition="below">
+        <mat-icon>tune</mat-icon>
+        <span class="filters-badge" *ngIf="activeFiltersCount > 0">
+          {{ activeFiltersCount }}
+        </span>
+      </button>
+    </div>
+
+    <!-- Results & Filters Info Bar -->
+    <div class="info-bar" *ngIf="!(loading$ | async)">
+      <div class="info-bar-content">
+        <!-- Results Count -->
+        <div class="results-info">
+          <span class="results-number">{{ ((listings$ | async) || []).length }}</span>
+          <span class="results-text">
+            {{ ((listings$ | async) || []).length === 1 ? 'Stay' : 'Stays' }}
+          </span>
+        </div>
+
+        <!-- Active Filters Chips -->
+        <div class="filters-chips" *ngIf="activeFiltersCount > 0">
+          <mat-chip-set>
+            <mat-chip class="active-filter-chip" (removed)="clearFilters()">
+              <mat-icon class="chip-icon">check_circle</mat-icon>
+              {{ activeFiltersCount }} filter{{ activeFiltersCount > 1 ? 's' : '' }}
+              <button matChipRemove aria-label="Remove filters">
+                <mat-icon>close</mat-icon>
+              </button>
+            </mat-chip>
+          </mat-chip-set>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================
+       MAIN CONTENT
+  ========================================= -->
+  <div class="main-content">
+
+    <!-- Loading State -->
+    <div class="state-container loading" *ngIf="loading$ | async">
+      <div class="state-content">
+        <div class="spinner-wrapper">
+          <mat-spinner diameter="56" color="primary"></mat-spinner>
+        </div>
+        <h3>Searching properties</h3>
+        <p>Hold tight, we're finding the best stays for you...</p>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div class="state-container error" *ngIf="(error$ | async) as error">
+      <div class="state-content">
+        <div class="state-icon error-icon">
+          <mat-icon>error_outline</mat-icon>
+        </div>
+        <h3>Something went wrong</h3>
+        <p>{{ error }}</p>
+        <button
+          mat-raised-button
+          color="primary"
+          class="action-button"
+          (click)="clearFilters()">
+          <mat-icon>refresh</mat-icon>
+          Try Again
+        </button>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="state-container empty" *ngIf="!(loading$ | async) && ((listings$ | async) || []).length === 0">
+      <div class="state-content">
+        <div class="state-icon empty-icon">
+          <mat-icon>search_off</mat-icon>
+        </div>
+        <h3>No properties found</h3>
+        <p>Try adjusting your search or filters to find what you're looking for</p>
+        <div class="action-buttons">
+          <button
+            mat-raised-button
+            color="primary"
+            class="action-button"
+            (click)="clearFilters()">
+            <mat-icon>clear_all</mat-icon>
+            Clear Filters
+          </button>
+          <button
+            mat-stroked-button
+            class="action-button-outline"
+            routerLink="/listings">
+            <mat-icon>explore</mat-icon>
+            Browse All
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Properties Grid -->
+    <div
+      class="properties-grid"
+      *ngIf="!(loading$ | async) && ((listings$ | async) || []).length > 0">
+      <app-property-card
+        *ngFor="let property of (listings$ | async) || []; trackBy: trackByPropertyId; let i = index"
+        [property]="property"
+        [isSearchMode]="isSearchMode"
+        [style.animation-delay.ms]="i * 40"
+        class="property-item"
+        >
+      </app-property-card>
+    </div>
+  </div>
+
+</div>

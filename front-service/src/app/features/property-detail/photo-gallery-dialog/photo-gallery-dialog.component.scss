@@ -1,0 +1,278 @@
+// src/app/features/property-detail/photo-gallery-dialog/photo-gallery-dialog.component.scss
+
+.photo-gallery-dialog {
+  width: 90vw;
+  max-width: 1200px;
+  height: 85vh;
+  max-height: 800px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+
+  // ===========================
+  // HEADER
+  // ===========================
+  .gallery-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: #fff;
+    border-bottom: 1px solid #ebebeb;
+    color: #222;
+    z-index: 10;
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      .close-btn {
+        color: #222;
+      }
+
+      h2 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #222;
+      }
+    }
+
+    .photo-counter {
+      font-size: 1rem;
+      color: #717171;
+      font-weight: 500;
+    }
+  }
+
+  // ===========================
+  // MAIN IMAGE
+  // ===========================
+  .gallery-main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 2rem 100px;
+    background: #f7f7f7;
+    min-height: 0;
+
+    @media (max-width: 768px) {
+      padding: 1rem 60px;
+    }
+
+    .main-image {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      user-select: none;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    // Navigation Buttons
+    .nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: white;
+      color: #222;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      transition: all 0.2s;
+      width: 48px;
+      height: 48px;
+
+      &:hover:not(:disabled) {
+        background: #f7f7f7;
+        transform: translateY(-50%) scale(1.1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+
+      &:disabled {
+        background: #f7f7f7;
+        color: #ddd;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+
+      mat-icon {
+        font-size: 28px;
+        width: 28px;
+        height: 28px;
+      }
+
+      &.prev-btn {
+        left: 1.5rem;
+
+        @media (max-width: 768px) {
+          left: 0.5rem;
+        }
+      }
+
+      &.next-btn {
+        right: 1.5rem;
+
+        @media (max-width: 768px) {
+          right: 0.5rem;
+        }
+      }
+    }
+  }
+
+  // ===========================
+  // THUMBNAILS
+  // ===========================
+  .gallery-thumbnails {
+    background: #fff;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #ebebeb;
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    .thumbnails-wrapper {
+      display: flex;
+      gap: 0.75rem;
+      min-width: min-content;
+
+      .thumbnail {
+        width: 100px;
+        height: 70px;
+        cursor: pointer;
+        border: 2px solid transparent;
+        border-radius: 8px;
+        overflow: hidden;
+        transition: all 0.2s;
+        flex-shrink: 0;
+
+        &:hover {
+          border-color: #ddd;
+          transform: scale(1.05);
+        }
+
+        &.active {
+          border-color: #222;
+          box-shadow: 0 0 0 1px #222;
+        }
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+    }
+
+    // Scrollbar styling
+    &::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f7f7f7;
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #ddd;
+      border-radius: 3px;
+
+      &:hover {
+        background: #bbb;
+      }
+    }
+  }
+
+  // ===========================
+  // KEYBOARD HINTS
+  // ===========================
+  .keyboard-hints {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, 200px);
+    display: flex;
+    gap: 2rem;
+    color: #717171;
+    font-size: 0.85rem;
+    z-index: 5;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    @media (max-width: 768px) {
+      display: none;
+    }
+
+    span {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
+}
+
+// ===========================
+// MOBILE OPTIMIZATIONS
+// ===========================
+@media (max-width: 768px) {
+  .photo-gallery-dialog {
+    width: 95vw;
+    height: 90vh;
+
+    .gallery-header {
+      padding: 0.75rem 1rem;
+
+      .header-left h2 {
+        font-size: 1rem;
+      }
+
+      .photo-counter {
+        font-size: 0.9rem;
+      }
+    }
+
+    .gallery-thumbnails {
+      padding: 0.75rem 1rem;
+
+      .thumbnails-wrapper .thumbnail {
+        width: 80px;
+        height: 60px;
+      }
+    }
+
+    .gallery-main .nav-btn {
+      width: 40px;
+      height: 40px;
+
+      mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+    }
+  }
+}

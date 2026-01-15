@@ -1,0 +1,162 @@
+<!-- src/app/features/property-detail/components/booking-card/booking-card.component.html -->
+
+<div class="booking-card">
+
+  <!-- ========================================
+       HEADER PRIX
+       ======================================== -->
+  <div class="price-header">
+    <div class="price">
+      <span class="amount">{{ pricePerNight | ethPrice:false:true }}</span>
+      <span class="period">/ night</span>
+    </div>
+
+    <!-- Conversion EUR sous le prix principal -->
+    <div class="price-conversion">
+      ≈ €{{ (pricePerNight * 3200).toFixed(0) }} EUR
+    </div>
+
+    <div *ngIf="hasWeekendPrice" class="weekend-price">
+      <span class="amount">{{ weekendPrice | ethPrice:false:true }}</span>
+      <span class="period">/ night weekend</span>
+      <div class="price-conversion-small">
+        ≈ €{{ (weekendPrice! * 3200).toFixed(0) }}
+      </div>
+    </div>
+
+    <mat-chip *ngIf="property.instantBooking" class="instant-booking-chip">
+      <mat-icon>bolt</mat-icon>
+      Instant Booking
+    </mat-chip>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <!-- ========================================
+       FORMULAIRE DE RÉSERVATION
+       ======================================== -->
+  <form [formGroup]="bookingForm" class="booking-form">
+
+    <!-- Dates -->
+    <div class="dates-row">
+      <!-- Check-in -->
+      <mat-form-field appearance="outline" class="date-field">
+        <mat-label>Check-in</mat-label>
+        <input
+          matInput
+          [matDatepicker]="checkInPicker"
+          formControlName="checkIn"
+          [min]="minDate"
+          [max]="maxDate"
+          [matDatepickerFilter]="dateFilter"
+          readonly>
+        <mat-datepicker-toggle matIconSuffix [for]="checkInPicker"></mat-datepicker-toggle>
+        <mat-datepicker #checkInPicker></mat-datepicker>
+      </mat-form-field>
+
+      <!-- Check-out -->
+      <mat-form-field appearance="outline" class="date-field">
+        <mat-label>Check-out</mat-label>
+        <input
+          matInput
+          [matDatepicker]="checkOutPicker"
+          formControlName="checkOut"
+          [min]="minDate"
+          [max]="maxDate"
+          [matDatepickerFilter]="checkOutFilter"
+          readonly>
+        <mat-datepicker-toggle matIconSuffix [for]="checkOutPicker"></mat-datepicker-toggle>
+        <mat-datepicker #checkOutPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <!-- Invités -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Nombre d'invités</mat-label>
+      <input
+        matInput
+        type="number"
+        formControlName="numGuests"
+        [min]="1"
+        [max]="property.maxGuests">
+      <mat-icon matIconPrefix>people</mat-icon>
+      <mat-hint>Maximum {{ property.maxGuests }} invités</mat-hint>
+    </mat-form-field>
+
+    <!-- Animaux (optionnel) -->
+    <div class="pets-checkbox" *ngIf="property.rules?.petsAllowed">
+      <mat-checkbox formControlName="hasPets">
+        J'amène un animal
+        <span *ngIf="property.petFee" class="pet-fee-text">
+          (+ {{ property.petFee }}€)
+        </span>
+      </mat-checkbox>
+    </div>
+
+    <!-- Min/Max stay info -->
+    <div class="stay-info" *ngIf="hasMinStay || hasMaxStay">
+      <mat-icon>info</mat-icon>
+      <div class="stay-info-text">
+        <span *ngIf="hasMinStay">Séjour minimum : {{ property.minStayNights }} nuits</span>
+        <span *ngIf="hasMinStay && hasMaxStay"> · </span>
+        <span *ngIf="hasMaxStay">Séjour maximum : {{ property.maxStayNights }} nuits</span>
+      </div>
+    </div>
+
+    <!-- Message d'erreur -->
+    <div *ngIf="error" class="error-message">
+      <mat-icon>error</mat-icon>
+      <span>{{ error }}</span>
+    </div>
+
+    <!-- Bouton réserver -->
+    <button
+      mat-raised-button
+      color="primary"
+      class="reserve-btn"
+      type="button"
+      [disabled]="!canReserve"
+      (click)="onReserve()">
+      <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+      <span *ngIf="!loading">Réserver</span>
+    </button>
+
+    <p class="no-charge-text">Vous ne serez pas débité pour le moment</p>
+
+  </form>
+
+  <!-- ========================================
+       DÉTAIL DES PRIX
+       ======================================== -->
+  <div *ngIf="totalNights > 0" class="price-breakdown">
+    <mat-divider></mat-divider>
+
+    <div class="breakdown-row">
+      <span>{{ pricePerNight }}ETH × {{ totalNights }} nuits</span>
+      <span>{{ baseAmount.toFixed(2) }}ETH</span>
+    </div>
+
+    <div class="breakdown-row" *ngIf="cleaningFee > 0">
+      <span>Frais de ménage</span>
+      <span>{{ cleaningFee.toFixed(2) }}ETH</span>
+    </div>
+
+    <div class="breakdown-row" *ngIf="petFee > 0">
+      <span>Frais animaux</span>
+      <span>{{ petFee.toFixed(2) }}ETH</span>
+    </div>
+
+    <div class="breakdown-row">
+      <span>Frais de service</span>
+      <span>{{ serviceFee.toFixed(2) }}ETH</span>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <div class="breakdown-row total-row">
+      <span><strong>Total</strong></span>
+      <span><strong>{{ totalAmount.toFixed(2) }}ETH</strong></span>
+    </div>
+  </div>
+
+</div>

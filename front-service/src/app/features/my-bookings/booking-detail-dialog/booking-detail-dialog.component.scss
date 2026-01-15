@@ -1,0 +1,546 @@
+/* src/app/features/my-bookings/booking-detail-dialog/booking-detail-dialog.component.scss */
+/* ✅ VERSION CORRIGÉE - Sans double scrollbar */
+
+.booking-detail-dialog {
+  width: 100%;
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh; // Limiter la hauteur totale
+  overflow: hidden; // Empêcher le scroll sur le container principal
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  gap: 16px;
+
+  p {
+    color: #666;
+  }
+}
+
+/* ========================================
+   HEADER - FIXED (pas de scroll)
+   ======================================== */
+.dialog-header {
+  flex-shrink: 0; // Ne pas réduire
+  margin: -24px -24px 0 -24px;
+
+  .photo-banner {
+    position: relative;
+    height: 200px;
+    background-size: cover;
+    background-position: center;
+    background-color: #031b30;
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+    }
+
+    .header-content {
+      position: absolute;
+      bottom: 20px;
+      left: 40px;
+      right: 24px;
+      color: white;
+
+      .status-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+      }
+
+      h2 {
+        font-size: 24px;
+        font-weight: 700;
+        margin: 0 0 8px 0;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      }
+
+      .location {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 14px;
+        margin: 0;
+        opacity: 0.9;
+
+        mat-icon {
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+        }
+      }
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      color: white;
+      background: rgba(0,0,0,0.3);
+
+      &:hover {
+        background: rgba(0,0,0,0.5);
+      }
+    }
+  }
+}
+
+/* ========================================
+   CONTENT - SCROLLABLE
+   ======================================== */
+::ng-deep {
+  mat-dialog-content {
+    flex: 1; // Prendre tout l'espace disponible
+    overflow-y: auto !important; // Une seule scrollbar ici
+    overflow-x: hidden !important;
+    padding: 0 24px !important;
+    margin: 0 !important;
+    max-height: none !important; // Enlever la limitation Material
+
+    // Custom scrollbar
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 3px;
+
+      &:hover {
+        background: #a1a1a1;
+      }
+    }
+  }
+}
+
+/* Booking Summary */
+.booking-summary {
+  padding: 24px 0;
+
+  .dates-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+
+    @media (max-width: 480px) {
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .date-block {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      .label {
+        font-size: 11px;
+        color: #999;
+        text-transform: uppercase;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+      }
+
+      .date {
+        font-size: 15px;
+        font-weight: 600;
+        color: #111;
+      }
+
+      .time {
+        font-size: 13px;
+        color: #666;
+      }
+    }
+
+    .arrow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: #999;
+
+      @media (max-width: 480px) {
+        transform: rotate(90deg);
+      }
+
+      mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+
+      .nights {
+        font-size: 12px;
+        font-weight: 600;
+        color: #e67e22;
+      }
+    }
+  }
+}
+
+/* ========================================
+   TABS - Optimisé pour scroll
+   ======================================== */
+.detail-tabs {
+  margin-top: 16px;
+
+  ::ng-deep {
+    .mat-mdc-tab-labels {
+      border-bottom: 1px solid #e8e8e8;
+    }
+
+    .mat-mdc-tab-body-wrapper {
+      // Laisser Material gérer la hauteur
+      flex: 1;
+    }
+
+    .mat-mdc-tab-body-content {
+      overflow: visible !important; // Pas de scroll dans les tabs
+    }
+  }
+}
+
+.tab-content {
+  padding: 24px 0;
+}
+
+/* Info Block */
+.info-block {
+  margin-bottom: 24px;
+
+  h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111;
+    margin: 0 0 12px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  p {
+    font-size: 14px;
+    color: #484848;
+    line-height: 1.6;
+    margin: 0;
+  }
+}
+
+/* Features Grid */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+
+  .feature {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #484848;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    transition: background 0.2s ease;
+
+    &:hover {
+      background: #e9ecef;
+    }
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      color: #e67e22;
+    }
+  }
+}
+
+/* Amenities */
+.amenities-list {
+  ::ng-deep {
+    mat-chip-set {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    mat-chip {
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        margin-right: 4px;
+      }
+    }
+  }
+}
+
+/* Rules */
+.rules-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  .rule-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    color: #484848;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+
+    mat-icon {
+      font-size: 22px;
+      width: 22px;
+      height: 22px;
+      color: #e74c3c;
+
+      &.allowed {
+        color: #27ae60;
+      }
+    }
+  }
+}
+
+.custom-rules {
+  margin-top: 24px;
+  padding: 16px;
+  background: #f7f7f7;
+  border-left: 4px solid #e67e22;
+  border-radius: 8px;
+
+  h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #111;
+    margin: 0 0 8px 0;
+  }
+
+  p {
+    font-size: 14px;
+    color: #484848;
+    margin: 0;
+    white-space: pre-line;
+    line-height: 1.6;
+  }
+}
+
+/* ========================================
+   PRICE BREAKDOWN - Amélioré
+   ======================================== */
+.price-breakdown {
+  background: #f8f9fa;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+
+  .price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 12px 0;
+    font-size: 14px;
+    color: #484848;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    &.total {
+      font-size: 18px;
+      font-weight: 700;
+      color: #111;
+      padding-top: 16px;
+      border-top: 2px solid #e67e22 !important;
+      border-bottom: none !important;
+      margin-top: 8px;
+
+      .price-column {
+        .price-value {
+          color: #e67e22;
+          font-size: 20px;
+        }
+      }
+    }
+
+    span:first-child {
+      font-weight: 500;
+    }
+
+    .price-column {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+
+      .price-value {
+        font-weight: 600;
+        color: #111;
+      }
+
+      .price-conversion {
+        font-size: 12px;
+        color: #999;
+      }
+    }
+  }
+
+  mat-divider {
+    margin: 8px 0;
+  }
+}
+
+/* ========================================
+   PHOTOS GRID
+   ======================================== */
+.photos-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+
+  @media (max-width: 480px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .photo-item {
+    aspect-ratio: 1;
+    background-size: cover;
+    background-position: center;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+  }
+}
+
+/* ========================================
+   ACTIONS - FIXED (pas de scroll)
+   ======================================== */
+::ng-deep {
+  mat-dialog-actions {
+    flex-shrink: 0; // Ne pas réduire
+    padding: 16px 24px !important;
+    border-top: 1px solid #e8e8e8;
+    background: white;
+    margin: 0 !important;
+
+    button {
+      mat-icon {
+        margin-right: 6px;
+      }
+    }
+  }
+}
+
+/* ========================================
+   CHAT SECTION - En dehors des actions
+   ======================================== */
+.chat-section {
+  padding: 16px 24px;
+  border-top: 1px solid #e8e8e8;
+  background: #f8f9fa;
+  display: flex;
+  justify-content: center;
+
+  .chat-button {
+    min-width: 200px;
+    padding: 12px 24px;
+    font-weight: 600;
+
+    mat-icon {
+      margin-right: 8px;
+    }
+  }
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 768px) {
+  .booking-detail-dialog {
+    max-height: 90vh;
+  }
+
+  .dialog-header {
+    .photo-banner {
+      height: 150px;
+
+      .header-content {
+        left: 20px;
+        bottom: 16px;
+
+        h2 {
+          font-size: 20px;
+        }
+      }
+    }
+  }
+
+  .booking-summary {
+    .dates-row {
+      flex-direction: column;
+    }
+  }
+
+  ::ng-deep {
+    mat-dialog-content {
+      padding: 0 16px !important;
+    }
+
+    mat-dialog-actions {
+      flex-direction: column;
+      gap: 8px;
+
+      button {
+        width: 100%;
+      }
+    }
+  }
+}
+
+/* ========================================
+   FIX MATERIAL DIALOG GLOBAL
+   ======================================== */
+::ng-deep {
+  .booking-detail-dialog-panel {
+    .mat-mdc-dialog-container {
+      padding: 0 !important;
+      overflow: hidden !important; // Crucial pour éviter double scroll
+
+      .mat-mdc-dialog-surface {
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
+      }
+    }
+  }
+}

@@ -1,0 +1,63 @@
+<!-- src/app/features/property-detail/photo-gallery-dialog/photo-gallery-dialog.component.html -->
+
+<div class="photo-gallery-dialog">
+
+  <!-- HEADER -->
+  <div class="gallery-header">
+    <div class="header-left">
+      <button mat-icon-button (click)="close()" class="close-btn">
+        <mat-icon>close</mat-icon>
+      </button>
+      <h2>{{ propertyTitle }}</h2>
+    </div>
+    <div class="header-right">
+      <span class="photo-counter">{{ photoCounter }}</span>
+    </div>
+  </div>
+
+  <!-- MAIN IMAGE -->
+  <div class="gallery-main">
+    <img
+      [src]="currentPhoto"
+      [alt]="'Photo ' + (currentIndex + 1)"
+      class="main-image">
+
+    <!-- Navigation Buttons -->
+    <button
+      mat-fab
+      class="nav-btn prev-btn"
+      (click)="previous()"
+      [disabled]="!hasPrevious && photos.length <= 1">
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+
+    <button
+      mat-fab
+      class="nav-btn next-btn"
+      (click)="next()"
+      [disabled]="!hasNext && photos.length <= 1">
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+  </div>
+
+  <!-- THUMBNAILS -->
+  <div class="gallery-thumbnails" *ngIf="photos.length > 1">
+    <div class="thumbnails-wrapper">
+      <div
+        *ngFor="let photo of photos; let i = index"
+        class="thumbnail"
+        [class.active]="i === currentIndex"
+        (click)="goToPhoto(i)">
+        <img [src]="photo" [alt]="'Thumbnail ' + (i + 1)">
+      </div>
+    </div>
+  </div>
+
+  <!-- KEYBOARD HINTS -->
+  <div class="keyboard-hints">
+    <span><mat-icon>keyboard_arrow_left</mat-icon> Previous</span>
+    <span><mat-icon>keyboard_arrow_right</mat-icon> Next</span>
+    <span><mat-icon>close</mat-icon> ESC to close</span>
+  </div>
+
+</div>

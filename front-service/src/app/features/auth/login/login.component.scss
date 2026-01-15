@@ -1,0 +1,447 @@
+// src/app/features/auth/login/login.component.scss
+
+// ============================
+// CONTAINER PRINCIPAL - SPLIT SCREEN
+// ============================
+.login-container {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  position: relative;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ============================
+// LEFT SIDE: IMAGE HERO
+// ============================
+.login-hero {
+  position: relative;
+  background-image: url('/assets/images/login-hero2.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+
+  @media (max-width: 1024px) {
+    display: none;
+  }
+
+  // Overlay sombre pour lisibilité
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        135deg,
+        rgba(0, 0, 0, 0.7) 0%,
+        rgba(0, 0, 0, 0.5) 100%
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    color: white;
+    max-width: 500px;
+    text-align: center;
+
+  }
+
+  .hero-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin: 0 0 1rem 0;
+    line-height: 1.2;
+    letter-spacing: -1px;
+
+    @media (max-width: 1280px) {
+      font-size: 2.5rem;
+    }
+  }
+
+  .hero-subtitle {
+    font-size: 1.125rem;
+    line-height: 1.6;
+    margin: 0 0 3rem 0;
+    opacity: 0.95;
+    font-weight: 300;
+  }
+
+  .hero-features {
+
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: center;        // centre les lignes dans le div par
+
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-size: 1rem;
+      font-weight: 500;
+
+      align-items: center;        // centre icône + texte
+
+      mat-icon {
+        font-size: 28px;
+        width: 28px;
+        height: 28px;
+        color: #e67e22;
+      }
+    }
+  }
+}
+
+// ============================
+// RIGHT SIDE: LOGIN FORM
+// ============================
+.login-form-side {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: white;
+
+  @media (max-width: 600px) {
+    padding: 1.5rem;
+  }
+}
+
+.login-card-wrapper {
+  width: 100%;
+  max-width: 460px;
+  animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ============================
+// HEADER
+// ============================
+.login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.logo-icon {
+  font-size: 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  color: #10345B;
+}
+
+.app-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #222;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.login-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #222;
+  margin: 0 0 0.5rem 0;
+}
+
+.login-description {
+  font-size: 0.95rem;
+  color: #717171;
+  margin: 0;
+  line-height: 1.5;
+}
+
+// ============================
+// CONTENU
+// ============================
+.login-content {
+  margin-top: 2rem;
+}
+
+// ============================
+// WARNING BOX
+// ============================
+.warning-box {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #fff8e1;
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+
+  .warning-icon {
+    color: #f57c00;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .warning-content {
+    flex: 1;
+
+    h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #222;
+      margin: 0 0 0.5rem;
+    }
+
+    p {
+      font-size: 0.85rem;
+      color: #717171;
+      margin: 0 0 0.75rem;
+      line-height: 1.5;
+    }
+  }
+
+  .install-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #222;
+    text-decoration: underline;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: color 0.2s;
+
+    &:hover {
+      color: #000;
+    }
+
+    mat-icon {
+      font-size: 1.125rem;
+      width: 1.125rem;
+      height: 1.125rem;
+    }
+  }
+}
+
+// ============================
+// BOUTON METAMASK
+// ============================
+.metamask-button {
+  width: 100%;
+  height: 52px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px !important;
+  text-transform: none;
+  margin-bottom: 1.5rem;
+  transition: all 0.2s ease;
+  background: linear-gradient(to right, #10345B, #10345B) !important;
+
+  &:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(255, 56, 92, 0.3) !important;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .button-spinner {
+    margin-right: 0.5rem;
+  }
+
+  .button-icon {
+    margin-right: 0.5rem;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+  }
+}
+
+// ============================
+// DIVIDER
+// ============================
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 1.5rem 0;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #ebebeb;
+  }
+
+  .divider-text {
+    padding: 0 1rem;
+    font-size: 0.875rem;
+    color: #717171;
+    font-weight: 400;
+  }
+}
+
+// ============================
+// BOUTON INSCRIPTION
+// ============================
+.register-button {
+  width: 100%;
+  height: 48px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 8px !important;
+  text-transform: none;
+  transition: all 0.2s ease;
+  border: 1px solid #222 !important;
+  color: #222 !important;
+
+  &:not(:disabled):hover {
+    background: #222 !important;
+    color: white !important;
+    transform: translateY(-2px);
+  }
+
+  .button-icon {
+    margin-right: 0.5rem;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+// ============================
+// INFO BOX
+// ============================
+.info-box {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #f7f7f7;
+  border-radius: 8px;
+  margin-top: 1.5rem;
+  border: 1px solid #ebebeb;
+
+  .info-icon {
+    color: #717171;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .info-text {
+    font-size: 0.85rem;
+    color: #717171;
+    margin: 0;
+    line-height: 1.6;
+
+    strong {
+      color: #222;
+      font-weight: 600;
+    }
+  }
+}
+
+// ============================
+// FOOTER
+// ============================
+.login-footer {
+  text-align: center;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #ebebeb;
+
+  .footer-text {
+    font-size: 0.8rem;
+    color: #717171;
+    margin: 0;
+
+    .footer-link {
+      color: #222;
+      text-decoration: underline;
+      transition: color 0.2s;
+      font-weight: 500;
+
+      &:hover {
+        color: #000;
+      }
+    }
+  }
+}
+
+// ============================
+// SNACKBAR STYLES
+// ============================
+::ng-deep {
+  .error-snackbar {
+    background-color: #d93025 !important;
+    color: white !important;
+
+    .mat-mdc-button {
+      color: white !important;
+    }
+  }
+
+  .info-snackbar {
+    background-color: #222 !important;
+    color: white !important;
+
+    .mat-mdc-button {
+      color: white !important;
+    }
+  }
+}
+
+// ============================
+// RESPONSIVE
+// ============================
+@media (max-width: 1024px) {
+  .login-form-side {
+    min-height: 100vh;
+  }
+}
+
+@media (max-width: 600px) {
+  .login-form-side {
+    padding: 1.5rem;
+  }
+
+  .app-title {
+    font-size: 1.5rem;
+  }
+
+  .login-title {
+    font-size: 1.25rem;
+  }
+
+  .metamask-button,
+  .register-button {
+    height: 48px;
+    font-size: 0.95rem;
+  }
+}
