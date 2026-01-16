@@ -2402,12 +2402,9 @@ class PricePredictionRequest(BaseModel):
 
 ### Architecture Technique (Résumé visuel)
 
-<img width="800" alt="Architecture AWS Real Estate DApp" 
-  src="https://github.com/user-attachments/assets/8254612e-9eb6-4021-8763-1708b8d7a199"  
-  style="max-width: 100%; border-radius: 8px;" />
-
+  <img width="800" height="1171" alt="Architecture AWS Real Estate DApp" src="https://github.com/user-attachments/assets/4f1f9ced-efbb-481c-accf-935ad1556d33"
+    style="max-width: 100%; border-radius: 8px;" />
     
-
 *Schéma global de l'architecture (VPC, ALB, EKS, RDS, S3+CloudFront, Jenkins)*
 
 ## ✨ Caractéristiques principales
