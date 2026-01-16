@@ -169,7 +169,8 @@ management:
       exposure:
         include: health,info,gateway,routes,metrics,env,prometheus
       cors:
-        allowed-origins: "${FRONTEND_URL:http://localhost:4200}"
+#        allowed-origins: "${FRONTEND_URL:http://localhost:4200}"
+        allowed-origins: "*"
         allowed-methods: GET,POST
   endpoint:
     gateway:

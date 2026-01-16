@@ -3,29 +3,27 @@ kind: ConfigMap
 metadata:
   name: global-config
 data:
-  MYSQL_HOST: mysql-db
+  MYSQL_HOST: real-estate-dapp-db-dev.cnwseskwiq1u.eu-west-3.rds.amazonaws.com
   MYSQL_PORT: "3306"
   MYSQL_DB: rental_db
-  MYSQL_URL: jdbc:mysql://mysql-db:3306/rental_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-  MYSQL_USER: rental_user
+  MYSQL_URL: jdbc:mysql://real-estate-dapp-db-dev.cnwseskwiq1u.eu-west-3.rds.amazonaws.com:3306/rental_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+  MYSQL_USER: admin
+
   REDIS_HOST: redis
   REDIS_PORT: "6379"
+
   RABBITMQ_HOST: rabbitmq
   RABBITMQ_PORT: "5672"
+
   EUREKA_HOST: eureka-server
   EUREKA_PORT: "8761"
   EUREKA_URL: http://admin:admin123@eureka-server:8761/eureka/
-  ETH_NETWORK: sepolia
-  ETH_RPC_URL: https://sepolia.infura.io/v3/50e3d616c7ae4bb4bb5d48d97ab6d5a8
-  ETH_CHAIN_ID: "11155111"
-  ETH_CONTRACT_ADDRESS: 0x23470CA6C42Fe32E3E48b85999123cC28a57Ca94
+
   AWS_REGION: eu-west-3
   S3_PROPERTIES_BUCKET: real-estate-dapp-properties-images-dev
   S3_USERS_BUCKET: real-estate-dapp-users-photos-dev
-  CLOUDFRONT_URL: https://dynu4ij1ldniw.cloudfront.net
-  MAIL_HOST: smtp.gmail.com
-  MAIL_PORT: "587"
-  MAIL_USERNAME: fatimaezzahraallai4@gmail.com
+  CLOUDFRONT_URL: https://d32xfdels11cfk.cloudfront.net
+
   USER_SERVICE_PORT: "8081"
   LISTING_SERVICE_PORT: "8082"
   BOOKING_SERVICE_PORT: "8083"
@@ -37,8 +35,6 @@ data:
   BLOCKCHAIN_SERVICE_PORT: "8089"
   AI_SERVICE_PORT: "8090"
   API_GATEWAY_PORT: "8080"
-  CONFIG_SERVER_PORT: "8888"
-  APP_MODE: local
-  JWT_SECRET: password321
-  JWT_EXPIRATION: "86400000"
-  CORS_ALLOWED_ORIGINS: http://localhost:4200
+
+  APP_MODE: cloud
+  CORS_ALLOWED_ORIGINS: http://real-estate-dapp-alb-dev-2096892691.eu-west-3.elb.amazonaws.com
