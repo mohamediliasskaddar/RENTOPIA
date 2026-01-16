@@ -1,27 +1,28 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: api-gateway-ingress
-  namespace: dev
-  annotations:
-    kubernetes.io/ingress.class: alb
-
-    # ALB settings
-    alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/target-type: ip
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
-
-    # Health check
-    alb.ingress.kubernetes.io/healthcheck-path: /actuator/health
-
-spec:
-  rules:
-    - http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: api-gateway
-                port:
-                  number: 8080
+##k8s/ingress/api-gateway-ingress-aws.yaml
+#apiVersion: networking.k8s.io/v1
+#kind: Ingress
+#metadata:
+#  name: api-gateway-ingress
+#  namespace: dev
+#  annotations:
+#    kubernetes.io/ingress.class: alb
+#
+#    # ALB settings
+#    alb.ingress.kubernetes.io/scheme: internet-facing
+#    alb.ingress.kubernetes.io/target-type: ip
+#    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80}]'
+#
+#    # Health check
+#    alb.ingress.kubernetes.io/healthcheck-path: /actuator/health
+#
+#spec:
+#  rules:
+#    - http:
+#        paths:
+#          - path: /
+#            pathType: Prefix
+#            backend:
+#              service:
+#                name: api-gateway
+#                port:
+#                  number: 8080

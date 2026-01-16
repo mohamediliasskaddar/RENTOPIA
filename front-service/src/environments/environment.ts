@@ -63,16 +63,10 @@ export const environment = {
     rpcUrl: 'https://sepolia.infura.io/v3/50e3d616c7ae4bb4bb5d48d97ab6d5a8'
   },
 
-  // socketUrl: 'http://messaging-service:8085',
   socketUrl: '/api/messages',
-
   maxFileSize: 5 * 1024 * 1024,
   allowedImageTypes: ['image/jpeg', 'image/png', 'image/webp'],
-
   tokenKey: 'authToken',
   userKey: 'current_user',
-
-  // wsUrl: 'ws://api-gateway:8080/api/ws/messages',
   wsUrl: '/api/ws/messages'
-
 };

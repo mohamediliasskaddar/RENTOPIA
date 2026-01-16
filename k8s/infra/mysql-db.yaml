@@ -1,74 +1,74 @@
-# =========================
-# MySQL - Headless Service
-# =========================
-apiVersion: v1
-kind: Service
-metadata:
-  name: mysql-db
-  labels:
-    app: mysql-db
-spec:
-  clusterIP: None
-  selector:
-    app: mysql-db
-  ports:
-    - port: 3306
-      targetPort: 3306
-
----
-# =========================
-# MySQL - StatefulSet
-# =========================
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: mysql-db
-spec:
-  serviceName: mysql-db
-  replicas: 1
-  selector:
-    matchLabels:
-      app: mysql-db
-  template:
-    metadata:
-      labels:
-        app: mysql-db
-    spec:
-      containers:
-        - name: mysql
-          image: mohamediliasskaddar/jee-project-mysql-db:latest
-          imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 3306
-
-          envFrom:
-            - configMapRef:
-                name: global-config
-            - secretRef:
-                name: global-secrets
-
-          volumeMounts:
-            - name: mysql-data
-              mountPath: /var/lib/mysql
-
-          readinessProbe:
-            tcpSocket:
-              port: 3306
-            initialDelaySeconds: 30
-            periodSeconds: 10
-
-          livenessProbe:
-            tcpSocket:
-              port: 3306
-            initialDelaySeconds: 60
-            periodSeconds: 20
-
-  volumeClaimTemplates:
-    - metadata:
-        name: mysql-data
-      spec:
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            storage: 10Gi
+## =========================
+## MySQL - Headless Service
+## =========================
+#apiVersion: v1
+#kind: Service
+#metadata:
+#  name: mysql-db
+#  labels:
+#    app: mysql-db
+#spec:
+#  clusterIP: None
+#  selector:
+#    app: mysql-db
+#  ports:
+#    - port: 3306
+#      targetPort: 3306
+#
+#---
+## =========================
+## MySQL - StatefulSet
+## =========================
+#apiVersion: apps/v1
+#kind: StatefulSet
+#metadata:
+#  name: mysql-db
+#spec:
+#  serviceName: mysql-db
+#  replicas: 1
+#  selector:
+#    matchLabels:
+#      app: mysql-db
+#  template:
+#    metadata:
+#      labels:
+#        app: mysql-db
+#    spec:
+#      containers:
+#        - name: mysql
+#          image: mohamediliasskaddar/jee-project-mysql-db:latest
+#          imagePullPolicy: IfNotPresent
+#          ports:
+#            - containerPort: 3306
+#
+#          envFrom:
+#            - configMapRef:
+#                name: global-config
+#            - secretRef:
+#                name: global-secrets
+#
+#          volumeMounts:
+#            - name: mysql-data
+#              mountPath: /var/lib/mysql
+#
+#          readinessProbe:
+#            tcpSocket:
+#              port: 3306
+#            initialDelaySeconds: 30
+#            periodSeconds: 10
+#
+#          livenessProbe:
+#            tcpSocket:
+#              port: 3306
+#            initialDelaySeconds: 60
+#            periodSeconds: 20
+#
+#  volumeClaimTemplates:
+#    - metadata:
+#        name: mysql-data
+#      spec:
+#        accessModes:
+#          - ReadWriteOnce
+#        resources:
+#          requests:
+#            storage: 10Gi
