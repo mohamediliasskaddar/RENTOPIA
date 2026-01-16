@@ -4,6 +4,10 @@ metadata:
   name: media-service
   labels:
     app: media-service
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8088"
+    prometheus.io/path: "/actuator/prometheus"
 spec:
   replicas: 1
   selector:

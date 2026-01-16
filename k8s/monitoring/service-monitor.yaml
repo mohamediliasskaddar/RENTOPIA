@@ -1,0 +1,17 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: all-spring-boot-services
+  namespace: monitoring                  # ← le namespace où est installé kube-prometheus-stack
+  labels:
+    release: monitoring                  # ← CRUCIAL : doit matcher exactement le nom de ton helm release (généralement "monitoring")
+spec:
+  selector: {}                           # ← VIDE = sélectionne TOUS les Services du namespace ciblé (pas de filtre par label)
+  namespaceSelector:
+    matchNames:
+      - dev                            # ← CHANGE ICI par ton namespace réel (dev, default, etc.)
+  endpoints:
+    - port: http                         # ← Nom du port dans tes Services (vérifie avec kubectl get svc -n dev)
+      path: /actuator/prometheus
+      interval: 15s
+      scheme: http

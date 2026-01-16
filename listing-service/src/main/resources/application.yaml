@@ -34,7 +34,7 @@ spring:
 # AI Service
 ai:
   service:
-    url: http://localhost:${AI_SERVICE_PORT:8090}
+    url: http://ai-service:8090
 
 # Actuator / Monitoring
 management:

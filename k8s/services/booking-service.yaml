@@ -4,6 +4,10 @@ metadata:
   name: booking-service
   labels:
     app: booking-service
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8083"
+    prometheus.io/path: "/actuator/prometheus"
 spec:
   replicas: 1
   selector:
