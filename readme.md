@@ -2343,81 +2343,199 @@ class PricePredictionRequest(BaseModel):
 
 ## ☁️ Cloud & DevOps
 
-### Responsabilités principales sur le projet Real Estate DApp :
+### Responsabilités principales sur le projet Real Estate DApp : 
 
 - Conception et provisionnement complet de l'infrastructure AWS via **Terraform** (28 fichiers modulaires organisés par service)
 - Architecture réseau sécurisée **Multi-AZ** : VPC, sous-réseaux publics/privés, tables de routage, Internet Gateway, NAT Gateway unique
 - Sécurité avancée :
-    - Rôles et politiques IAM à privilège minimal
-    - 8+ Security Groups avec règles très granulaires
-    - VPC Endpoints (S3, ECR, EKS, EC2) pour accès privé sans traversée Internet
+  - Rôles et politiques IAM à privilège minimal
+  - 8+ Security Groups avec règles très granulaires
+  - VPC Endpoints (S3, ECR, EKS, EC2) pour accès privé sans traversée Internet
 - Optimisation forte des coûts :
-    - RDS t4g.micro single-AZ
-    - Node group EKS t3.small avec autoscaling 1–2 nœuds
-    - NAT Gateway unique pour 2 AZ
-    - Backup RDS réduit à 1 jour
-    - VPC Endpoints pour minimiser les coûts de transfert de données
+  - RDS t4g.micro single-AZ
+  - Node group EKS  avec autoscaling 2–3 nœuds
+  - NAT Gateway unique pour 2 AZ
+  - Backup RDS réduit à 1 jour
+  - VPC Endpoints pour minimiser les coûts de transfert de données
 - Gestion du stockage média :
-    - 2 buckets S3 privés (propriétés + photos utilisateurs)
-    - Versioning, chiffrement AES256, lifecycle policy (90 jours pour propriétés)
-    - Accès exclusif via **CloudFront Origin Access Identity (OAI)**
+  - 2 buckets S3 privés (propriétés + photos utilisateurs)
+  - Versioning, chiffrement AES256, lifecycle policy (90 jours pour propriétés)
+  - Accès exclusif via **CloudFront Origin Access Identity (OAI)**
 - Configuration **Amazon EKS** (Kubernetes 1.32) :
-    - Cluster managé + node group minimal
-    - Intégration OIDC + logging complet vers CloudWatch
+  - Cluster managé + node group minimal
+  - Intégration OIDC + logging complet vers CloudWatch
 - Mise en place du **CDN** CloudFront :
-    - Deux origines S3
-    - Cache intelligent, compression automatique, HTTPS forcé
+  - Deux origines S3
+  - Cache intelligent, compression automatique, HTTPS forcé
 - Monitoring & observabilité :
-    - Dashboard CloudWatch personnalisé (EKS, RDS, ALB)
-    - Alertes actives : erreurs 5XX ALB + CPU élevé RDS
-    - Logs structurés (ALB 7j, applications 3j)
+  - Dashboard CloudWatch personnalisé (EKS, RDS, ALB)
+  - Alertes actives : erreurs 5XX ALB + CPU élevé RDS
+  - Logs structurés (ALB 7j, applications 3j)
 - Pipeline CI/CD :
-    - Instance Jenkins EC2 t3.micro
-    - Accès sécurisé uniquement via **AWS Session Manager (SSM)**
-    - Rôle IAM dédié (ECR push/pull, EKS describe, S3 artifacts)
+  - Accès sécurisé uniquement via **AWS Session Manager (SSM)**
+  - Rôle IAM dédié (ECR push/pull, EKS describe, S3 artifacts)
 
 ### Livrables techniques principaux
 
 - **Infrastructure complète 100% Terraform**  
   VPC 10.0.0.0/16 · ALB public · EKS · RDS MySQL · S3 + CloudFront · Jenkins · Monitoring
 
-- **Sécurité renforcée**
-    - 5 rôles IAM spécifiques
-    - Security Groups ultra-restrictifs
-    - Buckets S3 100% privés (Block Public Access + OAI)
-    - RDS & EKS dans subnets privés uniquement
-    - # Jenkins :
-        - Accès principal sécurisé (recommandé) : via SSM Session Manager
-        - Accès direct temporaire (dev/test) : http://<jenkins-public-ip>:8099
-        - Ancien port (non utilisé actuellement) : http://<jenkins-public-ip>:8080
+- **Sécurité renforcée**  
+  - 5 rôles IAM spécifiques  
+  - Security Groups ultra-restrictifs  
+  - Buckets S3 100% privés (Block Public Access + OAI)  
+  - RDS & EKS dans subnets privés uniquement  
 
-- **Optimisation des coûts**
-    - NAT Gateway unique → économie significative (~64$/mois vs 2 NAT)
-    - RDS single-AZ + petite instance + backup minimal
-    - VPC Endpoints pour S3/ECR/EKS → réduction coûts de transfert
-    - EKS node group très léger (1–2 t3.small)
+- **Optimisation des coûts**  
+  - NAT Gateway unique → économie significative (~64$/mois vs 2 NAT)  
+  - RDS single-AZ + petite instance + backup minimal  
+  - VPC Endpoints pour S3/ECR/EKS → réduction coûts de transfert  
+  - EKS node group très léger (1–2 t3.small)
 
-- **Stockage & distribution médias**
-    - Lifecycle 90 jours sur bucket propriétés
-    - Versioning sur bucket utilisateurs
-    - CloudFront : cache 1h par défaut, compression, IPv6, HTTPS forcé
+- **Stockage & distribution médias**  
+  - Lifecycle 90 jours sur bucket propriétés  
+  - Versioning sur bucket utilisateurs  
+  - CloudFront : cache 1h par défaut, compression, IPv6, HTTPS forcé
 
-- **Observabilité**
-    - Dashboard CloudWatch multi-services
-    - Alertes proactives (5XX, CPU RDS)
-    - Intégration logs EKS pods via politique IAM dédiée
+- **Observabilité**  
+  - Dashboard CloudWatch multi-services  
+  - Alertes proactives (5XX, CPU RDS)  
+  - Intégration logs EKS pods via politique IAM dédiée
+ 
+  ## 🔧 Services AWS Déployés
 
-- **Documentation & reproductibilité**
-    - Variables centralisées
-    - ~35 outputs Terraform (URLs, commandes DevOps, guides)
-    - Structure modulaire claire (alb.tf, eks.tf, s3.tf, security_groups.tf…)
-    - Guides intégrés : connexion ECR, kubeconfig, SSM, installation Jenkins
+### 🌐 Réseau & Connectivité
+| Composant | Configuration | Détails |
+|-----------|---------------|---------|
+| **VPC** | `10.0.0.0/16` | DNS support & hostnames activés |
+| **Sous-réseaux Publics** | 2 x `/24` (Multi-AZ) | Pour ALB, map public IP activé |
+| **Sous-réseaux Privés** | 2 x `/24` (Multi-AZ) | Pour EKS & RDS |
+| **Internet Gateway** | 1 | Accès Internet pour subnets publics |
+| **NAT Gateway** | 1 (unique) | Économie de coûts pour 2 AZ |
+| **VPC Endpoints** | S3, ECR, EKS, EC2 | Accès privé sans NAT Gateway |
+
+### 🔒 Sécurité
+| Security Group | Ports | Accès | Description |
+|----------------|-------|--------|-------------|
+| **alb-sg** | 80, 443 | 0.0.0.0/0 | Load Balancer public |
+| **frontend-sg** | 80 | alb-sg seulement | Application Angular |
+| **backend-sg** | 8080-8090 | alb-sg + self | Microservices Spring Boot |
+| **db-sg** | 3306 | VPC CIDR (10.0.0.0/16) | Base de données MySQL |
+| **k8s-sg** | Variés | Communication interne | Cluster Kubernetes |
+| **jenkins-sg** | 8080, 8099 | VPC + GitHub IPs | Serveur CI/CD |
+| **monitoring-sg** | 3000, 9093 | VPC seulement | Prometheus & Grafana |
+| **vpc-endpoints-sg** | 443 | VPC seulement | Endpoints privés AWS |
+
+### 🐳 Kubernetes (Amazon EKS)
+```
+Cluster:
+  Version: "1.32"
+  Name: "real-estate-dapp-eks-dev"
+  Logging: [api, audit, authenticator, controllerManager, scheduler]
+  
+Node Group:
+  Instance Type: "m7i-flex.large"
+  Scaling: min=1, desired=2, max=3
+  Subnets: Privés (2 AZ)
+  IAM Role: AmazonEKSWorkerNodePolicy + CNI + ECR ReadOnly
+  
+Addons:
+  - OIDC Provider (IAM Roles for Service Accounts)
+  - ALB Controller (AmazonEC2FullAccess)
+  - CloudWatch Logs Integration
+```
+### Base de Données (RDS MySQL)
+- ENGINE: mysql
+- VERSION: 8.0.43
+- INSTANCE: db.t4g.micro
+- STORAGE: 10GB gp2 (pas d'auto-scaling)
+- BACKUP: 1 jour retention
+- AVAILABILITY: Single-AZ (développement)
+- ENCRYPTION: Disabled (économie coûts)
+- PARAMETERS: utf8mb4, Europe/Paris timezone
+- ACCESS: Privé seulement (subnets privés)
+
+### Bucket S3	Usage	Features
+real-estate-dapp-properties-images-dev	Photos de propriétés	Versioning, Lifecycle 90j, Chiffrement AES256
+real-estate-dapp-users-photos-dev	Photos de profil	Chiffrement AES256
+
+### CloudFront CDN:
+Distribution unique avec 2 origines S3
+Origin Access Identity (OAI) seulement
+Cache: 1h défaut, 24h max
+Compression automatique
+HTTPS avec certificat CloudFront gratuit
+
+### 🐋 Container Registry (ECR)
+13 repositories ECR (lifecycle: 10 images max):
+```
+📦 Services Métier (10):
+  - user-service          - listing-service       - booking-service
+  - payment-service       - messaging-service     - notification-service
+  - review-service        - media-service         - blockchain-service
+  - ai-service
+
+🏗️ Infrastructure (2):
+  - api-gateway
+  - eureka-server
+
+🎨 Frontend (1):
+  - frontend
+```
+
+### ⚖️ Load Balancing (ALB)
+Configuration	Détails
+Type	Application Load Balancer (public)
+Listener	HTTP port 80 seulement
+Routing Rules	/ → Frontend (port 80)
+/api/* → API Gateway (port 8080)
+Health Checks	Frontend: / (200)
+Backend: /actuator/health (200)
+Target Type	ip (compatible EKS)
+
+### 📊 Monitoring & Observabilité
+CloudWatch Dashboard (real-estate-dapp-dev-dashboard):
+Widget 1: CPU/Mémoire nodes EKS (ContainerInsights)
+Widget 2: Métriques RDS (CPU, connections, storage)
+Widget 3: Métriques ALB (2xx/4xx/5xx, latence)
+- Logs:
+ALB Access Logs: 7 jours retention
+Microservices Logs: 3 jours retention
+EKS Control Plane Logs: Activés
+
+## 👥 IAM & Gestion des Accès
+
+### 🔑 **Rôles Principaux**
+- **eks-cluster-role** - Gestion du cluster EKS (AmazonEKSClusterPolicy)
+- **eks-node-role** - Worker nodes EKS (AmazonEKSWorkerNodePolicy + CNI + ECR ReadOnly)
+- **alb-controller-role** - AWS Load Balancer Controller dans EKS (AmazonEC2FullAccess)
+- **jenkins-role** - Instance Jenkins CI/CD (ECR push/pull, EKS describe, S3 artifacts)
+- **backend-s3-role** - Microservices backend (S3 read/write sur buckets media)
+- **backend-rds-role** - Connexion à la base de données (rds-db:connect simplifié)
+- **media-service-role** - Service média spécifique (S3 read/write via IRSA)
+- **devops-user** - DevOps Engineer (EKS/EKSWorker/ECRPower/S3ReadOnly)
+
+### 👤 **Utilisateur DevOps** - `devops-jenkins-dev`
+**Permissions** :
+- **EKS** : DescribeCluster, ListClusters
+- **ECR** : PowerUser (push/pull)
+- **S3** : ReadOnlyAccess
+- **IAM** : AssumeRole pour les rôles EKS
+- **AWS CLI + kubectl** : Accès complet aux clusters Kubernetes
+
+**Usage** : Configuration et maintenance du pipeline CI/CD, déploiement des applications sur EKS
+
+ **Documentation & reproductibilité**  
+  - Variables centralisées  
+  - ~35 outputs Terraform (URLs, commandes DevOps, guides)  
+  - Structure modulaire claire (alb.tf, eks.tf, s3.tf, security_groups.tf…)  
+  - Guides intégrés : connexion ECR, kubeconfig, SSM, installation Jenkins
 
 ### Architecture Technique (Résumé visuel)
 
-<img width="800" height="1171" alt="Architecture AWS Real Estate DApp" src="https://github.com/user-attachments/assets/4f1f9ced-efbb-481c-accf-935ad1556d33"
-style="max-width: 100%; border-radius: 8px;" />
-
+  <img width="800" height="1171" alt="Architecture AWS Real Estate DApp" src="https://github.com/user-attachments/assets/4f1f9ced-efbb-481c-accf-935ad1556d33"
+    style="max-width: 100%; border-radius: 8px;" />
+    
 *Schéma global de l'architecture (VPC, ALB, EKS, RDS, S3+CloudFront, Jenkins)*
 
 ## ✨ Caractéristiques principales
@@ -2460,9 +2578,9 @@ Fichiers principaux :
 ├── parameter_group.tf          # Paramètres MySQL (utf8mb4 + timezone Paris)
 │
 ├── iam_.tf                    # Rôles IAM : jenkins, backend-s3, backend-rds, devops-ssm...
-├── jenkins_ec2.tf              # Instance Jenkins t3.micro + SSM + user_data
+├── media-service-iam.tf       # Rôle IAM pour le media-service
 │
-├── cloudwatch_.tf             # Logs, Dashboard, 2 alarmes (ALB 5XX + RDS CPU)
+├── cloudwatch_.tf             # Logs, Dashboard, 2 alarmes(ALB 5XX + RDS CPU)
 ```
 
 ## 🔐 Points de sécurité importants
@@ -2475,43 +2593,14 @@ Fichiers principaux :
 
 ## 📊 Monitoring mis en place
 
-- **Dashboard CloudWatch** :
-    - CPU/Mémoire nœuds EKS
-    - CPU/Connexions/Stockage RDS
-    - Codes HTTP 2xx/4xx/5xx + latence ALB
+- **Dashboard CloudWatch** :  
+  - CPU/Mémoire nœuds EKS  
+  - CPU/Connexions/Stockage RDS  
+  - Codes HTTP 2xx/4xx/5xx + latence ALB
 
 - **Alertes actives** :
-    - > 10 erreurs 5XX sur ALB (5 min)
-    - CPU RDS > 80% pendant 10 min
-
-## 🚀 Commandes & URLs utiles (extrait des outputs)
-
-```
-# Application (dev)
-http://<alb-dns-name>
-http://<alb-dns-name>/api
-
-# Jenkins
-http://<jenkins-public-ip>:8080
-
-# Jenkins (accès direct temporaire dev)
-http://<jenkins-public-ip>:8099
-
-# CloudFront images
-https://<distribution-id>.cloudfront.net
-
-# Mise à jour kubeconfig
-aws eks update-kubeconfig --name real-estate-dapp-eks-dev --region eu-west-3
-
-# Login ECR
-aws ecr get-login-password --region eu-west-3 | docker login --username AWS --password-stdin <account>.dkr.ecr.eu-west-3.amazonaws.com
-
-# Session SSM Jenkins (recommandé)
-aws ssm start-session --target <instance-id-jenkins>
-
-# Dashboard CloudWatch
-https://eu-west-3.console.aws.amazon.com/cloudwatch/home?region=eu-west-3#dashboards:name=real-estate-dapp-dev-dashboard
-```
+  - > 10 erreurs 5XX sur ALB (5 min)
+  - CPU RDS > 80% pendant 10 min
 
 ## 🚀 Pipeline DevOps
 
