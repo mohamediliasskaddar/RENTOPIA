@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blockchain-service
+  labels:
+    app: blockchain-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: blockchain-service
+  template:
+    metadata:
+      labels:
+        app: blockchain-service
+    spec:
+      containers:
+        - name: blockchain-service
+          image: mohamediliasskaddar/jee-project-blockchain-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8089
+          envFrom:
+            - configMapRef:
+                name: global-config
+            - secretRef:
+                name: global-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: blockchain-service
+spec:
+  type: ClusterIP
+  selector:
+    app: blockchain-service
+  ports:
+    - protocol: TCP
+      port: 8089
+      targetPort: 8089

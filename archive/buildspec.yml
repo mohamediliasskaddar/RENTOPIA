@@ -1,0 +1,44 @@
+version: 0.2
+
+env:
+  variables:
+    AWS_REGION: eu-west-3
+    AWS_ACCOUNT_ID: 870613971200
+    ECR_REGISTRY: 870613971200.dkr.ecr.eu-west-3.amazonaws.com
+    IMAGE_TAG: latest
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
+
+  build:
+    commands:
+      - echo Build started on `date`
+      - |
+        services=(
+          eureka-server
+          user-service
+          listing-service
+          booking-service
+          payment-service
+          messaging-service
+          notification-service
+          review-service
+          media-service
+          blockchain-service
+          ai-service
+          api-gateway
+          front-service
+        )
+
+        for svc in "${services[@]}"; do
+          echo "Building $svc"
+          docker build -t real-estate-dapp-$svc-dev ./$svc
+          docker tag real-estate-dapp-$svc-dev:$IMAGE_TAG $ECR_REGISTRY/real-estate-dapp-$svc-dev:$IMAGE_TAG
+          docker push $ECR_REGISTRY/real-estate-dapp-$svc-dev:$IMAGE_TAG
+        done
+  post_build:
+    commands:
+      - echo Build completed successfully

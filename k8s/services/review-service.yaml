@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: review-service
+  labels:
+    app: review-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: review-service
+  template:
+    metadata:
+      labels:
+        app: review-service
+    spec:
+      containers:
+        - name: review-service
+          image: mohamediliasskaddar/jee-project-review-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8087
+          envFrom:
+            - configMapRef:
+                name: global-config
+            - secretRef:
+                name: global-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: review-service
+spec:
+  type: ClusterIP
+  selector:
+    app: review-service
+  ports:
+    - protocol: TCP
+      port: 8087
+      targetPort: 8087

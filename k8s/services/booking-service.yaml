@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: booking-service
+  labels:
+    app: booking-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: booking-service
+  template:
+    metadata:
+      labels:
+        app: booking-service
+    spec:
+      containers:
+        - name: booking-service
+          image: mohamediliasskaddar/jee-project-booking-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8083
+          envFrom:
+            - configMapRef:
+                name: global-config
+            - secretRef:
+                name: global-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: booking-service
+spec:
+  type: ClusterIP
+  selector:
+    app: booking-service
+  ports:
+    - protocol: TCP
+      port: 8083
+      targetPort: 8083

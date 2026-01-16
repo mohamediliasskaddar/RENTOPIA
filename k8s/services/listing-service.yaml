@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: listing-service
+  labels:
+    app: listing-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: listing-service
+  template:
+    metadata:
+      labels:
+        app: listing-service
+    spec:
+      containers:
+        - name: listing-service
+          image: mohamediliasskaddar/jee-project-listing-service:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8082
+          envFrom:
+            - configMapRef:
+                name: global-config
+            - secretRef:
+                name: global-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: listing-service
+spec:
+  type: ClusterIP
+  selector:
+    app: listing-service
+  ports:
+    - protocol: TCP
+      port: 8082
+      targetPort: 8082
