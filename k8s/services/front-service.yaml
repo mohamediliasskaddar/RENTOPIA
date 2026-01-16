@@ -1,29 +1,30 @@
+#k8s/services/front-service.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ai-service
+  name: front-service
   labels:
-    app: ai-service
+    app: front-service
   annotations:
     prometheus.io/scrape: "true"
-    prometheus.io/port: "8090"
+    prometheus.io/port: "4200"
     prometheus.io/path: "/actuator/prometheus"
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ai-service
+      app: front-service
   template:
     metadata:
       labels:
-        app: ai-service
+        app: front-service
     spec:
       containers:
-        - name: ai-service
-          image: mohamediliasskaddar/jee-project-ai-service:latest
+        - name: front-service
+          image: mohamediliasskaddar/jee-project-front-service:latest
           imagePullPolicy: Always
           ports:
-            - containerPort: 8090
+            - containerPort: 4200
           envFrom:
             - configMapRef:
                 name: global-config
@@ -33,12 +34,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: ai-service
+  name: front-service
 spec:
-  type: ClusterIP
+  type: ClusterIP   # On laisse ClusterIP si tu passes par Ingress
   selector:
-    app: ai-service
+    app: front-service
   ports:
     - protocol: TCP
-      port: 8090
-      targetPort: 8090
+      port: 80        # Port interne vers Ingress
+      targetPort: 4200

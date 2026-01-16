@@ -4,6 +4,10 @@ metadata:
   name: blockchain-service
   labels:
     app: blockchain-service
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8089"
+    prometheus.io/path: "/actuator/prometheus"
 spec:
   replicas: 1
   selector:

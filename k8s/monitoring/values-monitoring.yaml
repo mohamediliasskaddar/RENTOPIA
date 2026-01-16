@@ -1,0 +1,18 @@
+# k8s/monitoring/values-monitoring.yaml
+namespaceOverride: monitoring
+
+prometheus:
+  prometheusSpec:
+    serviceMonitorSelectorNilUsesHelmValues: false
+    scrapeInterval: 15s
+
+grafana:
+  adminPassword: "admin123"  # ← CHANGE ÇA OBLIGATOIREMENT !
+  service:
+    type: LoadBalancer       # ou NodePort pour local/minikube
+
+defaultRules:
+  create: true
+
+alertmanager:
+  enabled: false           # désactive si tu n'en as pas besoin tout de suite

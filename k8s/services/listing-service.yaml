@@ -4,6 +4,10 @@ metadata:
   name: listing-service
   labels:
     app: listing-service
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8082"
+    prometheus.io/path: "/actuator/prometheus"
 spec:
   replicas: 1
   selector:

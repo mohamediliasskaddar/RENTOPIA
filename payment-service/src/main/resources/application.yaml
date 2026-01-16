@@ -112,8 +112,9 @@ blockchain:
   network: ${ETH_NETWORK:sepolia}
 
   infura:
-    project-id: ${INFURA_PROJECT_ID:50e3d616c7ae4bb4bb5d48d97ab6d5a8}
-    endpoint: ${ETH_RPC_URL:https://sepolia.infura.io/v3/${INFURA_PROJECT_ID}}
+    infura:
+      project-id: ${INFURA_PROJECT_ID:50e3d616c7ae4bb4bb5d48d97ab6d5a8}
+      endpoint: https://sepolia.infura.io/v3/${INFURA_PROJECT_ID}
 
     connection-timeout: 30000
     read-timeout: 60000
