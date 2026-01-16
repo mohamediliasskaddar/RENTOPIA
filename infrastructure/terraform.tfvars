@@ -1,0 +1,6 @@
+db_password = "db_password_dev_1234"
+db_username = "admin"
+aws_region   = "eu-west-3"
+project_name = "real-estate-dapp"
+environment  = "dev"
+vpc_cidr     = "10.0.0.0/16"
